@@ -1,0 +1,57 @@
+# MLflow Project Configuration
+# This file defines the MLflow project structure and entry points
+
+name: image_classification_pipeline
+
+# Docker environment (alternative to conda)
+docker_env:
+  image: ml-pipeline-mlflow
+
+# Conda environment (if not using Docker)
+conda_env: conda.yaml
+
+# Entry points for different pipeline stages
+entry_points:
+  # Main training entry point
+  main:
+    parameters:
+      data_path: {type: string, default: "data/processed"}
+      model_name: {type: string, default: "resnet18"}
+      num_epochs: {type: int, default: 20}
+      batch_size: {type: int, default: 32}
+      learning_rate: {type: float, default: 0.001}
+      optimizer: {type: string, default: "adam"}
+    command: "python src/training.py \
+              --data-path {data_path} \
+              --model-name {model_name} \
+              --num-epochs {num_epochs} \
+              --batch-size {batch_size} \
+              --learning-rate {learning_rate} \
+              --optimizer {optimizer}"
+
+  # Data preprocessing entry point
+  preprocess:
+    parameters:
+      raw_data_path: {type: string, default: "data/raw"}
+      output_path: {type: string, default: "data/processed"}
+    command: "python src/preprocessing.py \
+              --raw-data-path {raw_data_path} \
+              --output-path {output_path}"
+
+  # Model evaluation entry point
+  evaluate:
+    parameters:
+      model_path: {type: string}
+      test_data_path: {type: string, default: "data/processed/test.csv"}
+    command: "python src/evaluation.py \
+              --model-path {model_path} \
+              --test-data-path {test_data_path}"
+
+  # Hyperparameter tuning entry point
+  tune:
+    parameters:
+      data_path: {type: string, default: "data/processed"}
+      n_trials: {type: int, default: 10}
+    command: "python src/hyperparameter_tuning.py \
+              --data-path {data_path} \
+              --n-trials {n_trials}"

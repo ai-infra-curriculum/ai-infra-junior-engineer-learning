@@ -1,0 +1,459 @@
+# Kubernetes Ingress
+#
+# Ingress manages external HTTP(S) access to services in the cluster.
+# It provides load balancing, SSL termination, and name-based virtual hosting.
+#
+# Learning Objectives:
+# - Understand Ingress vs LoadBalancer Service
+# - Configure NGINX Ingress Controller
+# - Set up path-based and host-based routing
+# - Implement SSL/TLS termination (optional)
+# - Configure rate limiting and request buffering
+
+# ============================================================================
+# INGRESS RESOURCE
+# ============================================================================
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: model-api-ingress
+  namespace: ml-serving
+  labels:
+    app: model-api
+    component: ingress
+
+  # ========================================================================
+  # ANNOTATIONS (NGINX Ingress Controller specific)
+  # ========================================================================
+
+  # TODO: Configure annotations for NGINX Ingress behavior
+  # Annotations control how NGINX processes requests
+  annotations:
+    # TODO: Set ingress class to nginx
+    # Tells Kubernetes which Ingress Controller handles this Ingress
+    # kubernetes.io/ingress.class: "nginx"  # Deprecated in v1.18+
+    # Now use spec.ingressClassName instead (see below)
+
+    # TODO: Enable SSL redirect (HTTP → HTTPS)
+    # Uncomment when SSL/TLS is configured
+    # nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    # nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+
+    # TODO: Configure rate limiting
+    # Limit: 100 requests per second per IP
+    # nginx.ingress.kubernetes.io/limit-rps: "100"
+
+    # TODO: Configure request size limits
+    # Max request body size: 10MB (default is 1MB)
+    # Increase for model inference with large inputs
+    # nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+
+    # TODO: Configure timeouts
+    # Increase for long-running model inference
+    # nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
+    # nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+    # nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+
+    # TODO: Enable CORS (if serving browser-based clients)
+    # nginx.ingress.kubernetes.io/enable-cors: "true"
+    # nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+    # nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, OPTIONS"
+
+    # TODO: Configure load balancing algorithm
+    # Options: round_robin (default), least_conn, ip_hash
+    # nginx.ingress.kubernetes.io/load-balance: "round_robin"
+
+    # TODO: Add monitoring annotations
+    # nginx.ingress.kubernetes.io/enable-metrics: "true"
+
+    # Certificate Manager annotations (if using cert-manager)
+    # cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    # cert-manager.io/acme-challenge-type: "http01"
+
+    placeholder: delete-me  # TODO: Remove after adding annotations
+
+spec:
+  # ========================================================================
+  # INGRESS CLASS
+  # ========================================================================
+
+  # TODO: Set ingress class name to nginx
+  # Specifies which Ingress Controller handles this Ingress
+  # Replaces the deprecated kubernetes.io/ingress.class annotation
+  ingressClassName: ""  # TODO: Set to "nginx"
+
+  # ========================================================================
+  # TLS CONFIGURATION (Optional)
+  # ========================================================================
+
+  # TODO: Configure TLS/SSL (uncomment when ready)
+  # Requires:
+  # - TLS certificate (from cert-manager or manually created Secret)
+  # - DNS configured to point to Ingress IP
+
+  # tls:
+  # - hosts:
+  #   - model-api.example.com
+  #   # TODO: Set secret name containing TLS certificate
+  #   secretName: ""  # TODO: Set to "model-api-tls"
+
+  # Creating TLS Secret manually:
+  #   kubectl create secret tls model-api-tls \
+  #     --cert=path/to/cert.crt \
+  #     --key=path/to/cert.key \
+  #     -n ml-serving
+
+  # Using cert-manager (automatic certificate management):
+  #   Install cert-manager: https://cert-manager.io/docs/installation/
+  #   Create ClusterIssuer for Let's Encrypt
+  #   Add annotation: cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  #   cert-manager automatically creates and renews certificate
+
+  # ========================================================================
+  # ROUTING RULES
+  # ========================================================================
+
+  rules:
+  # TODO: Configure routing rule for your domain
+  - host: ""  # TODO: Set to "model-api.example.com" (or your domain)
+    # For local testing with Minikube, use: model-api.local
+    # Add to /etc/hosts: <minikube-ip> model-api.local
+
+    http:
+      paths:
+      # -------------------------------------------------------------------
+      # Path: /predict (Model inference endpoint)
+      # -------------------------------------------------------------------
+      - path: /predict
+        # TODO: Set pathType to Prefix
+        # Options:
+        # - Prefix: Matches path prefix (e.g., /predict matches /predict/*)
+        # - Exact: Exact path match only
+        # - ImplementationSpecific: Depends on Ingress Controller
+        pathType: ""  # TODO: Set to "Prefix"
+
+        backend:
+          service:
+            # TODO: Set service name to model-api-service
+            name: ""  # TODO: Set to "model-api-service"
+            port:
+              # TODO: Set port number to 80
+              number: 0  # TODO: Set to 80
+
+      # -------------------------------------------------------------------
+      # Path: /health (Health check endpoint)
+      # -------------------------------------------------------------------
+      - path: /health
+        pathType: ""  # TODO: Set to "Prefix"
+        backend:
+          service:
+            name: ""  # TODO: Set to "model-api-service"
+            port:
+              number: 0  # TODO: Set to 80
+
+      # -------------------------------------------------------------------
+      # Path: /metrics (Prometheus metrics endpoint)
+      # -------------------------------------------------------------------
+      - path: /metrics
+        pathType: ""  # TODO: Set to "Prefix"
+        backend:
+          service:
+            name: ""  # TODO: Set to "model-api-service"
+            port:
+              number: 0  # TODO: Set to 80
+
+      # -------------------------------------------------------------------
+      # Path: / (Root endpoint - API information)
+      # -------------------------------------------------------------------
+      - path: /
+        pathType: ""  # TODO: Set to "Prefix"
+        backend:
+          service:
+            name: ""  # TODO: Set to "model-api-service"
+            port:
+              number: 0  # TODO: Set to 80
+
+  # ========================================================================
+  # ADDITIONAL ROUTING RULES (Optional)
+  # ========================================================================
+
+  # Multiple hosts (virtual hosting):
+  # - host: "api.example.com"
+  #   http:
+  #     paths:
+  #     - path: /v1
+  #       pathType: Prefix
+  #       backend:
+  #         service:
+  #           name: model-api-v1
+  #           port:
+  #             number: 80
+  #
+  # - host: "api-staging.example.com"
+  #   http:
+  #     paths:
+  #     - path: /
+  #       pathType: Prefix
+  #       backend:
+  #         service:
+  #           name: model-api-staging
+  #           port:
+  #             number: 80
+
+---
+
+# ============================================================================
+# DEFAULT BACKEND (Optional)
+# ============================================================================
+
+# Default backend handles requests that don't match any rule
+# Useful for custom 404 pages or fallback service
+
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: default-backend
+#   namespace: ml-serving
+# spec:
+#   selector:
+#     app: default-backend
+#   ports:
+#   - port: 80
+#     targetPort: 8080
+
+---
+
+# ============================================================================
+# INGRESS INSTRUCTIONS
+# ============================================================================
+
+# Prerequisites:
+
+# 1. Install NGINX Ingress Controller
+#
+#    For Minikube:
+#      minikube addons enable ingress
+#
+#    For cloud clusters (Helm):
+#      helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+#      helm repo update
+#      helm install nginx-ingress ingress-nginx/ingress-nginx \
+#        --namespace ingress-nginx --create-namespace
+
+# 2. Verify Ingress Controller is running:
+#      kubectl get pods -n ingress-nginx
+#      kubectl get svc -n ingress-nginx
+
+# Apply Ingress:
+#   kubectl apply -f ingress.yaml -n ml-serving
+
+# Verify Ingress:
+#   kubectl get ingress -n ml-serving
+#   kubectl describe ingress model-api-ingress -n ml-serving
+
+# Get Ingress IP/hostname:
+#   kubectl get ingress model-api-ingress -n ml-serving
+#   # Look for ADDRESS column
+
+# ============================================================================
+# DNS CONFIGURATION
+# ============================================================================
+
+# For production (cloud):
+#   1. Get Ingress LoadBalancer IP:
+#      INGRESS_IP=$(kubectl get ingress model-api-ingress -n ml-serving \
+#        -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+#
+#   2. Create DNS A record:
+#      model-api.example.com → $INGRESS_IP
+#
+#   3. Wait for DNS propagation (can take 5-60 minutes)
+#
+#   4. Verify:
+#      nslookup model-api.example.com
+#      curl http://model-api.example.com/health
+
+# For local testing (Minikube):
+#   1. Get Minikube IP:
+#      minikube ip
+#
+#   2. Add to /etc/hosts:
+#      echo "$(minikube ip) model-api.local" | sudo tee -a /etc/hosts
+#
+#   3. Test:
+#      curl http://model-api.local/health
+
+# ============================================================================
+# TESTING INGRESS
+# ============================================================================
+
+# Test 1: Health check
+#   curl http://model-api.example.com/health
+#   # Expected: {"status": "healthy", ...}
+
+# Test 2: Prediction endpoint
+#   curl -X POST http://model-api.example.com/predict \
+#     -H "Content-Type: application/json" \
+#     -d '{"instances": [[1,2,3,4,5]]}'
+
+# Test 3: HTTPS (if TLS configured)
+#   curl https://model-api.example.com/health
+
+# Test 4: Rate limiting
+#   # Send rapid requests to trigger rate limit
+#   for i in {1..200}; do
+#     curl -s -o /dev/null -w "%{http_code}\n" http://model-api.example.com/health
+#   done
+#   # Should see some 429 (Too Many Requests) responses
+
+# Test 5: Check Ingress logs
+#   kubectl logs -n ingress-nginx deployment/nginx-ingress-controller
+
+# ============================================================================
+# INGRESS vs LOADBALANCER SERVICE
+# ============================================================================
+
+# LoadBalancer Service:
+#   Pros:
+#   - Simple to configure
+#   - Works at L4 (TCP/UDP)
+#   - No additional components needed
+#
+#   Cons:
+#   - One LoadBalancer per Service (expensive!)
+#   - No HTTP routing (path-based, host-based)
+#   - No SSL/TLS termination
+#   - No rate limiting or advanced features
+
+# Ingress:
+#   Pros:
+#   - One LoadBalancer for many services (cost effective)
+#   - HTTP routing (paths, hosts, headers)
+#   - SSL/TLS termination
+#   - Rate limiting, request buffering, etc.
+#   - Standard Kubernetes resource
+#
+#   Cons:
+#   - Requires Ingress Controller installation
+#   - More complex configuration
+#   - HTTP/HTTPS only (use LoadBalancer for TCP/UDP)
+
+# Recommendation:
+#   - Use Ingress for HTTP(S) services (most APIs)
+#   - Use LoadBalancer for non-HTTP protocols (databases, message queues)
+
+# ============================================================================
+# NGINX INGRESS FEATURES
+# ============================================================================
+
+# Rate Limiting:
+#   nginx.ingress.kubernetes.io/limit-rps: "100"           # Requests per second
+#   nginx.ingress.kubernetes.io/limit-connections: "10"    # Concurrent connections
+#   nginx.ingress.kubernetes.io/limit-rpm: "6000"          # Requests per minute
+
+# Authentication:
+#   nginx.ingress.kubernetes.io/auth-type: "basic"
+#   nginx.ingress.kubernetes.io/auth-secret: "basic-auth"
+#   nginx.ingress.kubernetes.io/auth-realm: "Authentication Required"
+
+# Redirect:
+#   nginx.ingress.kubernetes.io/permanent-redirect: "https://newdomain.com"
+
+# Rewrite:
+#   nginx.ingress.kubernetes.io/rewrite-target: /$2
+#   # With path: /api(/|$)(.*)
+#   # /api/predict → /predict
+
+# Custom Headers:
+#   nginx.ingress.kubernetes.io/configuration-snippet: |
+#     more_set_headers "X-Custom-Header: value";
+
+# Whitelisting:
+#   nginx.ingress.kubernetes.io/whitelist-source-range: "10.0.0.0/8,172.16.0.0/12"
+
+# ============================================================================
+# SSL/TLS with cert-manager
+# ============================================================================
+
+# Install cert-manager:
+#   kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.13.0/cert-manager.yaml
+
+# Create ClusterIssuer:
+#   apiVersion: cert-manager.io/v1
+#   kind: ClusterIssuer
+#   metadata:
+#     name: letsencrypt-prod
+#   spec:
+#     acme:
+#       server: https://acme-v02.api.letsencrypt.org/directory
+#       email: your-email@example.com
+#       privateKeySecretRef:
+#         name: letsencrypt-prod
+#       solvers:
+#       - http01:
+#           ingress:
+#             class: nginx
+
+# Add to Ingress annotations:
+#   cert-manager.io/cluster-issuer: "letsencrypt-prod"
+
+# cert-manager automatically:
+#   - Creates TLS Secret
+#   - Obtains certificate from Let's Encrypt
+#   - Renews certificate before expiry
+
+# ============================================================================
+# TROUBLESHOOTING
+# ============================================================================
+
+# Ingress shows no ADDRESS:
+#   - Check Ingress Controller is running
+#   kubectl get pods -n ingress-nginx
+#
+#   - Check Ingress Controller Service has external IP
+#   kubectl get svc -n ingress-nginx
+
+# 404 Not Found:
+#   - Verify Service name and port in Ingress match Service manifest
+#   kubectl get svc -n ml-serving
+#
+#   - Check Service endpoints are populated
+#   kubectl get endpoints model-api-service -n ml-serving
+#
+#   - Check Ingress rules
+#   kubectl describe ingress model-api-ingress -n ml-serving
+
+# 502 Bad Gateway:
+#   - Backend pods not ready
+#   kubectl get pods -n ml-serving
+#
+#   - Service selector doesn't match pods
+#   kubectl get svc model-api-service -n ml-serving -o yaml
+
+# TLS certificate issues:
+#   - Check Secret exists
+#   kubectl get secret model-api-tls -n ml-serving
+#
+#   - Check certificate validity
+#   kubectl describe secret model-api-tls -n ml-serving
+#
+#   - Check cert-manager logs (if using cert-manager)
+#   kubectl logs -n cert-manager deployment/cert-manager
+
+# Check Ingress Controller logs:
+#   kubectl logs -n ingress-nginx deployment/nginx-ingress-controller -f
+
+# ============================================================================
+# LEARNING CHECKPOINTS
+# ============================================================================
+
+# After completing this file, you should understand:
+# ✓ Purpose of Ingress (L7 load balancing)
+# ✓ Ingress vs LoadBalancer Service
+# ✓ Path-based and host-based routing
+# ✓ NGINX Ingress Controller annotations
+# ✓ SSL/TLS termination
+# ✓ Rate limiting and security features
+# ✓ DNS configuration for Ingress
+# ✓ cert-manager for automatic certificate management

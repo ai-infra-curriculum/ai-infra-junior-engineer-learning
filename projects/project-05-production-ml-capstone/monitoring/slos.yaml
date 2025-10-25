@@ -1,0 +1,307 @@
+# Service Level Objectives (SLOs) and Service Level Indicators (SLIs)
+# =====================================================================
+# This file defines the SLOs and SLIs for the ML API service.
+# SLOs are commitments to your users about service reliability.
+
+---
+# SLO Configuration for Prometheus/Sloth
+# This uses the Sloth SLO generator format
+apiVersion: sloth.slok.dev/v1
+kind: PrometheusServiceLevel
+metadata:
+  name: ml-api-slo
+  namespace: ml-system-production
+spec:
+  service: "ml-api"
+  labels:
+    owner: "ml-team"
+    tier: "production"
+
+  # TODO: Define SLOs
+  slos:
+    # ========================================================================
+    # SLO 1: AVAILABILITY / UPTIME
+    # ========================================================================
+    - name: "requests-availability"
+      description: "99.9% of requests should succeed (non-5xx responses)"
+
+      # Objective: 99.9% availability
+      # Error budget: 0.1% = 43 minutes of downtime per month
+      objective: 99.9
+
+      # SLI: Ratio of successful requests to total requests
+      sli:
+        events:
+          # TODO: Define error query (5xx responses)
+          errorQuery: |
+            sum(rate(http_requests_total{job="ml-api",status=~"5.."}[{{.window}}]))
+
+          # TODO: Define total query (all requests)
+          totalQuery: |
+            sum(rate(http_requests_total{job="ml-api"}[{{.window}}]))
+
+      # Alert windows
+      alerting:
+        name: "ML API High Error Rate"
+        labels:
+          category: "availability"
+        annotations:
+          summary: "ML API is experiencing high error rates"
+        # Page when burning through error budget quickly
+        pageAlert:
+          labels:
+            severity: "critical"
+        # Ticket when burning through error budget slowly
+        ticketAlert:
+          labels:
+            severity: "warning"
+
+    # ========================================================================
+    # SLO 2: LATENCY
+    # ========================================================================
+    - name: "requests-latency-p95"
+      description: "95% of requests should complete within 500ms"
+
+      # Objective: P95 latency < 500ms
+      objective: 95
+
+      # SLI: Percentage of requests faster than 500ms
+      sli:
+        events:
+          # TODO: Define fast requests query (< 500ms)
+          errorQuery: |
+            sum(rate(http_request_duration_seconds_bucket{job="ml-api",le="0.5"}[{{.window}}]))
+
+          # TODO: Define total requests query
+          totalQuery: |
+            sum(rate(http_request_duration_seconds_count{job="ml-api"}[{{.window}}]))
+
+      alerting:
+        name: "ML API High Latency"
+        labels:
+          category: "latency"
+        annotations:
+          summary: "ML API latency is above target"
+        pageAlert:
+          labels:
+            severity: "critical"
+
+    # ========================================================================
+    # SLO 3: PREDICTION ACCURACY (ML-specific SLO)
+    # ========================================================================
+    - name: "prediction-quality"
+      description: "Model predictions should maintain >85% accuracy"
+
+      # Objective: 85% accuracy
+      objective: 85
+
+      # SLI: Model accuracy metric
+      # NOTE: This requires custom metrics from your ML system
+      sli:
+        events:
+          # TODO: Define accurate predictions query
+          errorQuery: |
+            sum(rate(model_predictions_total{job="ml-api",accurate="true"}[{{.window}}]))
+
+          # TODO: Define total predictions query
+          totalQuery: |
+            sum(rate(model_predictions_total{job="ml-api"}[{{.window}}]))
+
+      alerting:
+        name: "Model Accuracy Degradation"
+        labels:
+          category: "ml-quality"
+        annotations:
+          summary: "Model accuracy has dropped below SLO"
+        pageAlert:
+          labels:
+            severity: "warning"
+
+---
+# Manual SLO Tracking with PrometheusRule
+# If you're not using Sloth, you can define alerts manually
+
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: ml-api-slo-alerts
+  namespace: ml-system-production
+spec:
+  groups:
+    - name: ml-api-slos
+      interval: 30s
+      rules:
+        # TODO: Availability SLO alert
+        - alert: MLAPIHighErrorRate
+          expr: |
+            (
+              sum(rate(http_requests_total{job="ml-api",status=~"5.."}[5m]))
+              /
+              sum(rate(http_requests_total{job="ml-api"}[5m]))
+            ) > 0.01
+          for: 5m
+          labels:
+            severity: critical
+            slo: availability
+          annotations:
+            summary: "ML API error rate is above 1%"
+            description: "Error rate is {{ $value | humanizePercentage }}, exceeding 1% threshold (SLO: 99.9%)"
+
+        # TODO: Latency SLO alert
+        - alert: MLAPIHighLatency
+          expr: |
+            histogram_quantile(0.95,
+              sum(rate(http_request_duration_seconds_bucket{job="ml-api"}[5m])) by (le)
+            ) > 0.5
+          for: 5m
+          labels:
+            severity: warning
+            slo: latency
+          annotations:
+            summary: "ML API P95 latency is above 500ms"
+            description: "P95 latency is {{ $value | humanizeDuration }}, exceeding 500ms target"
+
+        # TODO: Error budget burn rate alert
+        - alert: ErrorBudgetBurnRateHigh
+          expr: |
+            (
+              1 - (
+                sum(rate(http_requests_total{job="ml-api",status!~"5.."}[1h]))
+                /
+                sum(rate(http_requests_total{job="ml-api"}[1h]))
+              )
+            ) > (0.001 * 14.4)  # Burning error budget 14.4x faster than sustainable
+          for: 5m
+          labels:
+            severity: critical
+            slo: error-budget
+          annotations:
+            summary: "Error budget is being consumed too quickly"
+            description: "At current rate, monthly error budget will be exhausted in {{ $value | humanizeDuration }}"
+
+        # TODO: Model quality SLO alert
+        - alert: ModelAccuracyDegraded
+          expr: |
+            (
+              sum(rate(model_predictions_correct_total{job="ml-api"}[1h]))
+              /
+              sum(rate(model_predictions_total{job="ml-api"}[1h]))
+            ) < 0.85
+          for: 30m
+          labels:
+            severity: warning
+            slo: ml-quality
+          annotations:
+            summary: "Model accuracy has degraded"
+            description: "Model accuracy is {{ $value | humanizePercentage }}, below 85% SLO"
+
+---
+# SLO Dashboard ConfigMap for Grafana
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ml-api-slo-dashboard
+  namespace: ml-system-production
+  labels:
+    grafana_dashboard: "1"
+data:
+  ml-api-slo-dashboard.json: |
+    {
+      "dashboard": {
+        "title": "ML API SLO Dashboard",
+        "panels": [
+          {
+            "title": "Availability SLO",
+            "targets": [
+              {
+                "expr": "TODO: Add Prometheus query for availability SLI"
+              }
+            ]
+          },
+          {
+            "title": "Error Budget Remaining",
+            "targets": [
+              {
+                "expr": "TODO: Add error budget calculation"
+              }
+            ]
+          }
+        ]
+      }
+    }
+
+# ==============================================================================
+# SLO IMPLEMENTATION GUIDE
+# ==============================================================================
+
+# TODO: Define your SLOs based on user expectations and business requirements
+#
+# Common SLOs for ML APIs:
+#
+# 1. AVAILABILITY:
+#    - Target: 99.9% (43 min downtime/month)
+#    - Measurement: (successful requests) / (total requests)
+#    - Success criteria: HTTP status 2xx, 3xx, 4xx
+#    - Failure criteria: HTTP status 5xx, timeouts
+#
+# 2. LATENCY:
+#    - Target: 95% of requests < 500ms
+#    - Measurement: P95 of request duration
+#    - Consider separate SLOs for different endpoints:
+#      - /predict: P95 < 500ms
+#      - /health: P95 < 50ms
+#
+# 3. THROUGHPUT:
+#    - Target: Support 1000 req/sec
+#    - Measurement: Request rate without degradation
+#
+# 4. DATA FRESHNESS (ML-specific):
+#    - Target: Models updated within 7 days of training
+#    - Measurement: Time since last model deployment
+#
+# 5. PREDICTION QUALITY (ML-specific):
+#    - Target: Model accuracy > 85%
+#    - Measurement: Accuracy on validation set or A/B test results
+#
+# TODO: Calculate error budget:
+#
+# Error budget = (1 - SLO) × time period
+#
+# For 99.9% monthly SLO:
+# Error budget = (1 - 0.999) × 30 days = 0.001 × 43200 minutes = 43.2 minutes
+#
+# TODO: Monitor error budget consumption:
+#
+# - Track error budget burn rate
+# - Alert when burning too fast
+# - Slow down releases if budget is depleted
+# - Use error budget to balance innovation vs stability
+#
+# TODO: Set up burn rate alerts:
+#
+# Multiwindow multi-burn-rate alerts (Google SRE recommendation):
+#
+# - Fast burn (1 hour): Alert if burning > 14.4x sustainable rate
+# - Slow burn (6 hours): Alert if burning > 6x sustainable rate
+#
+# TODO: Create SLO reports:
+#
+# - Weekly SLO review
+# - Monthly SLO compliance report
+# - Quarterly SLO retrospective
+# - Adjust SLOs based on user feedback and business needs
+#
+# TODO: SLO best practices:
+#
+# 1. Start with achievable SLOs (e.g., 99% instead of 99.99%)
+# 2. Base SLOs on user experience, not internal metrics
+# 3. Have separate SLOs for different user journeys
+# 4. Review and adjust SLOs quarterly
+# 5. Use error budget to make risk decisions
+# 6. Don't over-achieve SLOs (slows down innovation)
+# 7. Document SLO rationale and measurement
+#
+# Resources:
+# - Google SRE Book: https://sre.google/sre-book/service-level-objectives/
+# - Sloth SLO generator: https://github.com/slok/sloth
+# - SLO templates: https://github.com/google/slo-generator

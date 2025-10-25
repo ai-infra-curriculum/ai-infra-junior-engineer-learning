@@ -1,0 +1,538 @@
+# Prometheus Alert Rules
+#
+# This file defines alert rules that Prometheus evaluates periodically.
+# When conditions are met, alerts are sent to Alertmanager for routing.
+#
+# Learning Objectives:
+# - Write PromQL queries for alerting
+# - Understand alert rule syntax (expr, for, labels, annotations)
+# - Set appropriate alert thresholds
+# - Design actionable alerts
+#
+# References:
+# - https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/
+# - https://prometheus.io/docs/practices/alerting/
+
+# =============================================================================
+# Alert Rule Syntax
+# =============================================================================
+
+# Basic structure:
+# groups:
+#   - name: <group_name>
+#     interval: <evaluation_interval>
+#     rules:
+#       - alert: <alert_name>
+#         expr: <promql_expression>
+#         for: <duration>
+#         labels:
+#           severity: <critical|warning|info>
+#         annotations:
+#           summary: "<short_description>"
+#           description: "<detailed_description>"
+#           runbook_url: "<link_to_runbook>"
+
+
+# =============================================================================
+# Infrastructure Alerts
+# =============================================================================
+
+groups:
+  - name: infrastructure_alerts
+    interval: 30s  # Evaluate every 30 seconds
+    rules:
+
+      # -----------------------------------------------------------------------
+      # High CPU Usage Alert
+      # -----------------------------------------------------------------------
+
+      # TODO: Create alert for high CPU usage
+      # Trigger when: CPU usage > 80% for 5 minutes
+      #
+      # - alert: HighCPUUsage
+      #   expr: |
+      #     100 - (avg by (instance) (
+      #       rate(node_cpu_seconds_total{mode="idle"}[5m])
+      #     ) * 100) > 80
+      #   for: 5m
+      #   labels:
+      #     severity: warning
+      #     component: infrastructure
+      #   annotations:
+      #     summary: "High CPU usage on {{ $labels.instance }}"
+      #     description: |
+      #       CPU usage is {{ $value | humanizePercentage }} on {{ $labels.instance }}.
+      #       Current threshold: 80%
+      #       Duration: 5 minutes
+      #     runbook_url: "https://runbooks.example.com/infrastructure/high-cpu"
+      #
+      # PromQL Explanation:
+      # - node_cpu_seconds_total{mode="idle"}: Idle CPU time
+      # - rate()[5m]: Calculate per-second rate over 5 minutes
+      # - avg by (instance): Average across all CPU cores
+      # - 100 - (... * 100): Convert to CPU usage percentage
+      # - > 80: Alert if above 80%
+
+
+      # -----------------------------------------------------------------------
+      # High Memory Usage Alert
+      # -----------------------------------------------------------------------
+
+      # TODO: Create alert for high memory usage
+      # Trigger when: Memory usage > 85% for 5 minutes
+      #
+      # - alert: HighMemoryUsage
+      #   expr: |
+      #     (1 - (
+      #       node_memory_MemAvailable_bytes /
+      #       node_memory_MemTotal_bytes
+      #     )) * 100 > 85
+      #   for: 5m
+      #   labels:
+      #     severity: warning
+      #     component: infrastructure
+      #   annotations:
+      #     summary: "High memory usage on {{ $labels.instance }}"
+      #     description: |
+      #       Memory usage is {{ $value | humanizePercentage }}.
+      #       Available: {{ query "node_memory_MemAvailable_bytes" | first | value | humanizeBytes }}
+      #       Total: {{ query "node_memory_MemTotal_bytes" | first | value | humanizeBytes }}
+
+
+      # -----------------------------------------------------------------------
+      # Low Disk Space Alert
+      # -----------------------------------------------------------------------
+
+      # TODO: Create critical alert for low disk space
+      # Trigger when: Disk space < 15% free
+      #
+      # - alert: LowDiskSpace
+      #   expr: |
+      #     (node_filesystem_avail_bytes{mountpoint="/"} /
+      #      node_filesystem_size_bytes{mountpoint="/"}) * 100 < 15
+      #   for: 5m
+      #   labels:
+      #     severity: critical
+      #     component: infrastructure
+      #   annotations:
+      #     summary: "Low disk space on {{ $labels.instance }}"
+      #     description: |
+      #       Disk space is {{ $value | humanizePercentage }} free on {{ $labels.mountpoint }}.
+      #       Available: {{ query "node_filesystem_avail_bytes{mountpoint='/'}" | first | value | humanizeBytes }}
+      #       Total: {{ query "node_filesystem_size_bytes{mountpoint='/'}" | first | value | humanizeBytes }}
+      #       Action: Clean up logs or expand storage immediately.
+
+
+      # -----------------------------------------------------------------------
+      # Service Down Alert
+      # -----------------------------------------------------------------------
+
+      # TODO: Create critical alert when service is unreachable
+      # Trigger when: Target is down for 2 minutes
+      #
+      # - alert: ServiceDown
+      #   expr: up == 0
+      #   for: 2m
+      #   labels:
+      #     severity: critical
+      #     component: infrastructure
+      #   annotations:
+      #     summary: "Service {{ $labels.job }} is down"
+      #     description: |
+      #       {{ $labels.job }} on {{ $labels.instance }} has been unreachable for more than 2 minutes.
+      #       This may indicate:
+      #       - Service crash
+      #       - Network issue
+      #       - Container/pod failure
+      #       Action: Check service logs and restart if necessary.
+
+
+# =============================================================================
+# Application Alerts
+# =============================================================================
+
+  - name: application_alerts
+    interval: 30s
+    rules:
+
+      # -----------------------------------------------------------------------
+      # High Error Rate Alert
+      # -----------------------------------------------------------------------
+
+      # TODO: Create critical alert for high error rate
+      # Trigger when: 5xx error rate > 5% for 5 minutes
+      #
+      # - alert: HighErrorRate
+      #   expr: |
+      #     (
+      #       rate(http_requests_total{status=~"5.."}[5m]) /
+      #       rate(http_requests_total[5m])
+      #     ) * 100 > 5
+      #   for: 5m
+      #   labels:
+      #     severity: critical
+      #     component: application
+      #   annotations:
+      #     summary: "High error rate detected"
+      #     description: |
+      #       Error rate is {{ $value | humanizePercentage }}.
+      #       Errors per second: {{ query "rate(http_requests_total{status=~\"5..\"}[5m])" | first | value | humanize }}
+      #       Total requests per second: {{ query "rate(http_requests_total[5m])" | first | value | humanize }}
+      #
+      # PromQL Explanation:
+      # - http_requests_total{status=~"5.."}: Count of 5xx errors
+      # - status=~"5..": Regex matching 500-599
+      # - rate()[5m]: Requests per second over 5 minutes
+      # - Division gives error ratio, *100 for percentage
+
+
+      # -----------------------------------------------------------------------
+      # High Latency Alert
+      # -----------------------------------------------------------------------
+
+      # TODO: Create warning alert for high latency
+      # Trigger when: P95 latency > 1 second for 5 minutes
+      #
+      # - alert: HighLatency
+      #   expr: |
+      #     histogram_quantile(0.95,
+      #       rate(http_request_duration_seconds_bucket[5m])
+      #     ) > 1
+      #   for: 5m
+      #   labels:
+      #     severity: warning
+      #     component: application
+      #   annotations:
+      #     summary: "High P95 latency detected"
+      #     description: |
+      #       P95 latency is {{ $value | humanizeDuration }}.
+      #       This means 95% of requests complete in less than {{ $value }}s,
+      #       but 5% are slower.
+      #
+      # histogram_quantile Explanation:
+      # - 0.95: 95th percentile
+      # - Requires _bucket metric from Histogram
+      # - Returns value where 95% of observations are below
+
+
+      # -----------------------------------------------------------------------
+      # Low Throughput Alert
+      # -----------------------------------------------------------------------
+
+      # TODO: Create info alert for abnormally low traffic
+      # Trigger when: Request rate < 1 req/s for 10 minutes
+      #
+      # - alert: LowThroughput
+      #   expr: |
+      #     rate(http_requests_total[5m]) < 1
+      #   for: 10m
+      #   labels:
+      #     severity: info
+      #     component: application
+      #   annotations:
+      #     summary: "Low request throughput"
+      #     description: |
+      #       Request rate is {{ $value | humanize }} requests/second.
+      #       This may be expected (low traffic period) or indicate an issue
+      #       with load balancer or client connectivity.
+
+
+      # -----------------------------------------------------------------------
+      # High Response Time (P99)
+      # -----------------------------------------------------------------------
+
+      # TODO: Create warning for very slow requests
+      # Trigger when: P99 latency > 5 seconds
+      #
+      # - alert: VeryHighP99Latency
+      #   expr: |
+      #     histogram_quantile(0.99,
+      #       rate(http_request_duration_seconds_bucket[5m])
+      #     ) > 5
+      #   for: 5m
+      #   labels:
+      #     severity: warning
+      #     component: application
+      #   annotations:
+      #     summary: "Very high P99 latency ({{ $value }}s)"
+      #     description: |
+      #       1% of requests are taking more than {{ $value | humanizeDuration }}.
+      #       Check for:
+      #       - Slow database queries
+      #       - Timeouts waiting for external services
+      #       - Resource contention (CPU, memory)
+
+
+# =============================================================================
+# ML Model Alerts
+# =============================================================================
+
+  - name: ml_model_alerts
+    interval: 1m
+    rules:
+
+      # -----------------------------------------------------------------------
+      # Model Accuracy Drop Alert
+      # -----------------------------------------------------------------------
+
+      # TODO: Create critical alert for model accuracy degradation
+      # Trigger when: Accuracy < 85% for 10 minutes
+      #
+      # - alert: ModelAccuracyDrop
+      #   expr: |
+      #     model_accuracy < 0.85
+      #   for: 10m
+      #   labels:
+      #     severity: critical
+      #     component: ml-model
+      #   annotations:
+      #     summary: "Model accuracy has dropped below threshold"
+      #     description: |
+      #       Model {{ $labels.model_name }} accuracy is {{ $value | humanizePercentage }}.
+      #       Baseline: 90%
+      #       Current: {{ $value | humanizePercentage }}
+      #
+      #       Possible causes:
+      #       - Data drift
+      #       - Model degradation over time
+      #       - Bad model deployment
+      #       - Data quality issues
+      #
+      #       Action: Review data drift metrics, consider retraining.
+
+
+      # -----------------------------------------------------------------------
+      # Data Drift Detected Alert
+      # -----------------------------------------------------------------------
+
+      # TODO: Create warning alert for data drift
+      # Trigger when: Drift score > 0.5 for 5 minutes
+      #
+      # - alert: DataDriftDetected
+      #   expr: |
+      #     data_drift_score > 0.5
+      #   for: 5m
+      #   labels:
+      #     severity: warning
+      #     component: ml-model
+      #   annotations:
+      #     summary: "Data drift detected in {{ $labels.feature_name }}"
+      #     description: |
+      #       Distribution shift detected in feature: {{ $labels.feature_name }}
+      #       Drift score: {{ $value }}
+      #       Threshold: 0.5
+      #
+      #       This indicates input data distribution has changed significantly
+      #       compared to training data. Model performance may degrade.
+      #
+      #       Action:
+      #       1. Analyze distribution changes
+      #       2. Verify data pipeline
+      #       3. Consider model retraining with recent data
+
+
+      # -----------------------------------------------------------------------
+      # High Inference Latency Alert
+      # -----------------------------------------------------------------------
+
+      # TODO: Create warning for slow model inference
+      # Trigger when: P99 inference time > 500ms for 5 minutes
+      #
+      # - alert: HighInferenceLatency
+      #   expr: |
+      #     histogram_quantile(0.99,
+      #       rate(model_inference_duration_seconds_bucket[5m])
+      #     ) > 0.5
+      #   for: 5m
+      #   labels:
+      #     severity: warning
+      #     component: ml-model
+      #   annotations:
+      #     summary: "High model inference latency"
+      #     description: |
+      #       P99 inference latency is {{ $value | humanizeDuration }}.
+      #       Target: < 500ms
+      #       Current: {{ $value }}s
+      #
+      #       Possible causes:
+      #       - GPU memory pressure
+      #       - CPU bottleneck
+      #       - Large batch sizes
+      #       - Model complexity
+      #
+      #       Action: Profile inference, optimize model, check GPU utilization.
+
+
+      # -----------------------------------------------------------------------
+      # Low Prediction Confidence Alert
+      # -----------------------------------------------------------------------
+
+      # TODO: Create warning for low model confidence
+      # Trigger when: Average confidence < 70% for 10 minutes
+      #
+      # - alert: LowPredictionConfidence
+      #   expr: |
+      #     avg_over_time(
+      #       avg(model_prediction_confidence)[10m:]
+      #     ) < 0.7
+      #   for: 10m
+      #   labels:
+      #     severity: warning
+      #     component: ml-model
+      #   annotations:
+      #     summary: "Low average prediction confidence"
+      #     description: |
+      #       Average prediction confidence is {{ $value | humanizePercentage }}.
+      #
+      #       Low confidence may indicate:
+      #       - Out-of-distribution inputs
+      #       - Model uncertainty
+      #       - Data quality issues
+      #
+      #       Action: Review recent predictions, check input data quality.
+
+
+      # -----------------------------------------------------------------------
+      # Missing Features Alert
+      # -----------------------------------------------------------------------
+
+      # TODO: Create alert for data quality issues
+      # Trigger when: > 10 requests/min with missing features
+      #
+      # - alert: HighMissingFeatureRate
+      #   expr: |
+      #     rate(missing_features_total[5m]) > 0.167
+      #   for: 5m
+      #   labels:
+      #     severity: warning
+      #     component: ml-model
+      #   annotations:
+      #     summary: "High rate of missing features in {{ $labels.feature_name }}"
+      #     description: |
+      #       Feature {{ $labels.feature_name }} is missing in {{ $value | humanize }} requests/second.
+      #
+      #       This indicates a data pipeline or client integration issue.
+      #
+      #       Action: Check data pipeline, review client integration.
+      #
+      # Note: 0.167 = 10 missing features per minute / 60 seconds
+
+
+# =============================================================================
+# Business/SLO Alerts
+# =============================================================================
+
+  - name: slo_alerts
+    interval: 1m
+    rules:
+
+      # TODO: Create SLO burn rate alert
+      # Alert when SLO error budget is burning too fast
+      #
+      # - alert: HighSLOBurnRate
+      #   expr: |
+      #     (
+      #       1 - (
+      #         sum(rate(http_requests_total{status=~"2..|3.."}[1h])) /
+      #         sum(rate(http_requests_total[1h]))
+      #       )
+      #     ) > 0.001
+      #   for: 5m
+      #   labels:
+      #     severity: warning
+      #     component: slo
+      #   annotations:
+      #     summary: "SLO error budget burning too fast"
+      #     description: |
+      #       Current error rate: {{ $value | humanizePercentage }}
+      #       SLO target: 99.9% success rate
+      #       Monthly error budget: 0.1% (43.2 minutes downtime)
+      #
+      #       At current rate, error budget will be exhausted in:
+      #       {{ query "...[calculate time]..." }}
+
+
+# =============================================================================
+# Alert Best Practices
+# =============================================================================
+
+# 1. **Actionable Alerts**
+#    - Every alert should require human action
+#    - Include clear description of what's wrong
+#    - Provide next steps in annotations
+#
+# 2. **Severity Levels**
+#    - critical: Immediate action required (pages on-call)
+#    - warning: Investigate within business hours
+#    - info: Informational, no action needed
+#
+# 3. **Alert Fatigue Prevention**
+#    - Use 'for' clause to avoid flapping
+#    - Set appropriate thresholds
+#    - Group related alerts
+#    - Tune based on actual system behavior
+#
+# 4. **Runbook Links**
+#    - Always include runbook_url in annotations
+#    - Runbooks should have:
+#      - Quick diagnostic steps
+#      - Common resolutions
+#      - Escalation procedures
+#
+# 5. **Testing Alerts**
+#    - Test each alert before production
+#    - Verify notifications reach correct channels
+#    - Ensure descriptions are clear
+#    - Check false positive/negative rate
+
+
+# =============================================================================
+# Testing Your Alerts
+# =============================================================================
+
+# Method 1: Manual Testing
+# - Trigger condition artificially
+# - Example: For CPU alert, run: stress-ng --cpu 8 --timeout 60s
+# - Check alert fires in Prometheus UI: http://localhost:9090/alerts
+
+# Method 2: PromQL Testing
+# - Test your expressions in Prometheus graph UI
+# - Example: 100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)
+# - Verify results make sense
+
+# Method 3: Alertmanager Testing
+# - Check alert routing in Alertmanager: http://localhost:9093
+# - Verify correct receivers triggered
+# - Check notification delivery (email, Slack, etc.)
+
+
+# =============================================================================
+# Common PromQL Patterns
+# =============================================================================
+
+# Rate of increase (for Counters):
+# rate(metric_total[5m])
+
+# Percentage calculation:
+# (metric_a / metric_b) * 100
+
+# Quantiles (P50, P95, P99):
+# histogram_quantile(0.95, rate(metric_bucket[5m]))
+
+# Aggregation by label:
+# sum by (label) (metric)
+# avg by (label) (metric)
+# max by (label) (metric)
+
+# Boolean operators:
+# metric > threshold
+# metric < threshold
+# metric == value
+# metric != value
+
+# Combining conditions:
+# metric_a > 10 and metric_b < 5
+# metric_a > 10 or metric_b > 5
+
+# Absent metrics (alert if metric stops):
+# absent(metric) == 1

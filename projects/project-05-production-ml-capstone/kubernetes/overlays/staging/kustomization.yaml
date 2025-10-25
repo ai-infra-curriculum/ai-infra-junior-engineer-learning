@@ -1,0 +1,211 @@
+# Kustomize Overlay - Staging Environment
+# ========================================
+# This overlay customizes the base configuration for staging environment.
+# Staging mirrors production but uses separate infrastructure for testing.
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# TODO: Reference base configuration
+bases:
+  - ../../base
+
+# TODO: Add environment-specific labels
+commonLabels:
+  environment: staging
+
+# TODO: Override namespace
+namespace: ml-system-staging
+
+# TODO: Patch resources for staging
+patchesStrategicMerge:
+  # TODO: Add staging-specific patches
+  # - replica-count-patch.yaml
+  # - ingress-patch.yaml
+  # - tls-patch.yaml
+
+# TODO: Set replica count for staging
+replicas:
+  # - name: ml-api-deployment
+  #   count: 3  # Minimum HA configuration
+
+# TODO: Override images with staging tags
+images:
+  # - name: ml-api
+  #   newName: ghcr.io/your-org/ml-api
+  #   newTag: staging-${GIT_SHA}
+
+# TODO: Override ConfigMap values for staging
+configMapGenerator:
+  - name: ml-model-config
+    behavior: merge
+    literals:
+      # TODO: Add staging-specific configuration
+      # - MODEL_NAME=image-classifier
+      # - MODEL_VERSION=staging
+      # - MLFLOW_TRACKING_URI=https://mlflow-staging.example.com
+      # - LOG_LEVEL=INFO
+      # - ENVIRONMENT=staging
+      # - METRICS_ENABLED=true
+      # - TRACING_ENABLED=true
+
+# TODO: Use sealed secrets or external secrets for staging
+# DO NOT use secretGenerator for production-like environments
+# secretGenerator:
+#   - name: api-keys
+#     # Use SealedSecret or HashiCorp Vault instead
+
+# TODO: Add staging-specific resources
+resources:
+  # TODO: Add additional resources for staging
+  # - ingress.yaml
+  # - certificate.yaml (cert-manager)
+  # - sealed-secret.yaml
+
+# ==============================================================================
+# STAGING ENVIRONMENT CHARACTERISTICS
+# ==============================================================================
+
+# Staging should closely mirror production to catch issues before prod deployment:
+#
+# 1. High Availability:
+#    - Minimum 3 replicas
+#    - HPA enabled (3-10 replicas)
+#    - Pod Disruption Budget
+#    - Multi-node deployment
+#
+# 2. Production-like Configuration:
+#    - Same resource limits as production (or slightly lower)
+#    - Same environment variables (except endpoints)
+#    - Same security policies
+#
+# 3. TLS Enabled:
+#    - HTTPS with valid certificates (Let's Encrypt staging)
+#    - cert-manager for automatic certificate management
+#    - Domain: staging.example.com or similar
+#
+# 4. Monitoring:
+#    - Full Prometheus/Grafana stack
+#    - Alertmanager (test alerts, not paging)
+#    - ELK stack for logs
+#    - All metrics enabled
+#
+# 5. Staging-Specific Services:
+#    - Separate MLflow instance
+#    - Separate database (PostgreSQL)
+#    - Separate S3/MinIO bucket
+#    - Anonymized production data or synthetic data
+#
+# 6. Automated Deployment:
+#    - Auto-deploy on merge to develop branch
+#    - Run integration tests after deployment
+#    - Alert team on deployment status
+#
+# 7. Testing Ground:
+#    - Test new features before production
+#    - Load testing
+#    - Chaos engineering (optional)
+#    - Security scanning
+#
+# ==============================================================================
+# STUDENT IMPLEMENTATION
+# ==============================================================================
+
+# TODO: Create the following patch files:
+#
+# 1. replica-count-patch.yaml:
+#    apiVersion: apps/v1
+#    kind: Deployment
+#    metadata:
+#      name: ml-api-deployment
+#    spec:
+#      replicas: 3
+#
+# 2. ingress-patch.yaml:
+#    apiVersion: networking.k8s.io/v1
+#    kind: Ingress
+#    metadata:
+#      name: ml-api-ingress
+#      annotations:
+#        cert-manager.io/cluster-issuer: letsencrypt-staging
+#    spec:
+#      ingressClassName: nginx
+#      rules:
+#        - host: staging.example.com
+#          http:
+#            paths:
+#              - path: /
+#                pathType: Prefix
+#                backend:
+#                  service:
+#                    name: ml-api
+#                    port:
+#                      number: 80
+#      tls:
+#        - hosts:
+#            - staging.example.com
+#          secretName: staging-tls
+#
+# 3. Create additional resource files:
+#
+#    a) certificate.yaml:
+#       - cert-manager Certificate resource
+#       - Request certificate for staging.example.com
+#
+#    b) sealed-secret.yaml:
+#       - Use kubeseal to encrypt secrets
+#       - Safe to commit encrypted secrets to Git
+#
+# TODO: Set up external dependencies:
+#
+# 1. Domain Configuration:
+#    - Create DNS A record for staging.example.com
+#    - Point to LoadBalancer IP
+#
+# 2. cert-manager Installation:
+#    helm install cert-manager jetstack/cert-manager \
+#      --namespace cert-manager \
+#      --create-namespace \
+#      --set installCRDs=true
+#
+# 3. NGINX Ingress Controller:
+#    helm install ingress-nginx ingress-nginx/ingress-nginx \
+#      --namespace ingress-nginx \
+#      --create-namespace
+#
+# 4. Sealed Secrets Controller:
+#    kubectl apply -f https://github.com/bitnami-labs/sealed-secrets/releases/download/v0.24.0/controller.yaml
+#
+# TODO: Test staging deployment:
+#
+# 1. Preview generated manifests:
+#    kubectl kustomize kubernetes/overlays/staging/
+#
+# 2. Apply to cluster:
+#    kubectl apply -k kubernetes/overlays/staging/
+#
+# 3. Verify deployment:
+#    kubectl get all -n ml-system-staging
+#    kubectl get ingress -n ml-system-staging
+#    kubectl get certificate -n ml-system-staging
+#
+# 4. Wait for certificate:
+#    kubectl wait --for=condition=Ready certificate/staging-tls -n ml-system-staging --timeout=5m
+#
+# 5. Test endpoint:
+#    curl https://staging.example.com/health
+#    curl -H "X-API-Key: your-staging-key" https://staging.example.com/info
+#
+# 6. Check logs:
+#    kubectl logs -n ml-system-staging -l app=ml-api --tail=100 -f
+#
+# 7. Monitor metrics:
+#    kubectl port-forward -n ml-system-staging svc/prometheus 9090:9090
+#    # Open http://localhost:9090
+#
+# TODO: Integration with CI/CD:
+#
+# This staging overlay is deployed automatically by the CD pipeline
+# when code is merged to the develop branch.
+#
+# See: cicd/.github/workflows/cd.yml (deploy-staging job)

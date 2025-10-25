@@ -1,0 +1,470 @@
+name: CI Pipeline
+
+# TODO: Configure trigger conditions
+# This workflow should run on:
+# - Every push to main and develop branches
+# - Every pull request targeting main and develop
+# - Manual workflow dispatch (for testing)
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+# TODO: Set environment variables
+# Define global environment variables used across all jobs
+env:
+  PYTHON_VERSION: '3.11'
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # ==========================================================================
+  # JOB 1: CODE QUALITY CHECKS
+  # ==========================================================================
+  code-quality:
+    name: Code Quality Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      # TODO: Checkout code
+      # Use actions/checkout@v3 to get the repository code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # TODO: Set up Python environment
+      # Use actions/setup-python@v4 with version from env
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      # TODO: Cache dependencies
+      # Use actions/cache to cache pip dependencies
+      # Key: OS-python-version-requirements.txt hash
+      - name: Cache Python dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      # TODO: Install linting tools
+      # Install: flake8, black, mypy, bandit
+      - name: Install linting tools
+        run: |
+          pip install flake8 black mypy bandit
+
+      # TODO: Lint with flake8
+      # Run flake8 on src/ directory
+      # Max line length: 120
+      # Show statistics
+      - name: Lint with flake8
+        run: |
+          # TODO: Implement flake8 command
+          # flake8 src/ --count --max-line-length=120 --statistics
+          echo "TODO: Run flake8"
+
+      # TODO: Check code formatting with black
+      # Run black in check mode (don't modify files)
+      # Should fail if code is not formatted
+      - name: Check code formatting
+        run: |
+          # TODO: Implement black check command
+          # black --check src/
+          echo "TODO: Run black --check"
+
+      # TODO: Type checking with mypy
+      # Run mypy on src/ directory
+      # Ignore missing imports for now
+      - name: Type checking
+        run: |
+          # TODO: Implement mypy command
+          # mypy src/ --ignore-missing-imports
+          echo "TODO: Run mypy"
+
+      # TODO: Security scanning with bandit
+      # Scan src/ for security issues
+      # Output to JSON file
+      # Severity: medium and above
+      - name: Security scanning
+        run: |
+          # TODO: Implement bandit command
+          # bandit -r src/ -f json -o bandit-report.json
+          echo "TODO: Run bandit"
+
+      # TODO: Upload security report as artifact
+      # Upload bandit-report.json for later review
+      - name: Upload security report
+        uses: actions/upload-artifact@v3
+        with:
+          name: security-report
+          path: bandit-report.json
+
+
+  # ==========================================================================
+  # JOB 2: UNIT & INTEGRATION TESTS
+  # ==========================================================================
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    needs: code-quality  # Only run if code quality passes
+
+    steps:
+      # TODO: Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # TODO: Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      # TODO: Install dependencies
+      # Install both application and test dependencies
+      - name: Install dependencies
+        run: |
+          # TODO: Install from requirements.txt
+          # pip install -r requirements.txt
+          # pip install pytest pytest-cov pytest-mock
+          echo "TODO: Install dependencies"
+
+      # TODO: Run unit tests with coverage
+      # Use pytest with coverage reporting
+      # Minimum coverage: 80%
+      # Generate XML and HTML reports
+      - name: Run unit tests
+        run: |
+          # TODO: Implement pytest command
+          # pytest tests/ --cov=src/ --cov-report=xml --cov-report=html --cov-fail-under=80
+          echo "TODO: Run pytest"
+
+      # TODO: Upload coverage reports to Codecov
+      # Use codecov/codecov-action@v3
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: true
+
+      # TODO: Upload coverage HTML report as artifact
+      # For manual review if needed
+      - name: Upload coverage HTML
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: htmlcov/
+
+
+  # ==========================================================================
+  # JOB 3: BUILD DOCKER IMAGE
+  # ==========================================================================
+  build:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    needs: test  # Only build if tests pass
+
+    steps:
+      # TODO: Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # TODO: Set up Docker Buildx
+      # Required for multi-platform builds and caching
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # TODO: Log in to Container Registry
+      # Use GitHub Container Registry (ghcr.io)
+      # Credentials from GitHub secrets
+      - name: Log in to Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # TODO: Extract metadata for Docker
+      # Generate tags and labels
+      # Tags: branch name, git SHA, PR number
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,prefix={{branch}}-
+            type=semver,pattern={{version}}
+
+      # TODO: Build and push Docker image
+      # Use docker/build-push-action@v4
+      # Enable layer caching with GitHub Actions cache
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # TODO: Save image digest for later use
+      - name: Save image digest
+        run: |
+          echo "${{ steps.meta.outputs.tags }}" > image-tags.txt
+
+      - name: Upload image tags
+        uses: actions/upload-artifact@v3
+        with:
+          name: image-tags
+          path: image-tags.txt
+
+
+  # ==========================================================================
+  # JOB 4: SECURITY SCANNING
+  # ==========================================================================
+  scan:
+    name: Security Scan Docker Image
+    runs-on: ubuntu-latest
+    needs: build  # Run after image is built
+
+    steps:
+      # TODO: Checkout code (needed for Trivy config)
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # TODO: Download image tags from previous job
+      - name: Download image tags
+        uses: actions/download-artifact@v3
+        with:
+          name: image-tags
+
+      # TODO: Get image reference
+      - name: Get image reference
+        id: image
+        run: |
+          IMAGE_TAG=$(head -n 1 image-tags.txt)
+          echo "tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      # TODO: Run Trivy vulnerability scanner
+      # Scan the built Docker image
+      # Severity: CRITICAL, HIGH
+      # Exit code 1 if vulnerabilities found
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ steps.image.outputs.tag }}
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+
+      # TODO: Upload Trivy results to GitHub Security tab
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+      # TODO: Generate human-readable Trivy report
+      - name: Generate Trivy report
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ steps.image.outputs.tag }}
+          format: 'table'
+          output: 'trivy-report.txt'
+
+      # TODO: Upload Trivy report as artifact
+      - name: Upload Trivy report
+        uses: actions/upload-artifact@v3
+        with:
+          name: trivy-report
+          path: trivy-report.txt
+
+
+  # ==========================================================================
+  # JOB 5: INTEGRATION TESTS
+  # ==========================================================================
+  integration-test:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    needs: build
+
+    # TODO: Set up services for integration testing
+    # Example: PostgreSQL, MinIO
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: testpassword
+          POSTGRES_DB: testdb
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      # TODO: Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # TODO: Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      # TODO: Install dependencies
+      - name: Install dependencies
+        run: |
+          # TODO: Install test dependencies
+          echo "TODO: Install dependencies"
+
+      # TODO: Download image tags
+      - name: Download image tags
+        uses: actions/download-artifact@v3
+        with:
+          name: image-tags
+
+      # TODO: Start Docker container with built image
+      # Run the container in background
+      # Expose port 5000
+      # Set environment variables
+      - name: Start application container
+        run: |
+          # TODO: Implement docker run command
+          # IMAGE_TAG=$(head -n 1 image-tags.txt)
+          # docker run -d -p 5000:5000 \
+          #   -e MLFLOW_TRACKING_URI=http://localhost:5000 \
+          #   -e MODEL_NAME=test-model \
+          #   -e API_KEYS=test-key \
+          #   --name ml-api $IMAGE_TAG
+          echo "TODO: Start Docker container"
+
+      # TODO: Wait for application to be ready
+      - name: Wait for application
+        run: |
+          # TODO: Implement health check loop
+          # for i in {1..30}; do
+          #   if curl -f http://localhost:5000/health; then
+          #     echo "Application ready"
+          #     exit 0
+          #   fi
+          #   echo "Waiting for application..."
+          #   sleep 2
+          # done
+          # echo "Application failed to start"
+          # exit 1
+          echo "TODO: Wait for health check"
+
+      # TODO: Run integration tests
+      # Test API endpoints end-to-end
+      - name: Run integration tests
+        run: |
+          # TODO: Run integration test suite
+          # pytest tests/integration/ -v
+          echo "TODO: Run integration tests"
+
+      # TODO: Check logs on failure
+      - name: Application logs
+        if: failure()
+        run: |
+          # TODO: Show Docker logs
+          # docker logs ml-api
+          echo "TODO: Show logs"
+
+
+  # ==========================================================================
+  # JOB 6: NOTIFY ON COMPLETION
+  # ==========================================================================
+  notify:
+    name: Notify Build Status
+    runs-on: ubuntu-latest
+    needs: [code-quality, test, build, scan, integration-test]
+    if: always()  # Run even if previous jobs fail
+
+    steps:
+      # TODO: Send Slack notification
+      # Use 8398a7/action-slack@v3
+      # Include: workflow status, branch, commit message, author
+      - name: Send Slack notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: |
+            CI Pipeline: ${{ job.status }}
+            Branch: ${{ github.ref }}
+            Commit: ${{ github.sha }}
+            Author: ${{ github.actor }}
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+        if: always()
+
+
+# ==============================================================================
+# STUDENT IMPLEMENTATION NOTES
+# ==============================================================================
+
+# TODO LIST FOR STUDENTS:
+#
+# 1. Environment Setup:
+#    [ ] Create GitHub repository for the project
+#    [ ] Enable GitHub Actions in repository settings
+#    [ ] Set up GitHub Container Registry (ghcr.io)
+#    [ ] Add required secrets to GitHub repo:
+#        - SLACK_WEBHOOK (for notifications)
+#        - Any cloud provider credentials if needed
+#
+# 2. Dockerfile Creation:
+#    [ ] Create Dockerfile in repository root
+#    [ ] Use Python 3.11 base image
+#    [ ] Copy src/ directory
+#    [ ] Install dependencies from requirements.txt
+#    [ ] Set up non-root user
+#    [ ] Expose port 5000
+#    [ ] Define ENTRYPOINT/CMD for application
+#
+# 3. CI Pipeline Implementation:
+#    [ ] Uncomment and implement all TODO sections above
+#    [ ] Test each job individually
+#    [ ] Ensure proper job dependencies (needs:)
+#    [ ] Add appropriate error handling
+#
+# 4. Testing Setup:
+#    [ ] Create tests/ directory structure
+#    [ ] Write unit tests for all functions in src/main.py
+#    [ ] Write integration tests for API endpoints
+#    [ ] Achieve >80% code coverage
+#
+# 5. Code Quality:
+#    [ ] Set up .flake8 config file
+#    [ ] Set up pyproject.toml for black
+#    [ ] Set up mypy.ini for type checking
+#    [ ] Fix all linting errors before pushing
+#
+# 6. Security:
+#    [ ] Review and fix Bandit security findings
+#    [ ] Review and fix Trivy vulnerability findings
+#    [ ] Never commit secrets or API keys
+#    [ ] Use GitHub Secrets for sensitive data
+#
+# 7. Optimization:
+#    [ ] Enable dependency caching to speed up CI
+#    [ ] Use Docker layer caching
+#    [ ] Run jobs in parallel where possible
+#    [ ] Optimize test execution time
+#
+# 8. Documentation:
+#    [ ] Document CI pipeline in README
+#    [ ] Add badges to README (build status, coverage)
+#    [ ] Create troubleshooting guide for CI failures
+#
+# Expected CI Pipeline Duration: 8-12 minutes (with caching)
+# Cost: Free for public repositories, ~$0.008/minute for private repos

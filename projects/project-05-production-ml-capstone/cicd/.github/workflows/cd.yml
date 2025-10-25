@@ -1,0 +1,508 @@
+name: CD Pipeline
+
+# TODO: Configure trigger conditions
+# Staging: Automatic on push to develop branch
+# Production: Manual workflow dispatch with approval
+
+on:
+  push:
+    branches: [ develop ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+      image_tag:
+        description: 'Docker image tag to deploy'
+        required: true
+        default: 'latest'
+
+env:
+  KUBECTL_VERSION: 'v1.28.0'
+  HELM_VERSION: 'v3.12.0'
+
+jobs:
+  # ==========================================================================
+  # JOB 1: DEPLOY TO STAGING (AUTOMATIC)
+  # ==========================================================================
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    # Only run if:
+    # - Push to develop branch, OR
+    # - Manual trigger with staging environment
+    if: |
+      github.event_name == 'push' ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'staging')
+
+    environment:
+      name: staging
+      url: https://staging.example.com
+
+    steps:
+      # TODO: Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # TODO: Set up kubectl
+      # Install kubectl CLI
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: ${{ env.KUBECTL_VERSION }}
+
+      # TODO: Set up Helm
+      # Install Helm CLI
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: ${{ env.HELM_VERSION }}
+
+      # TODO: Configure kubectl with staging cluster
+      # Create kubeconfig from secret
+      # Secret contains base64-encoded kubeconfig
+      - name: Configure kubectl
+        run: |
+          # TODO: Implement kubeconfig setup
+          # mkdir -p $HOME/.kube
+          # echo "${{ secrets.KUBE_CONFIG_STAGING }}" | base64 -d > $HOME/.kube/config
+          # chmod 600 $HOME/.kube/config
+          echo "TODO: Configure kubeconfig"
+
+      # TODO: Verify cluster connection
+      - name: Verify cluster access
+        run: |
+          # TODO: Test cluster connectivity
+          # kubectl cluster-info
+          # kubectl get nodes
+          echo "TODO: Verify cluster"
+
+      # TODO: Determine image tag
+      # Use manual input if provided, otherwise use git SHA
+      - name: Set image tag
+        id: image
+        run: |
+          # TODO: Determine image tag
+          # if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+          #   IMAGE_TAG="${{ github.event.inputs.image_tag }}"
+          # else
+          #   IMAGE_TAG="${{ github.sha }}"
+          # fi
+          # echo "tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
+          # echo "Deploying image tag: $IMAGE_TAG"
+          echo "TODO: Set image tag"
+
+      # TODO: Deploy with Helm
+      # helm upgrade --install with staging values
+      # Wait for rollout to complete
+      - name: Deploy with Helm
+        run: |
+          # TODO: Implement Helm deployment
+          # helm upgrade --install ml-system ./helm/ml-system \
+          #   --namespace staging \
+          #   --create-namespace \
+          #   --values ./helm/ml-system/values-staging.yaml \
+          #   --set api.image.tag=${{ steps.image.outputs.tag }} \
+          #   --wait \
+          #   --timeout 10m \
+          #   --atomic  # Rollback on failure
+          echo "TODO: Deploy with Helm"
+
+      # TODO: Wait for deployment rollout
+      # Verify all pods are running
+      - name: Wait for rollout
+        run: |
+          # TODO: Implement rollout status check
+          # kubectl rollout status deployment/ml-system-api -n staging --timeout=5m
+          echo "TODO: Check rollout status"
+
+      # TODO: Get service endpoint
+      # Get LoadBalancer IP or Ingress URL
+      - name: Get service endpoint
+        id: endpoint
+        run: |
+          # TODO: Get external IP/URL
+          # ENDPOINT=$(kubectl get ingress ml-system-ingress -n staging -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+          # echo "url=https://$ENDPOINT" >> $GITHUB_OUTPUT
+          # echo "Staging endpoint: https://$ENDPOINT"
+          echo "TODO: Get endpoint"
+
+      # TODO: Run smoke tests
+      # Basic health checks to verify deployment
+      - name: Run smoke tests
+        env:
+          API_URL: ${{ steps.endpoint.outputs.url }}
+          API_KEY: ${{ secrets.STAGING_API_KEY }}
+        run: |
+          # TODO: Implement smoke tests
+          # # Wait for service to be ready
+          # sleep 30
+          #
+          # # Health check
+          # curl -f $API_URL/health || exit 1
+          #
+          # # Info endpoint
+          # curl -f -H "X-API-Key: $API_KEY" $API_URL/info || exit 1
+          #
+          # # Metrics endpoint
+          # curl -f $API_URL/metrics || exit 1
+          echo "TODO: Run smoke tests"
+
+      # TODO: Run integration tests
+      # Full API test suite
+      - name: Run integration tests
+        env:
+          API_URL: ${{ steps.endpoint.outputs.url }}
+          API_KEY: ${{ secrets.STAGING_API_KEY }}
+        run: |
+          # TODO: Run integration test suite
+          # pip install pytest requests
+          # pytest tests/integration/ -v --api-url=$API_URL --api-key=$API_KEY
+          echo "TODO: Run integration tests"
+
+      # TODO: Run load tests (optional)
+      # Use k6 for basic load testing
+      - name: Run load tests
+        run: |
+          # TODO: Implement load tests
+          # # Install k6
+          # curl https://github.com/grafana/k6/releases/download/v0.46.0/k6-v0.46.0-linux-amd64.tar.gz -L | tar xvz
+          # sudo mv k6-v0.46.0-linux-amd64/k6 /usr/local/bin/
+          #
+          # # Run load test
+          # k6 run tests/load/basic-load-test.js
+          echo "TODO: Run load tests"
+
+      # TODO: Notify team on success
+      - name: Notify deployment success
+        uses: 8398a7/action-slack@v3
+        with:
+          status: success
+          text: |
+            ✅ Staging Deployment Successful
+            Environment: Staging
+            Image: ${{ steps.image.outputs.tag }}
+            URL: ${{ steps.endpoint.outputs.url }}
+            Deployed by: ${{ github.actor }}
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+        if: success()
+
+      # TODO: Notify team on failure
+      - name: Notify deployment failure
+        uses: 8398a7/action-slack@v3
+        with:
+          status: failure
+          text: |
+            ❌ Staging Deployment Failed
+            Image: ${{ steps.image.outputs.tag }}
+            Error: Check GitHub Actions logs
+            Deployed by: ${{ github.actor }}
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+        if: failure()
+
+
+  # ==========================================================================
+  # JOB 2: DEPLOY TO PRODUCTION (MANUAL APPROVAL REQUIRED)
+  # ==========================================================================
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    # Only run on manual workflow dispatch with production environment
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production'
+
+    # Require manual approval before deploying to production
+    environment:
+      name: production
+      url: https://api.example.com
+
+    steps:
+      # TODO: Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # TODO: Set up kubectl and Helm
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: ${{ env.KUBECTL_VERSION }}
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: ${{ env.HELM_VERSION }}
+
+      # TODO: Configure kubectl with production cluster
+      - name: Configure kubectl
+        run: |
+          # TODO: Setup production kubeconfig
+          # mkdir -p $HOME/.kube
+          # echo "${{ secrets.KUBE_CONFIG_PRODUCTION }}" | base64 -d > $HOME/.kube/config
+          # chmod 600 $HOME/.kube/config
+          echo "TODO: Configure production kubeconfig"
+
+      # TODO: Verify cluster connection
+      - name: Verify cluster access
+        run: |
+          # TODO: Verify production cluster
+          # kubectl cluster-info
+          # kubectl get nodes
+          echo "TODO: Verify production cluster"
+
+      # TODO: Backup current production deployment
+      # Save current deployment YAML for rollback if needed
+      - name: Backup current deployment
+        run: |
+          # TODO: Backup deployment
+          # kubectl get deployment ml-system-api -n production -o yaml > backup-deployment.yaml
+          # kubectl get configmap ml-model-config -n production -o yaml > backup-configmap.yaml
+          echo "TODO: Backup deployment"
+
+      - name: Upload backup
+        uses: actions/upload-artifact@v3
+        with:
+          name: production-backup
+          path: backup-*.yaml
+
+      # TODO: Deploy Canary (10% traffic)
+      # Deploy new version to canary pods
+      # Route 10% of traffic to canary
+      - name: Deploy Canary
+        run: |
+          # TODO: Implement canary deployment
+          # # Option 1: Using Istio/Flagger (advanced)
+          # # Option 2: Using separate deployment + service weight
+          # # Option 3: Using Argo Rollouts
+          #
+          # # Example with basic Kubernetes:
+          # helm upgrade ml-system ./helm/ml-system \
+          #   --namespace production \
+          #   --values ./helm/ml-system/values-production.yaml \
+          #   --set api.image.tag=${{ github.event.inputs.image_tag }} \
+          #   --set api.canary.enabled=true \
+          #   --set api.canary.replicas=1 \
+          #   --set api.canary.weight=10 \
+          #   --wait
+          echo "TODO: Deploy canary"
+
+      # TODO: Monitor canary metrics
+      # Watch error rate, latency, and other metrics for 10 minutes
+      # If metrics degrade, abort and rollback
+      - name: Monitor canary
+        run: |
+          # TODO: Implement canary monitoring
+          # # Query Prometheus for canary metrics
+          # # Compare canary vs stable error rate, latency
+          # # If canary error_rate > stable error_rate * 1.5, abort
+          #
+          # python scripts/monitor_canary.py \
+          #   --duration 600 \
+          #   --error-threshold 0.05 \
+          #   --latency-threshold 1.0
+          echo "TODO: Monitor canary"
+
+      # TODO: Promote canary to full deployment
+      # If canary is healthy, roll out to all pods
+      - name: Promote canary
+        if: success()
+        run: |
+          # TODO: Implement full rollout
+          # helm upgrade ml-system ./helm/ml-system \
+          #   --namespace production \
+          #   --values ./helm/ml-system/values-production.yaml \
+          #   --set api.image.tag=${{ github.event.inputs.image_tag }} \
+          #   --set api.canary.enabled=false \
+          #   --wait \
+          #   --timeout 15m
+          echo "TODO: Promote canary"
+
+      # TODO: Verify full deployment
+      - name: Verify deployment
+        run: |
+          # TODO: Check rollout status
+          # kubectl rollout status deployment/ml-system-api -n production
+          echo "TODO: Verify deployment"
+
+      # TODO: Rollback on failure
+      # Restore from backup if deployment fails
+      - name: Rollback on failure
+        if: failure()
+        run: |
+          # TODO: Implement rollback
+          # # Option 1: Helm rollback
+          # helm rollback ml-system -n production
+          #
+          # # Option 2: kubectl apply backup
+          # kubectl apply -f backup-deployment.yaml
+          # kubectl apply -f backup-configmap.yaml
+          echo "TODO: Rollback deployment"
+
+      # TODO: Run production smoke tests
+      - name: Production smoke tests
+        env:
+          API_URL: https://api.example.com
+          API_KEY: ${{ secrets.PRODUCTION_API_KEY }}
+        run: |
+          # TODO: Run smoke tests
+          # curl -f $API_URL/health || exit 1
+          # curl -f -H "X-API-Key: $API_KEY" $API_URL/info || exit 1
+          echo "TODO: Run production smoke tests"
+
+      # TODO: Tag deployment in Git
+      # Create a Git tag for this production deployment
+      - name: Tag deployment
+        if: success()
+        run: |
+          # TODO: Create and push Git tag
+          # git config user.name "GitHub Actions"
+          # git config user.email "actions@github.com"
+          # git tag -a "prod-${{ github.event.inputs.image_tag }}" -m "Production deployment"
+          # git push origin "prod-${{ github.event.inputs.image_tag }}"
+          echo "TODO: Tag deployment"
+
+      # TODO: Update model version in MLflow
+      # Tag deployed model as "Production" in MLflow registry
+      - name: Update MLflow
+        if: success()
+        run: |
+          # TODO: Tag model in MLflow
+          # python scripts/tag_model_production.py \
+          #   --model-name image-classifier \
+          #   --version ${{ github.event.inputs.image_tag }}
+          echo "TODO: Update MLflow registry"
+
+      # TODO: Notify team of successful deployment
+      - name: Notify deployment success
+        uses: 8398a7/action-slack@v3
+        with:
+          status: success
+          text: |
+            🚀 Production Deployment Successful
+            Environment: Production
+            Image: ${{ github.event.inputs.image_tag }}
+            URL: https://api.example.com
+            Deployed by: ${{ github.actor }}
+
+            Deployment completed using canary strategy.
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+        if: success()
+
+      # TODO: Alert team of deployment failure
+      - name: Alert deployment failure
+        uses: 8398a7/action-slack@v3
+        with:
+          status: failure
+          text: |
+            🚨 Production Deployment Failed
+            Image: ${{ github.event.inputs.image_tag }}
+            Attempted by: ${{ github.actor }}
+
+            Deployment has been rolled back.
+            Check GitHub Actions logs for details.
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+        if: failure()
+
+      # TODO: Create incident if deployment fails
+      # Optionally create a PagerDuty incident
+      - name: Create incident
+        if: failure()
+        run: |
+          # TODO: Create PagerDuty incident
+          # curl -X POST https://api.pagerduty.com/incidents \
+          #   -H "Authorization: Token token=${{ secrets.PAGERDUTY_TOKEN }}" \
+          #   -H "Content-Type: application/json" \
+          #   -d '{
+          #     "incident": {
+          #       "type": "incident",
+          #       "title": "Production deployment failed",
+          #       "service": {...},
+          #       "urgency": "high"
+          #     }
+          #   }'
+          echo "TODO: Create incident"
+
+
+# ==============================================================================
+# STUDENT IMPLEMENTATION NOTES
+# ==============================================================================
+
+# TODO LIST FOR STUDENTS:
+#
+# 1. Kubernetes Cluster Setup:
+#    [ ] Set up staging Kubernetes cluster (GKE/EKS/AKS)
+#    [ ] Set up production Kubernetes cluster (separate from staging)
+#    [ ] Configure cluster access (kubeconfig)
+#    [ ] Set up Ingress controller (NGINX)
+#    [ ] Set up cert-manager for TLS
+#
+# 2. GitHub Secrets:
+#    [ ] Add KUBE_CONFIG_STAGING (base64-encoded kubeconfig)
+#    [ ] Add KUBE_CONFIG_PRODUCTION (base64-encoded kubeconfig)
+#    [ ] Add STAGING_API_KEY (for testing)
+#    [ ] Add PRODUCTION_API_KEY (for testing)
+#    [ ] Add SLACK_WEBHOOK (for notifications)
+#    [ ] Add PAGERDUTY_TOKEN (optional, for incidents)
+#
+# 3. Helm Charts:
+#    [ ] Create Helm chart in ./helm/ml-system/
+#    [ ] Create values-staging.yaml
+#    [ ] Create values-production.yaml
+#    [ ] Test Helm chart locally
+#
+# 4. Deployment Scripts:
+#    [ ] Create scripts/monitor_canary.py
+#    [ ] Create scripts/tag_model_production.py
+#    [ ] Create tests/integration/ test suite
+#    [ ] Create tests/load/ k6 scripts
+#
+# 5. CD Pipeline Implementation:
+#    [ ] Uncomment and implement all TODO sections
+#    [ ] Test staging deployment manually
+#    [ ] Test production deployment manually
+#    [ ] Test rollback procedure
+#
+# 6. Environment Configuration:
+#    [ ] Set up GitHub Environments (staging, production)
+#    [ ] Configure required reviewers for production
+#    [ ] Set up environment protection rules
+#    [ ] Configure environment secrets
+#
+# 7. Monitoring Integration:
+#    [ ] Set up Prometheus in both environments
+#    [ ] Create canary monitoring queries
+#    [ ] Set up alerts for deployment failures
+#    [ ] Test alert routing
+#
+# 8. Canary Deployment:
+#    [ ] Implement canary deployment strategy
+#    [ ] Define traffic splitting mechanism
+#    [ ] Set up monitoring for canary metrics
+#    [ ] Test canary rollback
+#
+# 9. Rollback Testing:
+#    [ ] Test Helm rollback
+#    [ ] Test backup/restore procedure
+#    [ ] Document rollback SOP
+#    [ ] Practice rollback in staging
+#
+# 10. Documentation:
+#     [ ] Document CD pipeline workflow
+#     [ ] Create deployment runbook
+#     [ ] Document rollback procedures
+#     [ ] Create incident response guide
+#
+# Advanced Topics (Optional):
+#   - GitOps with ArgoCD or Flux
+#   - Progressive delivery with Flagger
+#   - Service mesh (Istio/Linkerd) for traffic splitting
+#   - Blue/Green deployment strategy
+#   - Automated rollback on SLO violation
+#
+# Expected Deployment Times:
+#   - Staging: 8-10 minutes (automatic)
+#   - Production (canary): 20-25 minutes (with monitoring)
+#   - Production (full rollout): 10-15 minutes
+#   - Rollback: 2-5 minutes

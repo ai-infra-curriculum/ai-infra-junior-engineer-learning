@@ -1,0 +1,219 @@
+{"attributes":{"title":"ML Application Logs","description":"Dashboard for monitoring ML application logs and errors"},"id":"ml-app-logs","type":"dashboard","version":"8.11.0"}
+{"attributes":{"title":"Application Logs Index Pattern","description":"Index pattern for logs-*"},"id":"logs-*","type":"index-pattern","version":"8.11.0"}
+
+__INSTRUCTIONS__
+================
+
+This file is a Kibana dashboard export in NDJSON format.
+It's a placeholder that shows the structure of Kibana exports.
+
+TODO: Create your own dashboard in Kibana and export it
+
+Steps to create and export a Kibana dashboard:
+
+1. Access Kibana
+   - Open http://localhost:5601
+   - Wait for Kibana to start (may take 1-2 minutes)
+
+2. Create Index Pattern
+   - Go to Stack Management → Index Patterns
+   - Click "Create index pattern"
+   - Index pattern: logs-*
+   - Time field: @timestamp
+   - Click "Create index pattern"
+
+3. Explore Logs in Discover
+   - Go to Analytics → Discover
+   - Select "logs-*" index pattern
+   - You should see your logs appearing
+   - Use the search bar to filter logs
+
+4. Create Visualizations
+   Create these visualizations for your dashboard:
+
+   a) Log Volume Over Time (Line chart)
+      - Visualization type: Line
+      - Metrics: Count
+      - Buckets: Date Histogram on @timestamp
+      - Interval: Auto
+
+   b) Log Levels Distribution (Pie chart)
+      - Visualization type: Pie
+      - Metrics: Count
+      - Buckets: Terms on log_level.keyword
+      - Size: 10
+
+   c) Top Error Messages (Data table)
+      - Visualization type: Data table
+      - Metrics: Count
+      - Buckets: Terms on log_message.keyword
+      - Filter: log_level = "ERROR"
+      - Size: 20
+
+   d) Errors Over Time (Vertical bar chart)
+      - Visualization type: Vertical bar
+      - Metrics: Count
+      - Buckets: Date Histogram on @timestamp
+      - Filter: log_level = "ERROR"
+
+   e) Slow Requests (> 1 second)
+      - Visualization type: Line
+      - Metrics: Count
+      - Buckets: Date Histogram
+      - Filter: duration_ms > 1000
+
+   f) Log Level Timeline (Area chart)
+      - Visualization type: Area
+      - Metrics: Count
+      - Buckets: Date Histogram on @timestamp
+      - Split series: Terms on log_level.keyword
+
+   g) Request Duration Heatmap
+      - Visualization type: Heat map
+      - Metrics: Average of duration_ms
+      - Buckets: Date Histogram
+      - Split rows: Terms on endpoint.keyword
+
+5. Create Dashboard
+   - Go to Analytics → Dashboard
+   - Click "Create dashboard"
+   - Click "Add" to add visualizations
+   - Arrange panels in a logical layout
+   - Add filters (log level, time range, etc.)
+   - Save dashboard: "ML Application Logs"
+
+6. Export Dashboard
+   - Go to Stack Management → Saved Objects
+   - Search for your dashboard
+   - Select dashboard + all visualizations
+   - Click "Export" → "Export as NDJSON"
+   - Replace this file with the exported content
+
+7. Import Dashboard (to restore)
+   - Stack Management → Saved Objects
+   - Click "Import"
+   - Upload NDJSON file
+   - Resolve conflicts if needed
+
+
+Useful Kibana Search Queries (KQL - Kibana Query Language)
+===========================================================
+
+# Find ERROR logs
+log_level: "ERROR"
+
+# Find slow requests (> 1 second)
+duration_ms > 1000
+
+# Find specific endpoint
+endpoint: "/predict"
+
+# Find requests by user
+user_id: "user_123"
+
+# Combine filters with AND
+log_level: "ERROR" AND endpoint: "/predict"
+
+# Combine filters with OR
+log_level: "ERROR" OR log_level: "CRITICAL"
+
+# Wildcard search
+log_message: *timeout*
+
+# Range queries
+@timestamp >= "2025-10-18T00:00:00" AND @timestamp < "2025-10-18T23:59:59"
+
+# Exists query
+_exists_: error_message
+
+# NOT query
+NOT log_level: "DEBUG"
+
+
+Recommended Dashboard Layout
+============================
+
+┌─────────────────────────────────────────────────────────┐
+│  Time Range Picker    │  Log Level Filter    │ Search  │
+├─────────────────────────────────────────────────────────┤
+│                                                         │
+│  Log Volume Over Time (full width line chart)          │
+│                                                         │
+├─────────────────────────────────────────────────────────┤
+│  Log Levels      │  Top Errors        │  Slow Requests │
+│  (Pie Chart)     │  (Data Table)      │  (Metric)      │
+├─────────────────────────────────────────────────────────┤
+│  Errors Over Time (bar chart - full width)             │
+├─────────────────────────────────────────────────────────┤
+│  Request Duration Heatmap (full width)                  │
+├─────────────────────────────────────────────────────────┤
+│  Recent Logs (data table showing last 50 logs)         │
+│  - Timestamp                                            │
+│  - Log Level                                            │
+│  - Message                                              │
+│  - Duration                                             │
+│  - Endpoint                                             │
+└─────────────────────────────────────────────────────────┘
+
+
+Troubleshooting Kibana
+=====================
+
+Issue: "No matching indices found"
+Solution:
+- Check Elasticsearch has data: curl http://localhost:9200/logs-*/_count
+- Verify Logstash is running and processing logs
+- Check index pattern matches index name
+
+Issue: "@timestamp field not found"
+Solution:
+- Ensure Logstash date filter is working
+- Check raw documents in Elasticsearch
+- Recreate index pattern with correct time field
+
+Issue: Visualizations show "No results found"
+Solution:
+- Check time range (top right) includes time when logs were created
+- Verify filters aren't too restrictive
+- Check underlying data exists in Discover
+
+Issue: Dashboard is slow
+Solution:
+- Reduce time range
+- Add more filters to narrow results
+- Optimize visualizations (reduce bucket size)
+- Consider using rollup indices for old data
+
+
+Advanced Kibana Features
+========================
+
+1. Alerts (Kibana Alerting)
+   - Create alerts based on log conditions
+   - Example: Alert when ERROR count > 10 in 5 minutes
+   - Can send to Slack, email, webhook
+
+2. Canvas
+   - Create custom infographic-style reports
+   - Great for executive summaries
+
+3. Lens
+   - Drag-and-drop visualization builder
+   - Easier than classic visualizations
+
+4. Time Series Visual Builder (TSVB)
+   - Advanced time series visualizations
+   - Better than standard line charts for complex queries
+
+5. Vega/Vega-Lite
+   - Custom visualizations using Vega grammar
+   - For advanced users who need full control
+
+
+Learning Resources
+==================
+
+- Kibana User Guide: https://www.elastic.co/guide/en/kibana/current/index.html
+- KQL Query Language: https://www.elastic.co/guide/en/kibana/current/kuery-query.html
+- Kibana Lens: https://www.elastic.co/guide/en/kibana/current/lens.html
+- Kibana Alerting: https://www.elastic.co/guide/en/kibana/current/alerting-getting-started.html

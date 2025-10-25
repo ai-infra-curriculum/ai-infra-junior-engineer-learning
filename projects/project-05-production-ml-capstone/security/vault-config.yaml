@@ -1,0 +1,257 @@
+# HashiCorp Vault Configuration (Optional but Recommended)
+# =========================================================
+# This file shows how to integrate HashiCorp Vault for secrets management.
+# Vault provides dynamic secrets, encryption as a service, and audit logging.
+
+# NOTE: This is an advanced topic. For simpler projects, Kubernetes Secrets
+# with SealedSecrets is sufficient. Implement Vault for production systems
+# that require enterprise-grade secrets management.
+
+---
+# TODO: Install Vault using Helm
+# helm repo add hashicorp https://helm.releases.hashicorp.com
+# helm repo update
+# helm install vault hashicorp/vault \
+#   --namespace vault \
+#   --create-namespace \
+#   --values vault-values.yaml
+
+# Example vault-values.yaml:
+# server:
+#   ha:
+#     enabled: true
+#     replicas: 3
+#   dataStorage:
+#     enabled: true
+#     size: 10Gi
+#   auditStorage:
+#     enabled: true
+#     size: 10Gi
+
+---
+# ServiceAccount for ml-api to authenticate with Vault
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ml-api-vault-auth
+  namespace: ml-system-production
+
+---
+# SecretProviderClass for CSI Driver (recommended approach)
+# This uses the Secrets Store CSI Driver to mount Vault secrets
+apiVersion: secrets-store.csi.x-k8s.io/v1
+kind: SecretProviderClass
+metadata:
+  name: vault-ml-api-secrets
+  namespace: ml-system-production
+spec:
+  provider: vault
+  parameters:
+    # TODO: Configure Vault address
+    vaultAddress: "http://vault.vault:8200"
+
+    # TODO: Configure Vault role
+    roleName: "ml-api-role"
+
+    # TODO: Define secrets to fetch from Vault
+    objects: |
+      - objectName: "api-key"
+        secretPath: "secret/data/ml-api/production"
+        secretKey: "api_key"
+      - objectName: "mlflow-password"
+        secretPath: "secret/data/ml-api/production"
+        secretKey: "mlflow_password"
+      - objectName: "db-password"
+        secretPath: "secret/data/ml-api/production"
+        secretKey: "db_password"
+
+  # TODO: Sync secrets to Kubernetes Secret (optional)
+  secretObjects:
+    - secretName: ml-api-secrets
+      type: Opaque
+      data:
+        - objectName: api-key
+          key: API_KEY
+        - objectName: mlflow-password
+          key: MLFLOW_PASSWORD
+        - objectName: db-password
+          key: DB_PASSWORD
+
+---
+# Example Deployment using Vault secrets via CSI Driver
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ml-api-deployment-vault-example
+  namespace: ml-system-production
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: ml-api
+  template:
+    metadata:
+      labels:
+        app: ml-api
+    spec:
+      serviceAccountName: ml-api-vault-auth
+
+      # TODO: Add volumes for secrets
+      volumes:
+        - name: secrets-store
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: vault-ml-api-secrets
+
+      containers:
+        - name: ml-api
+          image: ghcr.io/your-org/ml-api:v1.0.0
+
+          # TODO: Mount secrets volume
+          volumeMounts:
+            - name: secrets-store
+              mountPath: "/mnt/secrets"
+              readOnly: true
+
+          # TODO: Reference secrets as environment variables
+          env:
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ml-api-secrets
+                  key: API_KEY
+            - name: MLFLOW_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ml-api-secrets
+                  key: MLFLOW_PASSWORD
+
+# ==============================================================================
+# VAULT CONFIGURATION IN VAULT SERVER
+# ==============================================================================
+
+# TODO: Initialize and unseal Vault
+# After Vault is deployed, you need to initialize and unseal it.
+# This is typically done once during initial setup.
+
+# 1. Initialize Vault:
+#    kubectl exec -n vault vault-0 -- vault operator init
+#    # Save the unseal keys and root token securely!
+
+# 2. Unseal Vault (repeat for each replica):
+#    kubectl exec -n vault vault-0 -- vault operator unseal <unseal-key-1>
+#    kubectl exec -n vault vault-0 -- vault operator unseal <unseal-key-2>
+#    kubectl exec -n vault vault-0 -- vault operator unseal <unseal-key-3>
+
+# TODO: Enable Kubernetes authentication
+# vault auth enable kubernetes
+#
+# vault write auth/kubernetes/config \
+#   kubernetes_host="https://$KUBERNETES_PORT_443_TCP_ADDR:443" \
+#   token_reviewer_jwt="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
+#   kubernetes_ca_cert=@/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+
+# TODO: Create Vault policy for ml-api
+# cat <<EOF | vault policy write ml-api-policy -
+# path "secret/data/ml-api/*" {
+#   capabilities = ["read"]
+# }
+# EOF
+
+# TODO: Create Vault role for Kubernetes authentication
+# vault write auth/kubernetes/role/ml-api-role \
+#   bound_service_account_names=ml-api-vault-auth \
+#   bound_service_account_namespaces=ml-system-production \
+#   policies=ml-api-policy \
+#   ttl=24h
+
+# TODO: Store secrets in Vault
+# vault kv put secret/ml-api/production \
+#   api_key="your-production-api-key" \
+#   mlflow_password="your-mlflow-password" \
+#   db_password="your-db-password"
+
+# TODO: Verify secrets
+# vault kv get secret/ml-api/production
+
+# ==============================================================================
+# ALTERNATIVE: Vault Agent Sidecar Injection
+# ==============================================================================
+
+# Instead of CSI Driver, you can use Vault Agent sidecar
+# This automatically injects a Vault Agent container
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ml-api-deployment-vault-agent-example
+  namespace: ml-system-production
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: ml-api
+  template:
+    metadata:
+      labels:
+        app: ml-api
+      annotations:
+        # TODO: Enable Vault Agent injection
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/role: "ml-api-role"
+
+        # TODO: Inject specific secrets
+        vault.hashicorp.com/agent-inject-secret-api-key: "secret/data/ml-api/production"
+        vault.hashicorp.com/agent-inject-template-api-key: |
+          {{- with secret "secret/data/ml-api/production" -}}
+          export API_KEY="{{ .Data.data.api_key }}"
+          {{- end }}
+
+    spec:
+      serviceAccountName: ml-api-vault-auth
+      containers:
+        - name: ml-api
+          image: ghcr.io/your-org/ml-api:v1.0.0
+          # Secrets will be available at /vault/secrets/
+
+# ==============================================================================
+# STUDENT IMPLEMENTATION NOTES
+# ==============================================================================
+
+# Vault is an advanced topic. Implement this if:
+# - You need enterprise-grade secrets management
+# - You have compliance requirements (SOC 2, HIPAA)
+# - You need dynamic secrets or encryption as a service
+# - You manage many secrets across multiple services
+#
+# For simpler projects, use:
+# - Kubernetes Secrets (baseline)
+# - SealedSecrets (safe to commit encrypted secrets)
+# - Cloud provider secret managers (AWS Secrets Manager, GCP Secret Manager)
+#
+# TODO: Implementation Steps:
+#
+# 1. Install Vault via Helm
+# 2. Initialize and unseal Vault
+# 3. Enable Kubernetes authentication
+# 4. Create policies and roles
+# 5. Store secrets in Vault
+# 6. Install Secrets Store CSI Driver:
+#    helm repo add secrets-store-csi-driver https://kubernetes-sigs.github.io/secrets-store-csi-driver/charts
+#    helm install csi-secrets-store secrets-store-csi-driver/secrets-store-csi-driver \
+#      --namespace kube-system
+# 7. Install Vault CSI Provider:
+#    helm repo add hashicorp https://helm.releases.hashicorp.com
+#    helm install vault-csi-provider hashicorp/vault-csi-provider \
+#      --namespace vault
+# 8. Create SecretProviderClass
+# 9. Update Deployment to use Vault secrets
+# 10. Test secret retrieval
+#
+# Resources:
+# - Vault documentation: https://www.vaultproject.io/docs
+# - Vault on Kubernetes: https://www.vaultproject.io/docs/platform/k8s
+# - CSI Driver: https://secrets-store-csi-driver.sigs.k8s.io/

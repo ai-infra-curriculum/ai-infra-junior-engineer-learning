@@ -1,0 +1,251 @@
+version: '3.8'
+
+# ML Pipeline Infrastructure with MLflow, Airflow, PostgreSQL, MinIO, and Redis
+
+services:
+  # ============================================================================
+  # PostgreSQL Database
+  # Used by: MLflow (backend store), Airflow (metadata DB)
+  # ============================================================================
+  postgres:
+    image: postgres:15
+    container_name: ml_pipeline_postgres
+    environment:
+      POSTGRES_USER: mlflow
+      POSTGRES_PASSWORD: mlflow
+      POSTGRES_DB: mlflow
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mlflow"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ml_pipeline_network
+
+  # ============================================================================
+  # MinIO Object Storage
+  # S3-compatible storage for MLflow artifacts and DVC
+  # ============================================================================
+  minio:
+    image: minio/minio:latest
+    container_name: ml_pipeline_minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"  # API
+      - "9001:9001"  # Console UI
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    networks:
+      - ml_pipeline_network
+
+  # ============================================================================
+  # MLflow Tracking Server
+  # Central experiment tracking and model registry
+  # ============================================================================
+  mlflow:
+    build:
+      context: ./mlflow
+      dockerfile: Dockerfile
+    container_name: ml_pipeline_mlflow
+    ports:
+      - "5000:5000"
+    environment:
+      MLFLOW_BACKEND_STORE_URI: postgresql://mlflow:mlflow@postgres:5432/mlflow
+      MLFLOW_S3_ENDPOINT_URL: http://minio:9000
+      AWS_ACCESS_KEY_ID: minioadmin
+      AWS_SECRET_ACCESS_KEY: minioadmin
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    command: >
+      mlflow server
+      --backend-store-uri postgresql://mlflow:mlflow@postgres:5432/mlflow
+      --default-artifact-root s3://mlflow/
+      --host 0.0.0.0
+      --port 5000
+    networks:
+      - ml_pipeline_network
+
+  # ============================================================================
+  # Redis Message Broker
+  # Used by: Airflow Celery Executor
+  # ============================================================================
+  redis:
+    image: redis:7-alpine
+    container_name: ml_pipeline_redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ml_pipeline_network
+
+  # ============================================================================
+  # Airflow Webserver
+  # UI and REST API for workflow management
+  # ============================================================================
+  airflow-webserver:
+    build:
+      context: ./airflow
+      dockerfile: Dockerfile
+    container_name: ml_pipeline_airflow_webserver
+    ports:
+      - "8080:8080"
+    environment:
+      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql://mlflow:mlflow@postgres:5432/airflow
+      AIRFLOW__CELERY__BROKER_URL: redis://redis:6379/0
+      AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://mlflow:mlflow@postgres:5432/airflow
+      AIRFLOW__CORE__FERNET_KEY: 'your-fernet-key-here'  # TODO: Generate with: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+      AIRFLOW__WEBSERVER__SECRET_KEY: 'your-secret-key-here'  # TODO: Generate random secret
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./src:/opt/airflow/src
+      - ./data:/opt/airflow/data
+      - ./models:/opt/airflow/models
+      - ./artifacts:/opt/airflow/artifacts
+      - airflow_logs:/opt/airflow/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: webserver
+    networks:
+      - ml_pipeline_network
+
+  # ============================================================================
+  # Airflow Scheduler
+  # Schedules and triggers DAG runs
+  # ============================================================================
+  airflow-scheduler:
+    build:
+      context: ./airflow
+      dockerfile: Dockerfile
+    container_name: ml_pipeline_airflow_scheduler
+    environment:
+      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql://mlflow:mlflow@postgres:5432/airflow
+      AIRFLOW__CELERY__BROKER_URL: redis://redis:6379/0
+      AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://mlflow:mlflow@postgres:5432/airflow
+      AIRFLOW__CORE__FERNET_KEY: 'your-fernet-key-here'  # TODO: Must match webserver
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./src:/opt/airflow/src
+      - ./data:/opt/airflow/data
+      - ./models:/opt/airflow/models
+      - ./artifacts:/opt/airflow/artifacts
+      - airflow_logs:/opt/airflow/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: scheduler
+    networks:
+      - ml_pipeline_network
+
+  # ============================================================================
+  # Airflow Worker
+  # Executes tasks from the queue
+  # ============================================================================
+  airflow-worker:
+    build:
+      context: ./airflow
+      dockerfile: Dockerfile
+    container_name: ml_pipeline_airflow_worker
+    environment:
+      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql://mlflow:mlflow@postgres:5432/airflow
+      AIRFLOW__CELERY__BROKER_URL: redis://redis:6379/0
+      AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://mlflow:mlflow@postgres:5432/airflow
+      AIRFLOW__CORE__FERNET_KEY: 'your-fernet-key-here'  # TODO: Must match webserver
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./src:/opt/airflow/src
+      - ./data:/opt/airflow/data
+      - ./models:/opt/airflow/models
+      - ./artifacts:/opt/airflow/artifacts
+      - airflow_logs:/opt/airflow/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: celery worker
+    networks:
+      - ml_pipeline_network
+
+# ============================================================================
+# Persistent Volumes
+# ============================================================================
+volumes:
+  postgres_data:
+    driver: local
+  minio_data:
+    driver: local
+  airflow_logs:
+    driver: local
+
+# ============================================================================
+# Network
+# ============================================================================
+networks:
+  ml_pipeline_network:
+    driver: bridge
+
+# ============================================================================
+# Usage Instructions
+# ============================================================================
+#
+# 1. Start all services:
+#    docker-compose up -d
+#
+# 2. Initialize Airflow database (first time only):
+#    docker-compose exec airflow-webserver airflow db init
+#    docker-compose exec airflow-webserver airflow users create \
+#        --username admin \
+#        --password admin \
+#        --firstname Admin \
+#        --lastname User \
+#        --role Admin \
+#        --email admin@example.com
+#
+# 3. Create MinIO bucket for MLflow (first time only):
+#    Access MinIO Console at http://localhost:9001
+#    Login with minioadmin/minioadmin
+#    Create bucket named "mlflow"
+#
+# 4. Access UIs:
+#    - MLflow: http://localhost:5000
+#    - Airflow: http://localhost:8080 (admin/admin)
+#    - MinIO Console: http://localhost:9001 (minioadmin/minioadmin)
+#
+# 5. Stop all services:
+#    docker-compose down
+#
+# 6. Stop and remove volumes (WARNING: deletes all data):
+#    docker-compose down -v
+#
+# ============================================================================

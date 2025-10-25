@@ -1,0 +1,396 @@
+# Kubernetes Service Manifests
+#
+# Services provide stable network endpoints for accessing pods.
+# Even as pods are created/destroyed, the Service endpoint remains constant.
+#
+# Learning Objectives:
+# - Understand Service types (ClusterIP, NodePort, LoadBalancer)
+# - Configure load balancing across pods
+# - Implement service discovery with DNS
+# - Understand selector-based routing
+
+# ============================================================================
+# CLUSTERIP SERVICE (Internal Access)
+# ============================================================================
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: model-api-service
+  namespace: ml-serving
+  labels:
+    app: model-api
+    component: inference
+
+  # TODO: Add annotations for monitoring
+  # Prometheus can discover services via annotations
+  annotations:
+    # TODO: Uncomment and set correct values:
+    # prometheus.io/scrape: "true"
+    # prometheus.io/port: "80"
+    # prometheus.io/path: "/metrics"
+    placeholder: delete-me  # TODO: Remove after adding annotations
+
+spec:
+  # TODO: Set Service type to ClusterIP
+  # ClusterIP: Service accessible only within cluster (default)
+  # Use case: Internal communication between services
+  type: ""  # TODO: Set to ClusterIP
+
+  # ========================================================================
+  # SELECTOR
+  # ========================================================================
+
+  # TODO: Configure selector to match Deployment pod labels
+  # Service routes traffic to pods matching ALL labels in selector
+  selector:
+    # TODO: Add label: app: model-api
+    # This must match labels in deployment.yaml template.metadata.labels
+    placeholder: delete-me  # TODO: Remove and add proper selector
+
+  # ========================================================================
+  # PORTS
+  # ========================================================================
+
+  ports:
+  # TODO: Configure port mapping
+  - name: http
+    protocol: TCP
+
+    # Port: The port exposed by the Service (what clients connect to)
+    # TODO: Set to 80 (standard HTTP port)
+    port: 0  # TODO: Change to 80
+
+    # TargetPort: The port on the pod where traffic is forwarded
+    # TODO: Set to 5000 (Flask application port)
+    # Can also reference port name from Deployment: targetPort: http
+    targetPort: 0  # TODO: Change to 5000
+
+    # NodePort: (Optional) Port exposed on each node (for NodePort/LoadBalancer types)
+    # Range: 30000-32767
+    # Leave unset for ClusterIP type
+
+  # ========================================================================
+  # SESSION AFFINITY (Optional)
+  # ========================================================================
+
+  # TODO: Configure session affinity (optional for stateless services)
+  # Options:
+  # - None: Round-robin load balancing (default, recommended for stateless)
+  # - ClientIP: Route requests from same client to same pod
+  #
+  # For ML inference (stateless), None is recommended
+  # sessionAffinity: None
+
+  # If using ClientIP session affinity, configure timeout:
+  # sessionAffinityConfig:
+  #   clientIP:
+  #     timeoutSeconds: 10800  # 3 hours
+
+  # ========================================================================
+  # IP FAMILIES (IPv4/IPv6)
+  # ========================================================================
+
+  # TODO: Configure IP family (optional, defaults to IPv4)
+  # ipFamilies:
+  # - IPv4
+  # ipFamilyPolicy: SingleStack
+
+---
+
+# ============================================================================
+# LOADBALANCER SERVICE (External Access)
+# ============================================================================
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: model-api-lb
+  namespace: ml-serving
+  labels:
+    app: model-api
+    component: inference
+
+  # TODO: Add cloud provider annotations for LoadBalancer configuration
+  # Different cloud providers use different annotations
+  annotations:
+    # AWS EKS annotations (uncomment if using AWS):
+    # service.beta.kubernetes.io/aws-load-balancer-type: "nlb"  # Network Load Balancer
+    # service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "http"
+    # service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "443"
+    # service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "arn:aws:acm:..."
+
+    # GCP GKE annotations (uncomment if using GCP):
+    # cloud.google.com/load-balancer-type: "External"
+    # cloud.google.com/backend-config: '{"default": "backend-config"}'
+
+    # Azure AKS annotations (uncomment if using Azure):
+    # service.beta.kubernetes.io/azure-load-balancer-internal: "false"
+
+    placeholder: delete-me  # TODO: Remove after adding annotations
+
+spec:
+  # TODO: Set Service type to LoadBalancer
+  # LoadBalancer: Cloud provider provisions external load balancer
+  # Automatically gets external IP address for internet access
+  type: ""  # TODO: Set to LoadBalancer
+
+  # ========================================================================
+  # SELECTOR
+  # ========================================================================
+
+  # TODO: Configure selector (same as ClusterIP Service)
+  selector:
+    # TODO: Add label: app: model-api
+    placeholder: delete-me  # TODO: Remove and add proper selector
+
+  # ========================================================================
+  # PORTS
+  # ========================================================================
+
+  ports:
+  # HTTP port
+  - name: http
+    protocol: TCP
+    # TODO: Set external port to 80
+    port: 0  # TODO: Change to 80
+    # TODO: Set target port to 5000
+    targetPort: 0  # TODO: Change to 5000
+
+  # TODO: (Optional) Add HTTPS port if using SSL/TLS
+  # - name: https
+  #   protocol: TCP
+  #   port: 443
+  #   targetPort: 5000
+
+  # ========================================================================
+  # LOAD BALANCER CONFIGURATION
+  # ========================================================================
+
+  # TODO: Configure external traffic policy
+  # Options:
+  # - Cluster: Traffic distributed to any node, then routed to pod (default)
+  # - Local: Traffic only to pods on the receiving node (preserves client IP)
+  #
+  # Cluster is recommended for better load distribution
+  # externalTrafficPolicy: Cluster
+
+  # TODO: Configure load balancer source ranges (IP whitelist)
+  # Restrict access to specific IP ranges for security
+  # loadBalancerSourceRanges:
+  # - "203.0.113.0/24"  # Example: Office IP range
+  # - "198.51.100.0/24" # Example: VPN IP range
+
+  # TODO: Configure health check node port (for Local traffic policy)
+  # healthCheckNodePort: 32000
+
+---
+
+# ============================================================================
+# HEADLESS SERVICE (Optional - for StatefulSet)
+# ============================================================================
+
+# Headless Service: Returns pod IPs directly instead of Service IP
+# Use case: StatefulSets, direct pod-to-pod communication
+# Not needed for this project, but included for learning
+
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: model-api-headless
+#   namespace: ml-serving
+#   labels:
+#     app: model-api
+# spec:
+#   type: ClusterIP
+#   clusterIP: None  # This makes it "headless"
+#   selector:
+#     app: model-api
+#   ports:
+#   - name: http
+#     port: 5000
+#     targetPort: 5000
+
+---
+
+# ============================================================================
+# SERVICE INSTRUCTIONS
+# ============================================================================
+
+# 1. Apply ConfigMap and Deployment first (dependencies):
+#    kubectl apply -f configmap.yaml -n ml-serving
+#    kubectl apply -f deployment.yaml -n ml-serving
+
+# 2. Apply this Service manifest:
+#    kubectl apply -f service.yaml -n ml-serving
+
+# 3. Verify Services:
+#    kubectl get svc -n ml-serving
+#    kubectl describe svc model-api-service -n ml-serving
+#    kubectl describe svc model-api-lb -n ml-serving
+
+# 4. Check Service endpoints (should list pod IPs):
+#    kubectl get endpoints model-api-service -n ml-serving
+#    # Should show 3 endpoints (one per pod)
+
+# 5. Test ClusterIP Service (from within cluster):
+#    kubectl run test-pod --image=curlimages/curl -it --rm -n ml-serving -- \
+#      curl http://model-api-service/health
+
+# 6. Test LoadBalancer Service (wait for external IP):
+#    kubectl get svc model-api-lb -n ml-serving --watch
+#    # Wait for EXTERNAL-IP to be assigned (may take 1-2 minutes)
+#
+#    EXTERNAL_IP=$(kubectl get svc model-api-lb -n ml-serving -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+#    curl http://$EXTERNAL_IP/health
+
+# 7. For Minikube (no real LoadBalancer):
+#    minikube tunnel  # Run in separate terminal
+#    # This exposes LoadBalancer services on localhost
+
+# ============================================================================
+# SERVICE DISCOVERY
+# ============================================================================
+
+# Kubernetes provides DNS-based service discovery
+# Services are accessible via DNS names:
+
+# Within same namespace:
+#   curl http://model-api-service/health
+#   curl http://model-api-service:80/health
+
+# From different namespace:
+#   curl http://model-api-service.ml-serving/health
+#   curl http://model-api-service.ml-serving.svc/health
+
+# Fully qualified domain name (FQDN):
+#   curl http://model-api-service.ml-serving.svc.cluster.local/health
+
+# DNS format: <service-name>.<namespace>.svc.cluster.local
+
+# ============================================================================
+# LOAD BALANCING
+# ============================================================================
+
+# How Services distribute traffic:
+
+# 1. ClusterIP Service:
+#    - kube-proxy creates iptables rules on each node
+#    - Traffic to Service IP is randomly distributed to pod IPs
+#    - Algorithm: Random selection (effectively round-robin)
+#    - Happens at network layer (transparent to application)
+
+# 2. LoadBalancer Service:
+#    - Cloud load balancer distributes traffic to node IPs
+#    - kube-proxy on each node distributes to pod IPs
+#    - Two-tier load balancing
+
+# 3. Session Affinity:
+#    - Without: Each request may go to different pod (stateless)
+#    - With ClientIP: Requests from same client go to same pod (stateful)
+
+# ============================================================================
+# ENDPOINTS
+# ============================================================================
+
+# Kubernetes automatically manages Endpoints object
+# Endpoints list all pod IPs matching Service selector
+
+# View endpoints:
+#   kubectl get endpoints model-api-service -n ml-serving -o yaml
+
+# Sample output:
+# apiVersion: v1
+# kind: Endpoints
+# metadata:
+#   name: model-api-service
+# subsets:
+# - addresses:
+#   - ip: 10.244.1.5
+#     targetRef:
+#       name: model-api-7d8f9c6b4-abc12
+#   - ip: 10.244.2.3
+#     targetRef:
+#       name: model-api-7d8f9c6b4-def34
+#   ports:
+#   - name: http
+#     port: 5000
+#     protocol: TCP
+
+# ============================================================================
+# TROUBLESHOOTING
+# ============================================================================
+
+# Service not accessible:
+#   1. Check Service exists:
+#      kubectl get svc model-api-service -n ml-serving
+#
+#   2. Check selector matches pods:
+#      kubectl get svc model-api-service -n ml-serving -o yaml | grep -A 2 selector
+#      kubectl get pods -n ml-serving --show-labels
+#
+#   3. Check endpoints are populated:
+#      kubectl get endpoints model-api-service -n ml-serving
+#      # Should list pod IPs. If empty, selector doesn't match any pods
+#
+#   4. Check pods are ready:
+#      kubectl get pods -n ml-serving
+#      # STATUS should be Running, READY should be 1/1
+
+# LoadBalancer EXTERNAL-IP stuck on <pending>:
+#   - Minikube: Run `minikube tunnel` in separate terminal
+#   - Cloud: Check cloud provider quotas and permissions
+#   - Cloud: Verify cluster has permission to create load balancers
+
+# Connection refused:
+#   1. Verify pod is listening on correct port:
+#      kubectl exec <pod-name> -n ml-serving -- netstat -tlnp
+#
+#   2. Test from another pod:
+#      kubectl run debug --image=curlimages/curl -it --rm -n ml-serving -- \
+#        curl http://<pod-ip>:5000/health
+
+# ============================================================================
+# COMPARISON: SERVICE TYPES
+# ============================================================================
+
+# ClusterIP (default):
+#   Access: Internal only (within cluster)
+#   Use: Service-to-service communication
+#   DNS: Yes
+#   External IP: No
+#   Example: Database, cache, internal APIs
+
+# NodePort:
+#   Access: External (via <NodeIP>:<NodePort>)
+#   Use: Development, testing
+#   DNS: Yes (internal)
+#   External IP: No (use node IP)
+#   Port Range: 30000-32767
+#   Example: Quick external access without LoadBalancer cost
+
+# LoadBalancer:
+#   Access: External (via cloud load balancer)
+#   Use: Production external services
+#   DNS: Yes (internal) + can add external DNS
+#   External IP: Yes (provisioned by cloud)
+#   Example: Public APIs, web services
+
+# ExternalName:
+#   Access: Maps to external DNS name
+#   Use: Access external services via k8s DNS
+#   Example: External database, third-party API
+
+# ============================================================================
+# LEARNING CHECKPOINTS
+# ============================================================================
+
+# After completing this file, you should understand:
+# ✓ Service types and when to use each
+# ✓ How selectors route traffic to pods
+# ✓ Port mapping (port vs targetPort)
+# ✓ Service discovery via DNS
+# ✓ Load balancing mechanisms
+# ✓ Endpoints and how they're populated
+# ✓ Session affinity options
+# ✓ Cloud provider LoadBalancer integration

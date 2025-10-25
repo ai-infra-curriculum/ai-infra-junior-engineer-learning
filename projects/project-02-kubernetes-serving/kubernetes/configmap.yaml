@@ -1,0 +1,284 @@
+# Kubernetes ConfigMap
+#
+# ConfigMaps store configuration data as key-value pairs.
+# They separate configuration from application code, allowing
+# environment-specific configs without rebuilding images.
+#
+# Learning Objectives:
+# - Understand ConfigMaps for configuration management
+# - Inject configuration via environment variables
+# - Update configuration without rebuilding images
+# - Version configuration for rollout triggers
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: model-config
+  namespace: ml-serving
+  labels:
+    app: model-api
+    version: v1.0
+
+  # TODO: Add annotation for change tracking
+  # Some tools (like Reloader) watch ConfigMaps and restart pods on changes
+  annotations:
+    # TODO: Add description annotation
+    # description: "Configuration for model serving API"
+    placeholder: delete-me  # TODO: Remove after adding annotation
+
+# ========================================================================
+# CONFIGURATION DATA
+# ========================================================================
+
+data:
+  # TODO: Set model_name - which model to load on startup
+  # Common values: "resnet50", "bert-base", "gpt2"
+  # The application reads this via MODEL_NAME environment variable
+  model_name: ""  # TODO: Set to "resnet50" or your chosen model
+
+  # TODO: Set log_level - logging verbosity
+  # Values: "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"
+  # Use INFO for production, DEBUG for development
+  log_level: ""  # TODO: Set to "INFO"
+
+  # TODO: Set max_batch_size - maximum batch size for inference
+  # Larger batches = better GPU utilization but higher latency
+  # Recommended: 16-32 for real-time serving, 64-128 for batch processing
+  max_batch_size: ""  # TODO: Set to "32"
+
+  # TODO: Add timeout configuration
+  # Request timeout in seconds
+  # timeout: "60"
+
+  # TODO: Add workers configuration (optional, for Gunicorn)
+  # Number of worker processes
+  # Formula: (2 * CPU_CORES) + 1
+  # workers: "5"
+
+  # TODO: Add additional configuration as needed
+  # Examples:
+  # - model_version: "1.0"
+  # - cache_enabled: "true"
+  # - cache_ttl: "3600"
+  # - metrics_enabled: "true"
+
+---
+
+# ============================================================================
+# ALTERNATIVE: ConfigMap from file
+# ============================================================================
+
+# You can also create ConfigMaps from files:
+#   kubectl create configmap model-config \
+#     --from-file=config.json \
+#     --from-file=model-config.yaml \
+#     -n ml-serving
+
+# Example config.json:
+# {
+#   "model_name": "resnet50",
+#   "log_level": "INFO",
+#   "max_batch_size": 32
+# }
+
+# Then mount as volume:
+# volumes:
+# - name: config-volume
+#   configMap:
+#     name: model-config
+#
+# volumeMounts:
+# - name: config-volume
+#   mountPath: /etc/config
+#   readOnly: true
+
+---
+
+# ============================================================================
+# CONFIGMAP INSTRUCTIONS
+# ============================================================================
+
+# 1. Apply this ConfigMap (must be created before Deployment):
+#    kubectl apply -f configmap.yaml -n ml-serving
+
+# 2. Verify ConfigMap:
+#    kubectl get configmap model-config -n ml-serving
+#    kubectl describe configmap model-config -n ml-serving
+
+# 3. View ConfigMap data:
+#    kubectl get configmap model-config -n ml-serving -o yaml
+
+# 4. Update ConfigMap:
+#    kubectl edit configmap model-config -n ml-serving
+#    # Or apply updated YAML file
+
+# 5. Verify pods use ConfigMap:
+#    kubectl exec <pod-name> -n ml-serving -- env | grep MODEL_NAME
+#    kubectl exec <pod-name> -n ml-serving -- env | grep LOG_LEVEL
+
+# ============================================================================
+# CONFIGMAP UPDATES
+# ============================================================================
+
+# Updating ConfigMaps:
+
+# Method 1: Edit in-place
+#   kubectl edit configmap model-config -n ml-serving
+#   # Changes are immediate but pods don't restart automatically
+
+# Method 2: Apply updated YAML
+#   # Edit this file, then:
+#   kubectl apply -f configmap.yaml -n ml-serving
+
+# Method 3: Using kubectl patch
+#   kubectl patch configmap model-config -n ml-serving \
+#     --type merge \
+#     -p '{"data":{"log_level":"DEBUG"}}'
+
+# IMPORTANT: Pods don't automatically restart when ConfigMap changes!
+
+# Solutions:
+# 1. Manual restart:
+#    kubectl rollout restart deployment/model-api -n ml-serving
+
+# 2. Use Reloader (https://github.com/stakater/Reloader)
+#    Automatically restarts pods when ConfigMap changes
+#    Add annotation to Deployment:
+#    reloader.stakater.com/auto: "true"
+
+# 3. Add ConfigMap hash to Deployment annotation (forces pod recreation)
+#    Add to Deployment template.metadata.annotations:
+#    checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+
+# ============================================================================
+# ENVIRONMENT VARIABLE INJECTION
+# ============================================================================
+
+# Three ways to use ConfigMaps:
+
+# 1. Individual environment variables (recommended for this project)
+# env:
+# - name: MODEL_NAME
+#   valueFrom:
+#     configMapKeyRef:
+#       name: model-config
+#       key: model_name
+
+# 2. All ConfigMap keys as environment variables
+# envFrom:
+# - configMapRef:
+#     name: model-config
+# # Creates env vars: model_name, log_level, max_batch_size
+
+# 3. Volume mount (for files)
+# volumes:
+# - name: config
+#   configMap:
+#     name: model-config
+# volumeMounts:
+# - name: config
+#   mountPath: /etc/config
+
+# ============================================================================
+# CONFIGMAP vs SECRETS
+# ============================================================================
+
+# Use ConfigMap for:
+# - Non-sensitive configuration
+# - Application settings
+# - Feature flags
+# - Environment-specific config
+# Examples: log_level, timeout, batch_size
+
+# Use Secrets for:
+# - Passwords
+# - API keys
+# - TLS certificates
+# - Tokens
+# Examples: database passwords, API tokens
+
+# Key difference: Secrets are base64-encoded (not encrypted!)
+# For true encryption, use:
+# - Sealed Secrets
+# - External Secrets Operator
+# - Cloud provider secret managers (AWS Secrets Manager, GCP Secret Manager)
+
+# ============================================================================
+# CONFIGMAP BEST PRACTICES
+# ============================================================================
+
+# 1. Namespace isolation:
+#    - One ConfigMap per application per environment
+#    - Name: <app>-config-<env> (e.g., model-api-config-prod)
+
+# 2. Versioning:
+#    - Include version in metadata.labels
+#    - For immutable configs, include hash in name
+#    - Example: model-config-v2-abc123
+
+# 3. Documentation:
+#    - Add comments explaining each configuration key
+#    - Include valid values and defaults
+#    - Document environment-specific differences
+
+# 4. Size limits:
+#    - ConfigMaps limited to 1MB
+#    - For large configs, use volume mounts or external config stores
+
+# 5. Validation:
+#    - Validate config values in application on startup
+#    - Fail fast if required config is missing or invalid
+#    - Log all configuration on startup (mask secrets!)
+
+# ============================================================================
+# EXAMPLE: Environment-Specific ConfigMaps
+# ============================================================================
+
+# Development ConfigMap:
+# data:
+#   model_name: "tiny-model"  # Faster loading
+#   log_level: "DEBUG"        # Verbose logging
+#   max_batch_size: "8"       # Smaller batches
+
+# Production ConfigMap:
+# data:
+#   model_name: "resnet50"    # Full model
+#   log_level: "INFO"         # Standard logging
+#   max_batch_size: "32"      # Optimized batches
+
+# ============================================================================
+# TROUBLESHOOTING
+# ============================================================================
+
+# ConfigMap not found:
+#   kubectl get configmap -n ml-serving
+#   # Verify namespace is correct
+
+# Pod can't read ConfigMap:
+#   kubectl describe pod <pod-name> -n ml-serving
+#   # Check Events for "ConfigMap not found" error
+#   # Ensure ConfigMap exists before creating Deployment
+
+# Environment variable not set:
+#   kubectl exec <pod-name> -n ml-serving -- env
+#   # Verify ConfigMap key names match Deployment spec
+
+# ConfigMap updates not reflected:
+#   # Environment variables: Requires pod restart
+#   kubectl rollout restart deployment/model-api -n ml-serving
+#
+#   # Volume mounts: Updates eventually (kubelet sync, ~1 minute)
+#   kubectl exec <pod-name> -n ml-serving -- cat /etc/config/model_name
+
+# ============================================================================
+# LEARNING CHECKPOINTS
+# ============================================================================
+
+# After completing this file, you should understand:
+# ✓ What ConfigMaps are and when to use them
+# ✓ How to create ConfigMaps from YAML
+# ✓ How to inject ConfigMap data as environment variables
+# ✓ ConfigMap vs Secrets (use cases)
+# ✓ How to update ConfigMaps
+# ✓ ConfigMap size limits and best practices
+# ✓ Why pods don't auto-restart on ConfigMap changes

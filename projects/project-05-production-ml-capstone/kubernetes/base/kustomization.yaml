@@ -1,0 +1,153 @@
+# Kustomize Base Configuration
+# =============================
+# This is the base configuration that is shared across all environments.
+# Environment-specific customizations are applied via overlays.
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# TODO: Add common labels
+# All resources created by this kustomization will have these labels
+commonLabels:
+  app.kubernetes.io/name: ml-api
+  app.kubernetes.io/component: api
+  app.kubernetes.io/part-of: ml-system
+
+# TODO: Define namespace
+# All resources will be created in this namespace
+namespace: ml-system
+
+# TODO: List base resources
+# Add paths to all base resource manifests
+resources:
+  # TODO: Add resource files
+  # - namespace.yaml
+  # - deployment.yaml
+  # - service.yaml
+  # - configmap.yaml
+  # - secret.yaml  # Use SealedSecret or external secret management
+  # - hpa.yaml
+  # - pdb.yaml  # Pod Disruption Budget
+  # - networkpolicy.yaml
+  # - serviceaccount.yaml
+  # - role.yaml
+  # - rolebinding.yaml
+
+# TODO: Configure config map generator
+# Generate ConfigMaps from files or literals
+configMapGenerator:
+  # Example:
+  # - name: ml-model-config
+  #   literals:
+  #     - MODEL_NAME=image-classifier
+  #     - MODEL_VERSION=latest
+  #     - MLFLOW_TRACKING_URI=http://mlflow-server:5000
+  #     - LOG_LEVEL=INFO
+
+# TODO: Configure secret generator
+# Generate Secrets (for development only - use Sealed Secrets in production)
+secretGenerator:
+  # Example:
+  # - name: api-keys
+  #   literals:
+  #     - API_KEY=dev-api-key-change-in-production
+
+# TODO: Add common annotations
+# These annotations will be added to all resources
+commonAnnotations:
+  # Example:
+  # managed-by: kustomize
+  # version: "1.0"
+
+# TODO: Define images
+# Specify container images to be used
+images:
+  # Example:
+  # - name: ml-api
+  #   newName: ghcr.io/your-org/ml-api
+  #   newTag: latest
+
+# TODO: Add transformers
+# Apply patches or transformations to resources
+# patches:
+#   - path: patches/replica-count.yaml
+#   - path: patches/resource-limits.yaml
+
+# ==============================================================================
+# STUDENT IMPLEMENTATION GUIDE
+# ==============================================================================
+
+# This kustomization.yaml defines the base configuration that is common across
+# all environments (dev, staging, production).
+#
+# Steps to implement:
+#
+# 1. Create Base Resource Manifests:
+#    Create the following YAML files in kubernetes/base/:
+#
+#    a) namespace.yaml:
+#       - Define ml-system namespace
+#       - Add resource quotas if needed
+#
+#    b) deployment.yaml:
+#       - Define Deployment for ml-api
+#       - Specify container image, ports, env vars
+#       - Configure liveness and readiness probes
+#       - Set resource requests and limits
+#       - Use ConfigMap and Secret references
+#
+#    c) service.yaml:
+#       - Define ClusterIP Service
+#       - Expose port 80 → targetPort 5000
+#       - Add appropriate selectors
+#
+#    d) configmap.yaml:
+#       - Store non-sensitive configuration
+#       - Model name, version, MLflow URI, etc.
+#
+#    e) secret.yaml:
+#       - Use SealedSecret or external secret manager
+#       - DO NOT commit plain Secrets to Git
+#
+#    f) hpa.yaml:
+#       - Configure Horizontal Pod Autoscaler
+#       - Min: 3, Max: 20 replicas
+#       - Target: CPU 70%, Memory 80%
+#
+#    g) pdb.yaml:
+#       - Configure Pod Disruption Budget
+#       - Ensure min 2 pods available during disruptions
+#
+#    h) networkpolicy.yaml:
+#       - Define network policies
+#       - Default deny all, explicit allow rules
+#
+#    i) serviceaccount.yaml:
+#       - Create ServiceAccount for ml-api
+#       - Avoid using default ServiceAccount
+#
+#    j) role.yaml + rolebinding.yaml:
+#       - Define RBAC permissions
+#       - Grant minimal required permissions
+#
+# 2. Configure Kustomization:
+#    - Uncomment and populate all TODO sections above
+#    - Add all resource files to resources: list
+#    - Configure ConfigMapGenerator and SecretGenerator
+#    - Set appropriate labels and annotations
+#
+# 3. Test Base Configuration:
+#    kubectl kustomize kubernetes/base/
+#    This should output all generated YAML
+#
+# 4. Apply Base Configuration (for testing):
+#    kubectl apply -k kubernetes/base/
+#    Verify all resources are created
+#
+# 5. Create Environment Overlays:
+#    Each environment (dev, staging, production) will have an overlay
+#    that customizes the base configuration
+#
+# Resources:
+# - Kustomize documentation: https://kustomize.io/
+# - Kubernetes best practices: https://kubernetes.io/docs/concepts/configuration/overview/

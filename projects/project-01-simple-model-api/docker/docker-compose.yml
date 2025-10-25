@@ -1,0 +1,326 @@
+# Docker Compose Configuration
+#
+# This file defines the services for local development and testing.
+# Docker Compose makes it easy to run multi-container applications.
+#
+# Author: AI Infrastructure Curriculum
+# License: MIT
+#
+# Usage:
+#   Start: docker-compose up
+#   Stop: docker-compose down
+#   Rebuild: docker-compose up --build
+
+version: '3.8'
+
+# TODO: Define services
+# Services are the containers that make up your application
+
+services:
+  # =========================================================================
+  # Model API Service
+  # =========================================================================
+
+  model-api:
+    # TODO: Configure the model API service
+
+    # Build configuration
+    # TODO: Specify build context and Dockerfile location
+    # build:
+    #   context: ..           # Build context (project root)
+    #   dockerfile: docker/Dockerfile
+
+    # Image name (alternative to build)
+    # TODO: Use this if you want to use a pre-built image
+    # image: model-api:v1.0
+
+    # Container name
+    # TODO: Give the container a friendly name
+    # container_name: model-api-dev
+
+    # Port mapping
+    # TODO: Map host port to container port
+    # Format: "HOST_PORT:CONTAINER_PORT"
+    # ports:
+    #   - "5000:5000"
+
+    # Environment variables
+    # TODO: Set environment variables for configuration
+    # environment:
+    #   - MODEL_NAME=resnet50
+    #   - DEVICE=cpu
+    #   - HOST=0.0.0.0
+    #   - PORT=5000
+    #   - LOG_LEVEL=INFO
+    #   - DEBUG=false
+
+    # Alternative: Load from .env file
+    # TODO: Uncomment to load environment variables from file
+    # env_file:
+    #   - ../.env
+
+    # Volume mounts
+    # TODO: Mount volumes for development
+    # This allows code changes without rebuilding
+    # volumes:
+    #   - ../src:/app/src:ro           # Mount source code (read-only)
+    #   - ../logs:/app/logs            # Mount logs directory
+    #   - model-cache:/root/.cache/torch  # Named volume for model weights
+
+    # Restart policy
+    # TODO: Configure restart behavior
+    # Options: no, always, on-failure, unless-stopped
+    # restart: unless-stopped
+
+    # Health check
+    # TODO: Configure health check
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+    #   interval: 30s
+    #   timeout: 5s
+    #   retries: 3
+    #   start_period: 30s
+
+    # Resource limits (OPTIONAL)
+    # TODO: Set resource limits to prevent container from using too much
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '2.0'      # Max 2 CPU cores
+    #       memory: 4G       # Max 4GB RAM
+    #     reservations:
+    #       cpus: '1.0'      # Minimum 1 CPU core
+    #       memory: 2G       # Minimum 2GB RAM
+
+    # Logging configuration
+    # TODO: Configure logging driver and options
+    # logging:
+    #   driver: "json-file"
+    #   options:
+    #     max-size: "10m"    # Max log file size
+    #     max-file: "3"      # Max number of log files
+
+    # Networks
+    # TODO: Attach to custom network (if using multiple services)
+    # networks:
+    #   - model-api-network
+
+
+# =========================================================================
+# Named Volumes (OPTIONAL)
+# =========================================================================
+
+# TODO: Define named volumes for persistent data
+# volumes:
+#   model-cache:
+#     driver: local
+
+
+# =========================================================================
+# Networks (OPTIONAL)
+# =========================================================================
+
+# TODO: Define custom networks for service communication
+# networks:
+#   model-api-network:
+#     driver: bridge
+
+
+# =========================================================================
+# Complete Example Configuration
+# =========================================================================
+
+# Uncomment and modify the example below:
+
+# version: '3.8'
+#
+# services:
+#   model-api:
+#     build:
+#       context: ..
+#       dockerfile: docker/Dockerfile
+#     container_name: model-api-dev
+#     ports:
+#       - "5000:5000"
+#     environment:
+#       - MODEL_NAME=resnet50
+#       - DEVICE=cpu
+#       - HOST=0.0.0.0
+#       - PORT=5000
+#       - LOG_LEVEL=INFO
+#     volumes:
+#       - ../src:/app/src:ro
+#       - ../logs:/app/logs
+#       - model-cache:/root/.cache/torch
+#     restart: unless-stopped
+#     healthcheck:
+#       test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+#       interval: 30s
+#       timeout: 5s
+#       retries: 3
+#       start_period: 30s
+#     logging:
+#       driver: "json-file"
+#       options:
+#         max-size: "10m"
+#         max-file: "3"
+#
+# volumes:
+#   model-cache:
+
+
+# =========================================================================
+# Usage Instructions
+# =========================================================================
+
+# Start all services:
+#   docker-compose up
+#
+# Start in detached mode (background):
+#   docker-compose up -d
+#
+# View logs:
+#   docker-compose logs -f
+#   docker-compose logs -f model-api  # Specific service
+#
+# Stop services:
+#   docker-compose down
+#
+# Stop and remove volumes:
+#   docker-compose down -v
+#
+# Rebuild and start:
+#   docker-compose up --build
+#
+# Scale services (if stateless):
+#   docker-compose up --scale model-api=3
+#
+# Execute command in running container:
+#   docker-compose exec model-api bash
+#   docker-compose exec model-api python src/app.py
+#
+# View service status:
+#   docker-compose ps
+
+
+# =========================================================================
+# Development Workflow
+# =========================================================================
+
+# 1. Initial setup:
+#    docker-compose up --build
+#
+# 2. Make code changes in src/
+#    - Changes are reflected immediately (volume mount)
+#    - No need to rebuild for Python code changes
+#
+# 3. View logs:
+#    docker-compose logs -f
+#
+# 4. Test the API:
+#    curl http://localhost:5000/health
+#    curl -X POST -F "file=@test.jpg" http://localhost:5000/predict
+#
+# 5. Stop when done:
+#    docker-compose down
+
+
+# =========================================================================
+# Advanced: Multi-Service Setup (Future Projects)
+# =========================================================================
+
+# For future projects, you might add additional services:
+#
+# services:
+#   model-api:
+#     # ... (as above)
+#
+#   # PostgreSQL database
+#   postgres:
+#     image: postgres:15-alpine
+#     environment:
+#       - POSTGRES_PASSWORD=secret
+#       - POSTGRES_DB=model_logs
+#     volumes:
+#       - postgres-data:/var/lib/postgresql/data
+#
+#   # Redis cache
+#   redis:
+#     image: redis:7-alpine
+#     ports:
+#       - "6379:6379"
+#
+#   # Monitoring with Prometheus
+#   prometheus:
+#     image: prom/prometheus
+#     volumes:
+#       - ./prometheus.yml:/etc/prometheus/prometheus.yml
+#     ports:
+#       - "9090:9090"
+#
+# volumes:
+#   postgres-data:
+
+
+# =========================================================================
+# Troubleshooting
+# =========================================================================
+
+# "ERROR: Couldn't connect to Docker daemon"
+#   - Start Docker Desktop or Docker service
+#   - Check Docker is running: docker ps
+#
+# "port is already allocated"
+#   - Another service is using port 5000
+#   - Change host port: "5001:5000"
+#   - Stop conflicting service
+#
+# "No such file or directory: '../src'"
+#   - Run from project root, not docker/ directory
+#   - cd to project root first
+#
+# Container keeps restarting
+#   - Check logs: docker-compose logs model-api
+#   - Remove restart policy temporarily
+#   - Check application startup
+#
+# Changes not reflected
+#   - Check volume mount is correct
+#   - Restart container: docker-compose restart model-api
+#   - For Dockerfile changes, rebuild: docker-compose up --build
+#
+# "Cannot start service: OCI runtime create failed"
+#   - Check resource limits aren't too high
+#   - Check Docker Desktop resource settings
+#   - Free up system resources
+
+
+# =========================================================================
+# Best Practices
+# =========================================================================
+
+# 1. Use specific image versions (not 'latest')
+#    - Bad: image: python:latest
+#    - Good: image: python:3.11-slim
+#
+# 2. Set resource limits in production
+#    - Prevents one container from consuming all resources
+#
+# 3. Use health checks
+#    - Allows Docker to detect and restart failed containers
+#
+# 4. Use named volumes for persistent data
+#    - Survives container deletion
+#
+# 5. Use .env files for secrets
+#    - Don't commit sensitive values to git
+#
+# 6. Use networks to isolate services
+#    - Better security and organization
+#
+# 7. Configure logging
+#    - Prevent disk space issues from unbounded logs
+#
+# 8. Use restart policies appropriately
+#    - 'unless-stopped' for production
+#    - 'no' for development

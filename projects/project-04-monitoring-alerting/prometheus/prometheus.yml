@@ -1,0 +1,333 @@
+# Prometheus Configuration
+#
+# This file configures Prometheus to scrape metrics from various targets.
+#
+# Learning Objectives:
+# - Understand Prometheus scrape configurations
+# - Learn about service discovery mechanisms
+# - Configure metric retention and evaluation intervals
+# - Set up alerting integration
+#
+# References:
+# - https://prometheus.io/docs/prometheus/latest/configuration/configuration/
+# - https://prometheus.io/docs/prometheus/latest/getting_started/
+
+# =============================================================================
+# Global Configuration
+# =============================================================================
+
+global:
+  # TODO: Set scrape interval
+  # How often to scrape targets for metrics
+  # Default: 1m, Recommended: 15s for detailed monitoring
+  # scrape_interval: 15s
+
+  # TODO: Set evaluation interval
+  # How often to evaluate alert rules
+  # Default: 1m, Recommended: 15s or 30s
+  # evaluation_interval: 30s
+
+  # TODO: Add external labels
+  # These labels are attached to all metrics and alerts
+  # Useful for identifying the cluster/environment
+  # external_labels:
+  #   cluster: 'ml-infrastructure'
+  #   environment: 'production'
+  #   region: 'us-west-2'
+
+
+# =============================================================================
+# Alertmanager Configuration
+# =============================================================================
+
+# TODO: Configure Alertmanager integration
+# Prometheus sends alerts to Alertmanager for routing and notification
+#
+# alerting:
+#   alertmanagers:
+#     - static_configs:
+#         - targets:
+#             - 'alertmanager:9093'
+#       timeout: 10s
+
+
+# =============================================================================
+# Alert Rules
+# =============================================================================
+
+# TODO: Load alert rule files
+# These files contain alert definitions (PromQL queries)
+#
+# rule_files:
+#   - '/etc/prometheus/alerts/infrastructure.yml'
+#   - '/etc/prometheus/alerts/application.yml'
+#   - '/etc/prometheus/alerts/ml_model.yml'
+
+
+# =============================================================================
+# Scrape Configurations
+# =============================================================================
+
+scrape_configs:
+  # ---------------------------------------------------------------------------
+  # Prometheus Self-Monitoring
+  # ---------------------------------------------------------------------------
+
+  # TODO: Add Prometheus self-monitoring job
+  # Prometheus scrapes its own /metrics endpoint to monitor itself
+  #
+  # - job_name: 'prometheus'
+  #   static_configs:
+  #     - targets: ['localhost:9090']
+  #       labels:
+  #         instance: 'prometheus-server'
+
+
+  # ---------------------------------------------------------------------------
+  # Node Exporter (System Metrics)
+  # ---------------------------------------------------------------------------
+
+  # TODO: Add Node Exporter scrape configuration
+  # Node Exporter provides system-level metrics (CPU, memory, disk, network)
+  #
+  # - job_name: 'node-exporter'
+  #   static_configs:
+  #     - targets: ['node-exporter:9100']
+  #       labels:
+  #         instance: 'main-server'
+  #         role: 'ml-infrastructure'
+  #
+  # Metrics collected:
+  # - node_cpu_seconds_total
+  # - node_memory_MemTotal_bytes
+  # - node_disk_io_time_seconds_total
+  # - node_network_receive_bytes_total
+
+
+  # ---------------------------------------------------------------------------
+  # ML Model API
+  # ---------------------------------------------------------------------------
+
+  # TODO: Add ML model API scrape configuration
+  # Your Flask/FastAPI application with /metrics endpoint
+  #
+  # - job_name: 'ml-api'
+  #   static_configs:
+  #     - targets: ['ml-api:5000']
+  #       labels:
+  #         service: 'model-inference'
+  #         model: 'resnet50'
+  #   metrics_path: '/metrics'
+  #   scrape_interval: 15s
+
+
+  # ---------------------------------------------------------------------------
+  # Multiple Application Instances
+  # ---------------------------------------------------------------------------
+
+  # TODO: Add configuration for multiple API instances
+  # In production, you'll have multiple replicas for high availability
+  #
+  # - job_name: 'ml-api-replicas'
+  #   static_configs:
+  #     - targets:
+  #         - 'ml-api-1:5000'
+  #         - 'ml-api-2:5000'
+  #         - 'ml-api-3:5000'
+  #       labels:
+  #         service: 'model-inference'
+
+
+  # ---------------------------------------------------------------------------
+  # Kubernetes Service Discovery (Advanced)
+  # ---------------------------------------------------------------------------
+
+  # TODO: Add Kubernetes service discovery configuration
+  # Automatically discovers pods and services in Kubernetes cluster
+  # Only if deploying to Kubernetes!
+  #
+  # - job_name: 'kubernetes-pods'
+  #   kubernetes_sd_configs:
+  #     - role: pod
+  #       namespaces:
+  #         names:
+  #           - ml-inference
+  #
+  #   # Only scrape pods with prometheus.io/scrape: "true" annotation
+  #   relabel_configs:
+  #     # Check if pod has scrape annotation
+  #     - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+  #       action: keep
+  #       regex: true
+  #
+  #     # Use custom metrics path if specified
+  #     - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+  #       action: replace
+  #       target_label: __metrics_path__
+  #       regex: (.+)
+  #
+  #     # Use custom port if specified
+  #     - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+  #       action: replace
+  #       regex: ([^:]+)(?::\d+)?;(\d+)
+  #       replacement: $1:$2
+  #       target_label: __address__
+  #
+  #     # Add pod metadata as labels
+  #     - source_labels: [__meta_kubernetes_namespace]
+  #       action: replace
+  #       target_label: kubernetes_namespace
+  #
+  #     - source_labels: [__meta_kubernetes_pod_name]
+  #       action: replace
+  #       target_label: kubernetes_pod_name
+
+
+  # ---------------------------------------------------------------------------
+  # File-Based Service Discovery
+  # ---------------------------------------------------------------------------
+
+  # TODO: Add file-based service discovery
+  # Useful for dynamic environments without Kubernetes
+  # Prometheus watches these files and reloads when they change
+  #
+  # - job_name: 'file-sd'
+  #   file_sd_configs:
+  #     - files:
+  #         - '/etc/prometheus/targets/*.json'
+  #       refresh_interval: 1m
+  #
+  # File format (targets.json):
+  # [
+  #   {
+  #     "targets": ["api-1:5000", "api-2:5000"],
+  #     "labels": {
+  #       "service": "ml-api",
+  #       "environment": "production"
+  #     }
+  #   }
+  # ]
+
+
+  # ---------------------------------------------------------------------------
+  # Blackbox Exporter (Endpoint Monitoring)
+  # ---------------------------------------------------------------------------
+
+  # TODO: Add Blackbox Exporter configuration
+  # Monitors endpoint availability and response time
+  # Useful for external service monitoring
+  #
+  # - job_name: 'blackbox-http'
+  #   metrics_path: /probe
+  #   params:
+  #     module: [http_2xx]  # Look for HTTP 200 response
+  #   static_configs:
+  #     - targets:
+  #         - http://ml-api:5000/health
+  #         - http://ml-api:5000/predict
+  #   relabel_configs:
+  #     - source_labels: [__address__]
+  #       target_label: __param_target
+  #     - source_labels: [__param_target]
+  #       target_label: instance
+  #     - target_label: __address__
+  #       replacement: blackbox-exporter:9115
+
+
+  # ---------------------------------------------------------------------------
+  # Database Exporters (Optional)
+  # ---------------------------------------------------------------------------
+
+  # TODO: Add database exporter if using PostgreSQL
+  #
+  # - job_name: 'postgres-exporter'
+  #   static_configs:
+  #     - targets: ['postgres-exporter:9187']
+  #       labels:
+  #         database: 'ml-predictions'
+
+
+  # ---------------------------------------------------------------------------
+  # Custom Exporters
+  # ---------------------------------------------------------------------------
+
+  # TODO: Add any custom exporters you create
+  # Example: A custom exporter for model registry, feature store, etc.
+  #
+  # - job_name: 'model-registry-exporter'
+  #   static_configs:
+  #     - targets: ['model-registry-exporter:8000']
+
+
+# =============================================================================
+# Storage Configuration
+# =============================================================================
+
+# TODO: Configure storage retention
+# Prometheus stores metrics in a time-series database (TSDB)
+# Default retention: 15 days
+#
+# This is configured via command-line flags in docker-compose.yml:
+# command:
+#   - '--storage.tsdb.path=/prometheus'
+#   - '--storage.tsdb.retention.time=30d'
+#   - '--storage.tsdb.retention.size=50GB'
+
+
+# =============================================================================
+# Remote Write (Long-Term Storage)
+# =============================================================================
+
+# TODO: Add remote write configuration for long-term storage
+# Send metrics to Thanos, Cortex, or cloud storage for retention > 30 days
+#
+# remote_write:
+#   - url: "http://thanos-receiver:19291/api/v1/receive"
+#     queue_config:
+#       capacity: 10000
+#       max_shards: 5
+#       min_shards: 1
+#       max_samples_per_send: 5000
+
+
+# =============================================================================
+# Testing Your Configuration
+# =============================================================================
+
+# Steps to validate:
+# 1. Start Prometheus: docker-compose up -d prometheus
+# 2. Check config: http://localhost:9090/config
+# 3. Check targets: http://localhost:9090/targets
+# 4. Verify metrics: http://localhost:9090/graph
+#    - Query: up
+#    - Should show all targets with value 1 (up) or 0 (down)
+# 5. Test alerts: http://localhost:9090/alerts
+
+
+# =============================================================================
+# Common Issues & Solutions
+# =============================================================================
+
+# Issue: Targets showing as "DOWN"
+# Solution:
+# - Check target is running: docker-compose ps
+# - Check network: targets must be on same Docker network
+# - Check firewall: port must be accessible
+# - Check /metrics endpoint: curl http://target:port/metrics
+
+# Issue: "context deadline exceeded" errors
+# Solution:
+# - Increase scrape_timeout (default: scrape_interval)
+# - Check target performance (slow /metrics endpoint)
+
+# Issue: High memory usage
+# Solution:
+# - Reduce scrape_interval
+# - Reduce metric retention time
+# - Reduce number of high-cardinality metrics
+
+# Issue: Gaps in time series
+# Solution:
+# - Check Prometheus logs for scrape errors
+# - Ensure stable network connection
+# - Check target uptime

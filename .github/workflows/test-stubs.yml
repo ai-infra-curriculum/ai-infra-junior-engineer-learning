@@ -1,0 +1,169 @@
+name: Test Code Stubs
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'projects/**/stubs/**/*.py'
+      - 'projects/**/tests/**/*.py'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'projects/**/stubs/**/*.py'
+      - 'projects/**/tests/**/*.py'
+  workflow_dispatch:
+
+jobs:
+  test-stubs:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+
+    - name: Cache pip packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-stubs-${{ hashFiles('**/requirements*.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-stubs-
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest pytest-cov pylint autopep8
+
+    - name: Check stub files exist
+      run: |
+        echo "Searching for stub files..."
+        STUB_COUNT=$(find projects -path "*/stubs/*.py" -type f | wc -l)
+        echo "Found $STUB_COUNT stub files"
+        if [ $STUB_COUNT -eq 0 ]; then
+          echo "Warning: No stub files found"
+          exit 0
+        fi
+
+    - name: Validate Python syntax in stubs
+      run: |
+        echo "Validating Python syntax in all stub files..."
+        EXIT_CODE=0
+        while IFS= read -r file; do
+          echo "Checking: $file"
+          if ! python -m py_compile "$file"; then
+            echo "Syntax error in: $file"
+            EXIT_CODE=1
+          fi
+        done < <(find projects -path "*/stubs/*.py" -type f)
+
+        if [ $EXIT_CODE -eq 0 ]; then
+          echo "All stub files are syntactically valid"
+        else
+          echo "Some stub files have syntax errors"
+          exit 1
+        fi
+
+    - name: Verify TODO comments in stubs
+      run: |
+        echo "Verifying TODO comments in stub files..."
+        MISSING_TODO=0
+        while IFS= read -r file; do
+          if ! grep -q "TODO" "$file"; then
+            echo "Missing TODO comment: $file"
+            MISSING_TODO=$((MISSING_TODO + 1))
+          fi
+        done < <(find projects -path "*/stubs/*.py" -type f)
+
+        if [ $MISSING_TODO -eq 0 ]; then
+          echo "All stub files contain TODO comments"
+        else
+          echo "Warning: $MISSING_TODO stub file(s) missing TODO comments"
+        fi
+
+    - name: Check for proper type hints
+      run: |
+        echo "Checking for type hints in stub functions..."
+        while IFS= read -r file; do
+          echo "Analyzing: $file"
+          # Check if functions have type hints
+          if grep -q "def " "$file"; then
+            if ! grep -q "def .*->.*:" "$file" && ! grep -q "def .*:.*#.*type:" "$file"; then
+              echo "Info: $file may be missing type hints"
+            fi
+          fi
+        done < <(find projects -path "*/stubs/*.py" -type f)
+
+    - name: Verify stub structure
+      run: |
+        echo "Verifying stub file structure..."
+        python << 'EOF'
+        import os
+        import ast
+        from pathlib import Path
+
+        stub_files = list(Path('projects').rglob('stubs/*.py'))
+
+        for stub_file in stub_files:
+            try:
+                with open(stub_file, 'r') as f:
+                    tree = ast.parse(f.read(), filename=str(stub_file))
+
+                has_functions = any(isinstance(node, ast.FunctionDef) for node in ast.walk(tree))
+                has_classes = any(isinstance(node, ast.ClassDef) for node in ast.walk(tree))
+
+                if not has_functions and not has_classes:
+                    print(f"Warning: {stub_file} has no functions or classes")
+                else:
+                    print(f"Valid: {stub_file}")
+
+            except SyntaxError as e:
+                print(f"Syntax error in {stub_file}: {e}")
+        EOF
+
+    - name: Run stub tests
+      run: |
+        if [ -d "tests" ]; then
+          echo "Running tests for stubs..."
+          pytest tests/ -v --tb=short -m "stub or stubs" || echo "No stub-specific tests found"
+        else
+          echo "No tests directory found, skipping tests"
+        fi
+      continue-on-error: true
+
+    - name: Generate stub validation report
+      if: always()
+      run: |
+        echo "## Stub Validation Report" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        STUB_COUNT=$(find projects -path "*/stubs/*.py" -type f | wc -l)
+        echo "**Total stub files:** $STUB_COUNT" >> $GITHUB_STEP_SUMMARY
+
+        TODO_COUNT=$(find projects -path "*/stubs/*.py" -type f -exec grep -l "TODO" {} \; | wc -l)
+        echo "**Files with TODO comments:** $TODO_COUNT" >> $GITHUB_STEP_SUMMARY
+
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Stub Files List" >> $GITHUB_STEP_SUMMARY
+        find projects -path "*/stubs/*.py" -type f | while read -r file; do
+          echo "- \`$file\`" >> $GITHUB_STEP_SUMMARY
+        done
+
+    - name: Check stub completeness
+      run: |
+        echo "Checking if stubs have corresponding tests..."
+        for stub_dir in $(find projects -type d -name "stubs"); do
+          project_dir=$(dirname "$stub_dir")
+          test_dir="$project_dir/tests"
+
+          if [ -d "$test_dir" ]; then
+            echo "Tests found for: $project_dir"
+          else
+            echo "Warning: No tests directory for: $project_dir"
+          fi
+        done

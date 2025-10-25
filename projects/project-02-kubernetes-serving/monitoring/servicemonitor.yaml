@@ -1,0 +1,401 @@
+# Prometheus ServiceMonitor
+#
+# ServiceMonitor is a Custom Resource Definition (CRD) from the
+# Prometheus Operator that declaratively specifies how to monitor
+# a set of services.
+#
+# Learning Objectives:
+# - Understand Prometheus Operator and ServiceMonitor CRD
+# - Configure automatic service discovery for metrics
+# - Set up scraping intervals and endpoints
+# - Use label selectors for service matching
+
+# NOTE: ServiceMonitor requires Prometheus Operator to be installed
+# If using Prometheus without Operator, configure scrape configs manually
+# in Prometheus ConfigMap
+
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: model-api-monitor
+  namespace: ml-serving
+  labels:
+    app: model-api
+    release: prometheus  # Match Prometheus Operator's serviceMonitorSelector
+
+spec:
+  # ========================================================================
+  # SERVICE SELECTOR
+  # ========================================================================
+
+  # TODO: Configure selector to match Service labels
+  # ServiceMonitor finds services matching these labels
+  selector:
+    matchLabels:
+      # TODO: Add label to match model-api-service
+      # Must match labels in service.yaml
+      placeholder: delete-me  # TODO: Replace with: app: model-api
+
+  # ========================================================================
+  # NAMESPACE SELECTOR
+  # ========================================================================
+
+  # TODO: Configure namespace selector
+  # Options:
+  # 1. Any namespace: omit namespaceSelector
+  # 2. Same namespace as ServiceMonitor: namespaceSelector: {}
+  # 3. Specific namespaces: namespaceSelector.matchNames
+
+  # For this project, monitor services in same namespace
+  namespaceSelector:
+    matchNames:
+    - ""  # TODO: Set to "ml-serving"
+
+  # ========================================================================
+  # ENDPOINTS
+  # ========================================================================
+
+  # TODO: Configure endpoints to scrape
+  # Each endpoint defines how to scrape metrics from the Service
+  endpoints:
+  - port: ""  # TODO: Set to "http" (matches port name in service.yaml)
+
+    # TODO: Set path to /metrics
+    # Where Prometheus scrapes metrics from
+    path: ""  # TODO: Set to "/metrics"
+
+    # TODO: Set scrape interval to 30 seconds
+    # How often Prometheus scrapes metrics
+    # Default is 30s if not specified
+    interval: ""  # TODO: Set to "30s"
+
+    # TODO: Set scrape timeout to 10 seconds
+    # How long to wait for scrape response before timing out
+    # Must be shorter than interval
+    scrapeTimeout: ""  # TODO: Set to "10s"
+
+    # TODO: Set scheme to http
+    # Use "https" if Service uses TLS
+    scheme: ""  # TODO: Set to "http"
+
+    # =====================================================================
+    # RELABELING (Optional but useful)
+    # =====================================================================
+
+    # TODO: Configure metric relabeling (optional)
+    # Relabeling transforms labels before storing metrics
+    # Use cases:
+    # - Add custom labels
+    # - Rename labels
+    # - Drop unwanted metrics
+    # - Filter by label values
+
+    # Example: Add environment label
+    # metricRelabelings:
+    # - sourceLabels: [__address__]
+    #   targetLabel: environment
+    #   replacement: production
+
+    # Example: Drop metrics with high cardinality
+    # metricRelabelings:
+    # - action: drop
+    #   regex: "user_.*"  # Drop all user-specific metrics
+    #   sourceLabels: [__name__]
+
+    # TODO: Configure relabelings to add pod metadata (optional)
+    # relabelings:
+    # - sourceLabels: [__meta_kubernetes_pod_name]
+    #   targetLabel: pod
+    # - sourceLabels: [__meta_kubernetes_pod_node_name]
+    #   targetLabel: node
+    # - sourceLabels: [__meta_kubernetes_namespace]
+    #   targetLabel: namespace
+
+    # =====================================================================
+    # BASIC AUTH / TLS (Optional)
+    # =====================================================================
+
+    # TODO: Configure authentication if metrics endpoint is protected
+    # basicAuth:
+    #   username:
+    #     name: metrics-auth
+    #     key: username
+    #   password:
+    #     name: metrics-auth
+    #     key: password
+
+    # TODO: Configure TLS if using HTTPS
+    # tlsConfig:
+    #   insecureSkipVerify: false
+    #   ca:
+    #     secret:
+    #       name: metrics-tls
+    #       key: ca.crt
+
+---
+
+# ============================================================================
+# ALTERNATIVE: Prometheus ConfigMap (Without Operator)
+# ============================================================================
+
+# If not using Prometheus Operator, add scrape config to Prometheus ConfigMap:
+
+# apiVersion: v1
+# kind: ConfigMap
+# metadata:
+#   name: prometheus-config
+#   namespace: monitoring
+# data:
+#   prometheus.yml: |
+#     global:
+#       scrape_interval: 30s
+#       evaluation_interval: 30s
+#
+#     scrape_configs:
+#     - job_name: 'model-api'
+#       kubernetes_sd_configs:
+#       - role: endpoints
+#         namespaces:
+#           names:
+#           - ml-serving
+#       relabel_configs:
+#       - source_labels: [__meta_kubernetes_service_label_app]
+#         action: keep
+#         regex: model-api
+#       - source_labels: [__meta_kubernetes_endpoint_port_name]
+#         action: keep
+#         regex: http
+#       - source_labels: [__meta_kubernetes_namespace]
+#         target_label: namespace
+#       - source_labels: [__meta_kubernetes_service_name]
+#         target_label: service
+#       - source_labels: [__meta_kubernetes_pod_name]
+#         target_label: pod
+
+---
+
+# ============================================================================
+# SERVICEMONITOR INSTRUCTIONS
+# ============================================================================
+
+# Prerequisites:
+
+# 1. Install Prometheus Operator
+#    Using Helm:
+#      helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+#      helm repo update
+#      helm install prometheus prometheus-community/kube-prometheus-stack \
+#        --namespace monitoring --create-namespace
+
+# 2. Verify Prometheus Operator is running:
+#      kubectl get pods -n monitoring
+#      # Should see: prometheus-operator, prometheus-prometheus-0, etc.
+
+# 3. Verify ServiceMonitor CRD exists:
+#      kubectl get crd servicemonitors.monitoring.coreos.com
+
+# Apply ServiceMonitor:
+#   kubectl apply -f servicemonitor.yaml -n ml-serving
+
+# Verify ServiceMonitor:
+#   kubectl get servicemonitor -n ml-serving
+#   kubectl describe servicemonitor model-api-monitor -n ml-serving
+
+# Check if Prometheus is scraping:
+#   1. Port-forward Prometheus:
+#      kubectl port-forward -n monitoring svc/prometheus-kube-prometheus-prometheus 9090:9090
+
+#   2. Open browser: http://localhost:9090
+
+#   3. Check targets: Status → Targets
+#      Should see model-api endpoints
+
+#   4. Query metrics: Graph tab
+#      Query: model_api_requests_total
+#      Should see your metrics
+
+# ============================================================================
+# SERVICEMONITOR MATCHING
+# ============================================================================
+
+# How ServiceMonitor finds Services:
+
+# 1. Prometheus Operator watches for ServiceMonitor resources
+# 2. ServiceMonitor.spec.selector matches Service labels
+# 3. ServiceMonitor.spec.namespaceSelector matches namespaces
+# 4. For each matching Service:
+#    - Get Service endpoints (pod IPs)
+#    - Generate scrape configs for each endpoint
+#    - Update Prometheus configuration
+# 5. Prometheus scrapes endpoints at specified interval
+
+# Example Service labels:
+#   apiVersion: v1
+#   kind: Service
+#   metadata:
+#     name: model-api-service
+#     labels:
+#       app: model-api  # ← ServiceMonitor selector matches this
+
+# Example ServiceMonitor selector:
+#   selector:
+#     matchLabels:
+#       app: model-api  # ← Matches Service label
+
+---
+
+# ============================================================================
+# PROMETHEUS OPERATOR ARCHITECTURE
+# ============================================================================
+
+# ┌─────────────────────────────────────────────────────────────┐
+# │                 Prometheus Operator                         │
+# │                                                             │
+# │  Watches:                                                   │
+# │  - Prometheus CRD                                           │
+# │  - ServiceMonitor CRD                                       │
+# │  - PodMonitor CRD                                           │
+# │  - PrometheusRule CRD (alerts)                              │
+# │                                                             │
+# │  Generates:                                                 │
+# │  - Prometheus StatefulSet                                   │
+# │  - Prometheus ConfigMap (scrape configs)                    │
+# │  - RBAC rules for service discovery                         │
+# └─────────────────────────────────────────────────────────────┘
+#                           │
+#                           ▼
+# ┌─────────────────────────────────────────────────────────────┐
+# │                   Prometheus Server                         │
+# │                                                             │
+# │  1. Reads generated ConfigMap                               │
+# │  2. Discovers Services via Kubernetes API                   │
+# │  3. Scrapes /metrics endpoints                              │
+# │  4. Stores time-series data                                 │
+# └─────────────────────────────────────────────────────────────┘
+#                           │
+#                           ▼
+# ┌─────────────────────────────────────────────────────────────┐
+# │                      Your Service                           │
+# │                                                             │
+# │  Pods expose /metrics endpoint                              │
+# │  Prometheus scrapes every 30 seconds                        │
+# └─────────────────────────────────────────────────────────────┘
+
+---
+
+# ============================================================================
+# DEBUGGING SERVICEMONITOR
+# ============================================================================
+
+# ServiceMonitor not discovering services:
+#   1. Check ServiceMonitor labels match Service:
+#      kubectl get svc -n ml-serving --show-labels
+#      kubectl get servicemonitor model-api-monitor -n ml-serving -o yaml | grep -A 3 selector
+#
+#   2. Check namespace selector:
+#      kubectl describe servicemonitor model-api-monitor -n ml-serving
+#
+#   3. Check Prometheus Operator logs:
+#      kubectl logs -n monitoring deployment/prometheus-operator
+
+# Metrics not appearing in Prometheus:
+#   1. Check Prometheus targets:
+#      kubectl port-forward -n monitoring svc/prometheus-kube-prometheus-prometheus 9090:9090
+#      # Open http://localhost:9090/targets
+#
+#   2. Verify endpoint is healthy:
+#      kubectl port-forward -n ml-serving svc/model-api-service 8080:80
+#      curl http://localhost:8080/metrics
+#
+#   3. Check Prometheus logs:
+#      kubectl logs -n monitoring prometheus-prometheus-kube-prometheus-prometheus-0
+
+# Prometheus can't scrape endpoints:
+#   - Check RBAC permissions
+#   - Verify network policies allow Prometheus → Service communication
+#   - Check Service port name matches ServiceMonitor port
+
+# ============================================================================
+# SERVICEMONITOR EXAMPLES
+# ============================================================================
+
+# Example 1: Multiple endpoints
+#   endpoints:
+#   - port: http
+#     path: /metrics
+#   - port: admin
+#     path: /admin/metrics
+
+# Example 2: Different scrape intervals
+#   endpoints:
+#   - port: http
+#     path: /metrics
+#     interval: 30s  # Frequent scraping
+#   - port: admin
+#     path: /admin/metrics
+#     interval: 5m   # Infrequent scraping
+
+# Example 3: Label filtering
+#   selector:
+#     matchLabels:
+#       app: model-api
+#     matchExpressions:
+#     - key: environment
+#       operator: In
+#       values: [production, staging]
+
+# Example 4: Cross-namespace monitoring
+#   namespaceSelector:
+#     matchNames:
+#     - ml-serving
+#     - ml-serving-staging
+#     - ml-serving-prod
+
+---
+
+# ============================================================================
+# BEST PRACTICES
+# ============================================================================
+
+# 1. Use consistent label selectors
+#    - Standardize labels across services
+#    - Document labeling conventions
+#    - Use label selectors that won't match unwanted services
+
+# 2. Set appropriate scrape intervals
+#    - 30s: Standard (balance between freshness and load)
+#    - 15s: High-frequency (real-time dashboards)
+#    - 1m-5m: Low-frequency (batch jobs, expensive metrics)
+
+# 3. Configure scrape timeouts
+#    - Always shorter than interval
+#    - Account for network latency
+#    - 10s is typical for most services
+
+# 4. Use relabeling sparingly
+#    - Only when necessary (adds complexity)
+#    - Document relabeling rules
+#    - Test relabeling with real metrics
+
+# 5. Monitor cardinality
+#    - Too many unique label combinations = high memory usage
+#    - Avoid labels with unbounded values (user IDs, timestamps)
+#    - Drop high-cardinality metrics if not needed
+
+# 6. Namespace isolation
+#    - Use namespaceSelector to limit scope
+#    - Prevents accidental monitoring of wrong services
+#    - Improves Prometheus performance
+
+# ============================================================================
+# LEARNING CHECKPOINTS
+# ============================================================================
+
+# After completing this file, you should understand:
+# ✓ What ServiceMonitor is and why it's useful
+# ✓ How Prometheus Operator uses ServiceMonitors
+# ✓ Configuring service discovery with label selectors
+# ✓ Setting scrape intervals and timeouts
+# ✓ Difference between ServiceMonitor and manual Prometheus config
+# ✓ Debugging ServiceMonitor issues
+# ✓ Best practices for metric collection

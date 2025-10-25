@@ -1,0 +1,52 @@
+# Add patterns of files that DVC should ignore
+# Similar to .gitignore but for DVC
+
+# Python cache
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Don't track model artifacts (use MLflow for this)
+*.pth
+*.pkl
+*.h5
+*.onnx
+
+# Don't track plots
+*.png
+*.jpg
+*.jpeg
+*.pdf
+
+# Don't track compressed archives
+*.zip
+*.tar
+*.gz

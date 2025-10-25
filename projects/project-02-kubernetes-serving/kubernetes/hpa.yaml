@@ -1,0 +1,424 @@
+# Kubernetes Horizontal Pod Autoscaler (HPA)
+#
+# HPA automatically scales the number of pods based on observed metrics
+# (CPU, memory, or custom metrics). This enables applications to handle
+# variable load without manual intervention.
+#
+# Learning Objectives:
+# - Understand auto-scaling concepts
+# - Configure CPU and memory-based scaling
+# - Set up scaling policies (scale-up vs scale-down behavior)
+# - Prevent scaling flapping with stabilization windows
+
+apiVersion: autoscaling/v2  # Use v2 for advanced features (multiple metrics, behavior)
+kind: HorizontalPodAutoscaler
+metadata:
+  name: model-api-hpa
+  namespace: ml-serving
+  labels:
+    app: model-api
+    component: autoscaler
+
+spec:
+  # ========================================================================
+  # TARGET DEPLOYMENT
+  # ========================================================================
+
+  # TODO: Configure which Deployment to scale
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    # TODO: Set name to match your Deployment (model-api)
+    name: ""  # TODO: Set to "model-api"
+
+  # ========================================================================
+  # REPLICA LIMITS
+  # ========================================================================
+
+  # TODO: Set minimum replicas to 3
+  # Minimum ensures high availability even during low load
+  # With 3 replicas, can tolerate 1 pod failure during rolling updates
+  minReplicas: 0  # TODO: Change to 3
+
+  # TODO: Set maximum replicas to 10
+  # Maximum prevents runaway scaling and controls costs
+  # Consider cluster capacity when setting max
+  maxReplicas: 0  # TODO: Change to 10
+
+  # ========================================================================
+  # METRICS
+  # ========================================================================
+
+  # TODO: Configure metrics to trigger scaling
+  # HPA evaluates all metrics and scales to meet ALL targets
+  # (uses the highest desired replica count from any metric)
+
+  metrics:
+  # -----------------------------------------------------------------------
+  # CPU Metric
+  # -----------------------------------------------------------------------
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        # TODO: Set target CPU utilization to 70%
+        # When average CPU across all pods exceeds 70%, scale up
+        # Formula: desiredReplicas = ceil(currentReplicas * currentCPU / targetCPU)
+        # Example: 3 replicas at 85% → ceil(3 * 85 / 70) = ceil(3.64) = 4 replicas
+        averageUtilization: 0  # TODO: Set to 70
+
+  # Question: Why 70% instead of 80% or 90%?
+  # Answer: 70% provides headroom for traffic spikes while scaling occurs.
+  # Lower threshold = more responsive but potentially higher costs.
+  # Higher threshold = slower response, risk of overload.
+
+  # -----------------------------------------------------------------------
+  # Memory Metric
+  # -----------------------------------------------------------------------
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        # TODO: Set target memory utilization to 80%
+        # Memory threshold is higher than CPU because:
+        # - Memory usage is more stable (doesn't spike as quickly)
+        # - Scaling up doesn't immediately free memory (garbage collection needed)
+        averageUtilization: 0  # TODO: Set to 80
+
+  # -----------------------------------------------------------------------
+  # Custom Metrics (Advanced - Optional)
+  # -----------------------------------------------------------------------
+
+  # TODO: (Optional) Add custom metrics when ready
+  # Requires metrics-server and custom metrics API
+
+  # Example: Scale based on request rate
+  # - type: Pods
+  #   pods:
+  #     metric:
+  #       name: http_requests_per_second
+  #     target:
+  #       type: AverageValue
+  #       averageValue: "100"  # Scale if >100 requests/sec per pod
+
+  # Example: Scale based on queue depth
+  # - type: Object
+  #   object:
+  #     metric:
+  #       name: queue_depth
+  #     describedObject:
+  #       apiVersion: v1
+  #       kind: Service
+  #       name: rabbitmq
+  #     target:
+  #       type: Value
+  #       value: "1000"  # Scale if queue has >1000 messages
+
+  # ========================================================================
+  # SCALING BEHAVIOR
+  # ========================================================================
+
+  # TODO: Configure scaling behavior to prevent flapping
+  # Flapping: Rapid scaling up and down, wastes resources and causes instability
+
+  behavior:
+    # ---------------------------------------------------------------------
+    # Scale Up Behavior (Aggressive)
+    # ---------------------------------------------------------------------
+    scaleUp:
+      # TODO: Set stabilization window to 0 seconds
+      # Scale up immediately when threshold exceeded
+      # No waiting period for scale-up (respond quickly to load)
+      stabilizationWindowSeconds: 60  # TODO: Change to 0
+
+      # TODO: Configure scale-up policies
+      # Multiple policies can be defined; HPA selects based on selectPolicy
+      policies:
+      # Policy 1: Percentage-based scaling
+      - type: Percent
+        # TODO: Set value to 100 (can double pod count)
+        # Example: 3 pods → can scale to 6 pods in one step
+        value: 0  # TODO: Change to 100
+        # TODO: Set period to 30 seconds
+        # Can apply this policy every 30 seconds
+        periodSeconds: 0  # TODO: Change to 30
+
+      # Policy 2: Absolute pod count scaling
+      - type: Pods
+        # TODO: Set value to 2 (can add max 2 pods)
+        # Provides absolute limit on scale-up rate
+        value: 0  # TODO: Change to 2
+        # TODO: Set period to 30 seconds
+        periodSeconds: 0  # TODO: Change to 30
+
+      # TODO: Set select policy to Max
+      # Options:
+      # - Max: Use the policy that allows most scaling (aggressive)
+      # - Min: Use the policy that allows least scaling (conservative)
+      # - Disabled: Don't scale
+      selectPolicy: ""  # TODO: Set to "Max"
+
+    # Why aggressive scale-up?
+    # - Quick response to traffic spikes prevents service degradation
+    # - Cost of extra pods is low compared to poor user experience
+    # - Pods can be scaled down later once load stabilizes
+
+    # ---------------------------------------------------------------------
+    # Scale Down Behavior (Conservative)
+    # ---------------------------------------------------------------------
+    scaleDown:
+      # TODO: Set stabilization window to 300 seconds (5 minutes)
+      # Wait 5 minutes before scaling down to avoid flapping
+      # Ensures load has truly decreased before removing capacity
+      stabilizationWindowSeconds: 0  # TODO: Change to 300
+
+      # TODO: Configure scale-down policies
+      policies:
+      # Policy 1: Percentage-based scaling
+      - type: Percent
+        # TODO: Set value to 50 (can remove max 50% of pods)
+        # Example: 6 pods → can scale down to 3 pods in one step
+        # More conservative than scale-up (100%)
+        value: 0  # TODO: Change to 50
+        # TODO: Set period to 60 seconds
+        # Can apply this policy every 60 seconds (slower than scale-up)
+        periodSeconds: 0  # TODO: Change to 60
+
+      # TODO: Set select policy to Max
+      # Even for scale-down, Max is typical (allows more aggressive of policies)
+      selectPolicy: ""  # TODO: Set to "Max"
+
+    # Why conservative scale-down?
+    # - Traffic can spike again quickly (avoid flapping)
+    # - Cost of running extra pods for a few minutes is low
+    # - Prevents thrashing (rapid scale up/down cycles)
+
+  # ========================================================================
+  # BEHAVIOR SUMMARY
+  # ========================================================================
+
+  # Scale Up:
+  #   - Immediate (no stabilization window)
+  #   - Can double pod count OR add 2 pods (whichever is more)
+  #   - Responds every 30 seconds
+  #   - Example: 3 → 6 → 10 (max) in ~1 minute under sustained load
+
+  # Scale Down:
+  #   - Wait 5 minutes after load decreases
+  #   - Can remove max 50% of pods
+  #   - Responds every 60 seconds
+  #   - Example: 10 → 5 → 3 (min) over ~6 minutes after load drops
+
+---
+
+# ============================================================================
+# HPA INSTRUCTIONS
+# ============================================================================
+
+# Prerequisites:
+# 1. Metrics Server must be installed
+#    For Minikube: minikube addons enable metrics-server
+#    For cloud: kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+
+# 2. Deployment must have resource requests defined
+#    HPA calculates percentage based on requests, not limits
+#    See deployment.yaml resources.requests section
+
+# Apply HPA:
+#   kubectl apply -f hpa.yaml -n ml-serving
+
+# Verify HPA:
+#   kubectl get hpa -n ml-serving
+#   kubectl describe hpa model-api-hpa -n ml-serving
+
+# Watch HPA in real-time:
+#   kubectl get hpa model-api-hpa -n ml-serving --watch
+
+# Check current metrics:
+#   kubectl top pods -n ml-serving
+#   kubectl top nodes
+
+# ============================================================================
+# TESTING AUTO-SCALING
+# ============================================================================
+
+# Test 1: Generate CPU load
+#   # Create load generator pod
+#   kubectl run load-generator --image=busybox -n ml-serving -- \
+#     /bin/sh -c "while true; do wget -q -O- http://model-api-service/predict; done"
+
+#   # Or use multiple load generators
+#   kubectl run load-generator-{1..5} --image=busybox -n ml-serving -- \
+#     /bin/sh -c "while true; do wget -q -O- http://model-api-service/predict; done"
+
+#   # Watch HPA scale up
+#   kubectl get hpa model-api-hpa -n ml-serving --watch
+
+#   # Watch pods scale
+#   kubectl get pods -n ml-serving --watch
+
+# Test 2: Use load testing tool (k6, Apache Bench, wrk)
+#   # Install k6: https://k6.io/docs/getting-started/installation/
+#   k6 run --vus 50 --duration 5m load-test.js
+
+#   # While running, monitor HPA and pods
+#   watch 'kubectl get hpa,pods -n ml-serving'
+
+# Test 3: Verify scale-down
+#   # Stop load generators
+#   kubectl delete pod load-generator -n ml-serving
+
+#   # Watch HPA wait 5 minutes, then scale down
+#   kubectl get hpa model-api-hpa -n ml-serving --watch
+
+# ============================================================================
+# HPA DECISION LOGIC
+# ============================================================================
+
+# How HPA calculates desired replicas:
+
+# 1. Gather metrics from all pods
+#    currentCPU = average CPU across all pods
+
+# 2. Calculate desired replicas
+#    desiredReplicas = ceil(currentReplicas * (currentCPU / targetCPU))
+
+# Example with 3 replicas:
+#   Current: 3 pods at 85% CPU
+#   Target: 70% CPU
+#   Calculation: ceil(3 * (85 / 70)) = ceil(3.64) = 4 replicas
+#   Action: Scale from 3 to 4 pods
+
+# Example with 6 replicas:
+#   Current: 6 pods at 45% CPU
+#   Target: 70% CPU
+#   Calculation: ceil(6 * (45 / 70)) = ceil(3.86) = 4 replicas
+#   But: Stabilization window prevents immediate scale-down
+#   Action: Wait 5 minutes, then scale from 6 to 4 pods
+
+# 3. Apply constraints
+#    - Clamp to minReplicas (3) and maxReplicas (10)
+#    - Apply scaling policies (max 2 pods per 30s scale-up)
+#    - Apply stabilization window (5 min for scale-down)
+
+# 4. Update Deployment
+#    HPA updates deployment.spec.replicas
+#    Deployment controller creates/deletes pods
+
+# ============================================================================
+# HPA METRICS COLLECTION
+# ============================================================================
+
+# Metrics flow:
+# 1. Metrics Server collects resource metrics from kubelets
+# 2. HPA queries Metrics Server API every 15 seconds (default)
+# 3. HPA calculates desired replicas
+# 4. HPA updates Deployment if needed
+
+# Check metrics manually:
+#   kubectl top pods -n ml-serving
+#   kubectl top nodes
+
+# View raw metrics:
+#   kubectl get --raw /apis/metrics.k8s.io/v1beta1/namespaces/ml-serving/pods
+
+# ============================================================================
+# TROUBLESHOOTING
+# ============================================================================
+
+# HPA shows "unknown" for metrics:
+#   # Check Metrics Server is running
+#   kubectl get deployment metrics-server -n kube-system
+
+#   # Check Metrics Server logs
+#   kubectl logs -n kube-system deployment/metrics-server
+
+#   # Verify metrics are available
+#   kubectl top pods -n ml-serving
+
+# HPA not scaling:
+#   1. Check current metrics vs target
+#      kubectl describe hpa model-api-hpa -n ml-serving
+#
+#   2. Verify resource requests are set in Deployment
+#      kubectl get deployment model-api -n ml-serving -o yaml | grep -A 8 resources
+#
+#   3. Check HPA events
+#      kubectl describe hpa model-api-hpa -n ml-serving | tail -20
+
+# HPA scaling too slowly:
+#   - Decrease stabilizationWindowSeconds for scaleUp
+#   - Increase policy values (allow more aggressive scaling)
+#   - Decrease target utilization threshold
+
+# HPA flapping (rapid up/down):
+#   - Increase stabilizationWindowSeconds for scaleDown
+#   - Make scaleDown policies more conservative
+#   - Check if application has memory leaks causing repeated OOM
+
+# Pods don't have metrics:
+#   - Verify pods have resource requests defined
+#   - Wait 60 seconds after pod creation for metrics to appear
+#   - Check if metrics-server can reach kubelets
+
+# ============================================================================
+# ADVANCED HPA FEATURES
+# ============================================================================
+
+# 1. Custom Metrics
+#    Requires: Custom Metrics API (Prometheus Adapter, Datadog, etc.)
+#    Example: Scale based on queue depth, request rate, custom app metrics
+
+# 2. External Metrics
+#    Requires: External Metrics API
+#    Example: Scale based on AWS SQS queue length, cloud provider metrics
+
+# 3. Multiple HPAs (Advanced)
+#    Can create multiple HPAs for different time-of-day scaling
+#    Use different namespaces or label selectors
+
+# 4. Vertical Pod Autoscaler (VPA)
+#    Complements HPA by adjusting resource requests/limits
+#    Not recommended to use VPA and HPA on same resource (can conflict)
+
+# ============================================================================
+# BEST PRACTICES
+# ============================================================================
+
+# 1. Set appropriate min/max replicas
+#    - Min: Enough for high availability (usually 2-3)
+#    - Max: Within cluster capacity and budget
+
+# 2. Conservative thresholds
+#    - Start with 70-80% CPU target
+#    - Monitor and adjust based on actual load patterns
+
+# 3. Test scaling behavior
+#    - Run load tests to verify scaling
+#    - Measure time to scale up (should be < 2 minutes)
+#    - Verify scale-down doesn't happen too quickly
+
+# 4. Monitor scaling events
+#    - Set up alerts for scaling events
+#    - Track scaling frequency (excessive = flapping)
+#    - Review HPA decisions regularly
+
+# 5. Consider custom metrics
+#    - CPU/memory don't always reflect application load
+#    - Request rate, queue depth often better indicators
+#    - Implement custom metrics after mastering resource-based scaling
+
+# ============================================================================
+# LEARNING CHECKPOINTS
+# ============================================================================
+
+# After completing this file, you should understand:
+# ✓ How HPA makes scaling decisions
+# ✓ Difference between scale-up and scale-down policies
+# ✓ Purpose of stabilization windows
+# ✓ How to prevent scaling flapping
+# ✓ Relationship between resource requests and HPA
+# ✓ Metrics collection via Metrics Server
+# ✓ Testing and debugging auto-scaling behavior

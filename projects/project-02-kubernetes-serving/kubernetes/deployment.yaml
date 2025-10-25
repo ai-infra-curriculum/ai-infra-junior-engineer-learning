@@ -1,0 +1,391 @@
+# Kubernetes Deployment Manifest
+#
+# A Deployment manages a set of identical pods, ensuring the desired number
+# of replicas are running at all times. It also handles rolling updates,
+# rollbacks, and scaling.
+#
+# Learning Objectives:
+# - Understand Deployment specifications
+# - Configure resource requests and limits
+# - Implement health checks (liveness and readiness probes)
+# - Use ConfigMaps for configuration
+# - Set up rolling update strategy
+
+apiVersion: apps/v1  # API version for Deployment resource
+kind: Deployment
+metadata:
+  name: model-api
+  namespace: ml-serving  # Deploy to ml-serving namespace (created separately)
+  labels:
+    app: model-api
+    version: v1.0
+    component: inference
+    managed-by: kubectl  # Will be 'helm' when using Helm charts
+
+spec:
+  # ========================================================================
+  # REPLICA CONFIGURATION
+  # ========================================================================
+
+  # TODO: Set number of pod replicas to 3
+  # This provides high availability - if one pod fails, 2 others still serve traffic
+  # Question: Why 3 replicas instead of 2?
+  # Answer: With 2 replicas and maxUnavailable=0, rolling updates would be slow
+  #         With 3, we can have 1 updating while 2+ are still available
+  replicas: 0  # TODO: Change to 3
+
+  # ========================================================================
+  # SELECTOR
+  # ========================================================================
+
+  # TODO: Configure selector to match pod labels
+  # The selector determines which pods this Deployment manages
+  # Must match spec.template.metadata.labels below
+  selector:
+    matchLabels:
+      # TODO: Add label: app: model-api
+      # This tells the Deployment which pods it owns
+      placeholder: delete-me  # TODO: Remove this and add proper label
+
+  # ========================================================================
+  # UPDATE STRATEGY
+  # ========================================================================
+
+  # TODO: Configure RollingUpdate strategy for zero-downtime deployments
+  strategy:
+    type: RollingUpdate  # Alternative: Recreate (causes downtime)
+    rollingUpdate:
+      # TODO: Set maxSurge to 1
+      # maxSurge: Maximum number of pods that can be created above desired replicas
+      # Example: With 3 replicas and maxSurge=1, can have 4 pods during update
+      # Benefit: Faster updates
+      # Cost: More resources during update
+      maxSurge: 0  # TODO: Change to 1
+
+      # TODO: Set maxUnavailable to 0
+      # maxUnavailable: Maximum number of pods that can be unavailable during update
+      # With maxUnavailable=0, we guarantee zero downtime
+      # Update process: Create new pod → wait for ready → delete old pod
+      maxUnavailable: 1  # TODO: Change to 0
+
+  # ========================================================================
+  # POD TEMPLATE
+  # ========================================================================
+
+  template:
+    metadata:
+      labels:
+        # TODO: Add labels that match selector above
+        # These labels are applied to all pods created by this Deployment
+        app: model-api  # Must match selector
+        version: v1.0   # Used for traffic routing (future: Istio)
+
+      annotations:
+        # TODO: Add annotations for Prometheus metric scraping
+        # These annotations tell Prometheus how to scrape metrics from pods
+        # Replace 'false' with 'true' and set correct values
+        prometheus.io/scrape: "false"  # TODO: Change to "true"
+        prometheus.io/port: "0"        # TODO: Change to "5000"
+        prometheus.io/path: "/health"  # TODO: Change to "/metrics"
+
+    spec:
+      # ====================================================================
+      # CONTAINER SPECIFICATION
+      # ====================================================================
+
+      containers:
+      - name: model-api
+
+        # TODO: Set container image
+        # Format: registry/repository:tag
+        # For local Minikube testing: model-api:v1.0
+        # For cloud deployment: <your-registry>/model-api:v1.0
+        image: ""  # TODO: Set image name
+
+        # TODO: Set imagePullPolicy
+        # Options:
+        # - Always: Always pull image (use for 'latest' tag)
+        # - IfNotPresent: Pull if not cached locally (use for versioned tags)
+        # - Never: Never pull, only use local cache
+        imagePullPolicy: ""  # TODO: Set to IfNotPresent
+
+        # ==================================================================
+        # PORTS
+        # ==================================================================
+
+        ports:
+        - name: http
+          # TODO: Set containerPort to 5000 (Flask default port)
+          containerPort: 0  # TODO: Change to 5000
+          protocol: TCP
+
+        # ==================================================================
+        # ENVIRONMENT VARIABLES (from ConfigMap)
+        # ==================================================================
+
+        env:
+        # TODO: Configure environment variables from ConfigMap
+        # These variables are injected from the 'model-config' ConfigMap
+        # The application reads these on startup (see src/app.py)
+
+        - name: MODEL_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: ""  # TODO: Set to 'model-config'
+              key: ""   # TODO: Set to 'model_name'
+
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: ""  # TODO: Set to 'model-config'
+              key: ""   # TODO: Set to 'log_level'
+
+        - name: MAX_BATCH_SIZE
+          valueFrom:
+            configMapKeyRef:
+              name: ""  # TODO: Set to 'model-config'
+              key: ""   # TODO: Set to 'max_batch_size'
+
+        - name: PORT
+          value: ""  # TODO: Set to "5000"
+
+        # ==================================================================
+        # RESOURCE REQUESTS AND LIMITS
+        # ==================================================================
+
+        # TODO: Configure resource management
+        # Resources ensure predictable performance and prevent resource starvation
+        resources:
+          requests:
+            # CPU request: Guaranteed CPU allocation for scheduling
+            # Format: millicores (1000m = 1 core)
+            # TODO: Set to 500m (0.5 cores)
+            cpu: ""
+
+            # Memory request: Guaranteed memory allocation
+            # Format: Gi (Gibibytes), Mi (Mebibytes)
+            # TODO: Set to 1Gi
+            memory: ""
+
+          limits:
+            # CPU limit: Maximum CPU the container can use
+            # Can burst above request up to this limit
+            # TODO: Set to 1000m (1 core) = 2x request
+            cpu: ""
+
+            # Memory limit: Maximum memory before OOMKill
+            # Exceeding this will terminate the container
+            # TODO: Set to 2Gi = 2x request
+            memory: ""
+
+        # Why these values?
+        # - Request 500m CPU: Based on typical inference workload
+        # - Limit 1000m CPU: Allow bursting during traffic spikes
+        # - Request 1Gi memory: Sufficient for model + framework overhead
+        # - Limit 2Gi memory: Prevent runaway memory usage
+
+        # ==================================================================
+        # LIVENESS PROBE
+        # ==================================================================
+
+        # TODO: Configure liveness probe
+        # Purpose: Detect if application is in a broken state and needs restart
+        # Kubernetes restarts the container if liveness probe fails repeatedly
+        livenessProbe:
+          httpGet:
+            path: ""     # TODO: Set to /health
+            port: 0      # TODO: Set to 5000
+            scheme: HTTP
+
+          # TODO: Set initialDelaySeconds to 30
+          # Wait 30 seconds after container start before first probe
+          # Why? Model loading takes time (~10-20 seconds for large models)
+          initialDelaySeconds: 0  # TODO: Change to 30
+
+          # TODO: Set periodSeconds to 10
+          # Check every 10 seconds after initial delay
+          periodSeconds: 0  # TODO: Change to 10
+
+          # TODO: Set timeoutSeconds to 5
+          # Probe times out if no response in 5 seconds
+          timeoutSeconds: 0  # TODO: Change to 5
+
+          # TODO: Set failureThreshold to 3
+          # Restart container after 3 consecutive failures (30 seconds)
+          failureThreshold: 0  # TODO: Change to 3
+
+          # TODO: Set successThreshold to 1
+          # Consider healthy after 1 successful probe
+          successThreshold: 0  # TODO: Change to 1
+
+        # ==================================================================
+        # READINESS PROBE
+        # ==================================================================
+
+        # TODO: Configure readiness probe
+        # Purpose: Determine if pod should receive traffic
+        # Pod is removed from Service endpoints if readiness probe fails
+        readinessProbe:
+          httpGet:
+            path: ""     # TODO: Set to /health
+            port: 0      # TODO: Set to 5000
+            scheme: HTTP
+
+          # TODO: Set initialDelaySeconds to 10
+          # Start checking readiness sooner than liveness (10s vs 30s)
+          # Why? We want to know when pod is ready ASAP
+          initialDelaySeconds: 0  # TODO: Change to 10
+
+          # TODO: Set periodSeconds to 5
+          # Check more frequently than liveness (5s vs 10s)
+          # Why? Faster detection of readiness changes
+          periodSeconds: 0  # TODO: Change to 5
+
+          # TODO: Set timeoutSeconds to 3
+          # Shorter timeout than liveness
+          timeoutSeconds: 0  # TODO: Change to 3
+
+          # TODO: Set failureThreshold to 3
+          # Mark not ready after 3 failures (15 seconds)
+          failureThreshold: 0  # TODO: Change to 3
+
+          # TODO: Set successThreshold to 1
+          # Mark ready after 1 success (quick recovery)
+          successThreshold: 0  # TODO: Change to 1
+
+        # ==================================================================
+        # LIFECYCLE HOOKS (Optional but recommended)
+        # ==================================================================
+
+        # TODO: Configure preStop hook for graceful shutdown
+        # Uncomment and configure the following:
+        # lifecycle:
+        #   preStop:
+        #     httpGet:
+        #       path: /shutdown
+        #       port: 5000
+        #
+        # Or use sleep to allow graceful shutdown:
+        # lifecycle:
+        #   preStop:
+        #     exec:
+        #       command: ["/bin/sh", "-c", "sleep 5"]
+
+        # Why preStop hook?
+        # Gives application time to finish active requests before SIGTERM
+        # Prevents connection errors during pod termination
+
+      # ====================================================================
+      # POD-LEVEL CONFIGURATION
+      # ====================================================================
+
+      # TODO: Set terminationGracePeriodSeconds to 30
+      # How long to wait after SIGTERM before SIGKILL
+      # Default is 30 seconds, sufficient for most applications
+      # terminationGracePeriodSeconds: 30
+
+      # TODO: Configure security context (optional but recommended)
+      # Run as non-root user for security
+      # securityContext:
+      #   runAsNonRoot: true
+      #   runAsUser: 1000
+      #   fsGroup: 1000
+
+      # TODO: Configure affinity rules (optional, for multi-zone deployment)
+      # Spread pods across nodes/zones for high availability
+      # affinity:
+      #   podAntiAffinity:
+      #     preferredDuringSchedulingIgnoredDuringExecution:
+      #     - weight: 100
+      #       podAffinityTerm:
+      #         labelSelector:
+      #           matchLabels:
+      #             app: model-api
+      #         topologyKey: kubernetes.io/hostname
+
+---
+
+# ============================================================================
+# DEPLOYMENT INSTRUCTIONS
+# ============================================================================
+
+# 1. Create namespace (if not exists):
+#    kubectl create namespace ml-serving
+
+# 2. Apply ConfigMap first (dependency):
+#    kubectl apply -f configmap.yaml -n ml-serving
+
+# 3. Apply this Deployment:
+#    kubectl apply -f deployment.yaml -n ml-serving
+
+# 4. Verify deployment:
+#    kubectl get deployment model-api -n ml-serving
+#    kubectl get pods -n ml-serving
+#    kubectl describe deployment model-api -n ml-serving
+
+# 5. Check pod logs:
+#    kubectl logs -f deployment/model-api -n ml-serving
+
+# 6. Check pod health:
+#    kubectl get pods -n ml-serving -o wide
+#    # All pods should show STATUS: Running, READY: 1/1
+
+# 7. Test health endpoint:
+#    kubectl port-forward deployment/model-api 8080:5000 -n ml-serving
+#    curl http://localhost:8080/health
+
+# ============================================================================
+# COMMON OPERATIONS
+# ============================================================================
+
+# Scale deployment:
+#   kubectl scale deployment model-api --replicas=5 -n ml-serving
+
+# Update image (rolling update):
+#   kubectl set image deployment/model-api model-api=model-api:v1.1 -n ml-serving
+
+# Watch rollout status:
+#   kubectl rollout status deployment/model-api -n ml-serving
+
+# View rollout history:
+#   kubectl rollout history deployment/model-api -n ml-serving
+
+# Rollback to previous version:
+#   kubectl rollout undo deployment/model-api -n ml-serving
+
+# Rollback to specific revision:
+#   kubectl rollout undo deployment/model-api --to-revision=2 -n ml-serving
+
+# ============================================================================
+# TROUBLESHOOTING
+# ============================================================================
+
+# Pod not starting:
+#   kubectl describe pod <pod-name> -n ml-serving
+#   # Check Events section for errors
+
+# Pod crashing:
+#   kubectl logs <pod-name> -n ml-serving
+#   kubectl logs <pod-name> -n ml-serving --previous  # Logs from crashed container
+
+# Readiness probe failing:
+#   kubectl describe pod <pod-name> -n ml-serving
+#   # Check Readiness probe failures in Events
+#   kubectl exec <pod-name> -n ml-serving -- curl localhost:5000/health
+
+# High resource usage:
+#   kubectl top pod -n ml-serving
+#   kubectl describe pod <pod-name> -n ml-serving | grep -A 8 Limits
+
+# ============================================================================
+# LEARNING CHECKPOINTS
+# ============================================================================
+
+# After completing this file, you should understand:
+# ✓ How Deployments manage pod lifecycles
+# ✓ The difference between requests and limits
+# ✓ Liveness vs readiness probes
+# ✓ Rolling update strategies (maxSurge, maxUnavailable)
+# ✓ ConfigMap integration with environment variables
+# ✓ Resource management and scheduling
+# ✓ Graceful shutdown and lifecycle hooks

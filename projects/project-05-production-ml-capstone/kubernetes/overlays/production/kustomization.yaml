@@ -1,0 +1,353 @@
+# Kustomize Overlay - Production Environment
+# ===========================================
+# This overlay customizes the base configuration for production deployment.
+# Production requires highest standards of reliability, security, and performance.
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# TODO: Reference base configuration
+bases:
+  - ../../base
+
+# TODO: Add production-specific labels
+commonLabels:
+  environment: production
+  criticality: high
+
+# TODO: Override namespace
+namespace: ml-system-production
+
+# TODO: Production-specific patches
+patchesStrategicMerge:
+  # TODO: Add production patches
+  # - replica-count-patch.yaml
+  # - resource-limits-patch.yaml
+  # - ingress-patch.yaml
+  # - monitoring-patch.yaml
+  # - security-patch.yaml
+
+# TODO: Set production replica count
+replicas:
+  # - name: ml-api-deployment
+  #   count: 5  # Higher baseline for production
+
+# TODO: Production images with specific tags
+# NEVER use 'latest' tag in production!
+images:
+  # - name: ml-api
+  #   newName: ghcr.io/your-org/ml-api
+  #   newTag: v1.2.3  # Specific version tag, never 'latest'
+
+# TODO: Production ConfigMap
+configMapGenerator:
+  - name: ml-model-config
+    behavior: merge
+    literals:
+      # TODO: Add production configuration
+      # - MODEL_NAME=image-classifier
+      # - MODEL_VERSION=production  # Or specific version number
+      # - MLFLOW_TRACKING_URI=https://mlflow.example.com
+      # - LOG_LEVEL=WARN  # Less verbose in production
+      # - ENVIRONMENT=production
+      # - METRICS_ENABLED=true
+      # - TRACING_ENABLED=true
+      # - PERFORMANCE_MONITORING=true
+      # - ENABLE_CACHE=true
+      # - CACHE_TTL_SECONDS=3600
+
+# TODO: Use external secret management for production
+# DO NOT use secretGenerator in production
+# Use SealedSecrets, HashiCorp Vault, AWS Secrets Manager, etc.
+# secretGenerator: []  # Empty
+
+# TODO: Add production-specific resources
+resources:
+  # TODO: Add production resources
+  # - ingress.yaml
+  # - certificate.yaml
+  # - sealed-secret.yaml
+  # - pod-disruption-budget.yaml
+  # - service-monitor.yaml  # For Prometheus
+  # - network-policy.yaml
+
+# ==============================================================================
+# PRODUCTION ENVIRONMENT REQUIREMENTS
+# ==============================================================================
+
+# Production must meet these standards:
+#
+# 1. HIGH AVAILABILITY:
+#    ✅ Minimum 5 replicas (more for high traffic)
+#    ✅ HPA: Min 5, Max 20 replicas
+#    ✅ Pod Disruption Budget: minAvailable = 3
+#    ✅ Multi-zone deployment (spread across AZs)
+#    ✅ Pod anti-affinity (don't co-locate replicas)
+#    ✅ Health checks: liveness, readiness, startup probes
+#    ✅ Rolling update strategy: maxSurge=1, maxUnavailable=0
+#
+# 2. SECURITY:
+#    ✅ TLS/HTTPS with valid production certificates
+#    ✅ cert-manager with Let's Encrypt production
+#    ✅ Network policies enforced
+#    ✅ RBAC with least privilege
+#    ✅ Pod Security Standards: restricted
+#    ✅ Non-root user in containers
+#    ✅ Read-only root filesystem
+#    ✅ No privileged containers
+#    ✅ Secrets from external secret manager
+#    ✅ Image scanning and signing
+#    ✅ API authentication and authorization
+#    ✅ Rate limiting and DDoS protection
+#
+# 3. PERFORMANCE:
+#    ✅ Resource requests = limits (guaranteed QoS)
+#    ✅ CPU: 1000m request, 2000m limit
+#    ✅ Memory: 2Gi request, 4Gi limit
+#    ✅ GPU allocation (if needed)
+#    ✅ Local SSD for model caching
+#    ✅ Optimized container images (multi-stage builds)
+#    ✅ Model quantization and optimization
+#
+# 4. MONITORING & OBSERVABILITY:
+#    ✅ Full Prometheus/Grafana stack
+#    ✅ Alertmanager with PagerDuty integration
+#    ✅ ELK or Loki for centralized logging
+#    ✅ Distributed tracing (Jaeger/Zipkin)
+#    ✅ ServiceMonitor for automatic scraping
+#    ✅ SLO/SLI tracking (99.9% uptime)
+#    ✅ Error budget monitoring
+#    ✅ Performance dashboards
+#
+# 5. RELIABILITY:
+#    ✅ Automated backups (daily)
+#    ✅ Disaster recovery plan tested
+#    ✅ Rollback procedure documented and tested
+#    ✅ Circuit breakers for external dependencies
+#    ✅ Retry logic with exponential backoff
+#    ✅ Graceful degradation (fallback responses)
+#    ✅ Connection pooling
+#    ✅ Request timeouts configured
+#
+# 6. DATA MANAGEMENT:
+#    ✅ Persistent volumes for stateful data
+#    ✅ Volume snapshots enabled
+#    ✅ Backup retention: 30 days
+#    ✅ Cross-region backup replication
+#    ✅ Data encryption at rest
+#    ✅ Data encryption in transit
+#
+# 7. COMPLIANCE & GOVERNANCE:
+#    ✅ Audit logging enabled
+#    ✅ Compliance policies enforced (PCI, HIPAA, GDPR)
+#    ✅ Data retention policies
+#    ✅ Privacy controls
+#    ✅ Regular security audits
+#    ✅ Vulnerability scanning
+#    ✅ Penetration testing
+#
+# ==============================================================================
+# STUDENT IMPLEMENTATION
+# ==============================================================================
+
+# TODO: Create production patch files:
+#
+# 1. replica-count-patch.yaml:
+#    apiVersion: apps/v1
+#    kind: Deployment
+#    metadata:
+#      name: ml-api-deployment
+#    spec:
+#      replicas: 5
+#
+# 2. resource-limits-patch.yaml:
+#    apiVersion: apps/v1
+#    kind: Deployment
+#    metadata:
+#      name: ml-api-deployment
+#    spec:
+#      template:
+#        spec:
+#          containers:
+#            - name: ml-api
+#              resources:
+#                requests:
+#                  cpu: 1000m
+#                  memory: 2Gi
+#                limits:
+#                  cpu: 2000m
+#                  memory: 4Gi
+#
+# 3. ingress-patch.yaml:
+#    apiVersion: networking.k8s.io/v1
+#    kind: Ingress
+#    metadata:
+#      name: ml-api-ingress
+#      annotations:
+#        cert-manager.io/cluster-issuer: letsencrypt-prod
+#        nginx.ingress.kubernetes.io/rate-limit: "100"
+#        nginx.ingress.kubernetes.io/ssl-redirect: "true"
+#    spec:
+#      ingressClassName: nginx
+#      rules:
+#        - host: api.example.com
+#          http:
+#            paths:
+#              - path: /
+#                pathType: Prefix
+#                backend:
+#                  service:
+#                    name: ml-api
+#                    port:
+#                      number: 80
+#      tls:
+#        - hosts:
+#            - api.example.com
+#          secretName: production-tls
+#
+# 4. security-patch.yaml:
+#    Add Pod Security Context, Network Policies, etc.
+#
+# 5. monitoring-patch.yaml:
+#    Add ServiceMonitor, PodMonitor for Prometheus
+#
+# TODO: Create additional production resources:
+#
+# 1. pod-disruption-budget.yaml:
+#    apiVersion: policy/v1
+#    kind: PodDisruptionBudget
+#    metadata:
+#      name: ml-api-pdb
+#    spec:
+#      minAvailable: 3
+#      selector:
+#        matchLabels:
+#          app: ml-api
+#
+# 2. certificate.yaml:
+#    apiVersion: cert-manager.io/v1
+#    kind: Certificate
+#    metadata:
+#      name: production-tls
+#    spec:
+#      secretName: production-tls
+#      issuerRef:
+#        name: letsencrypt-prod
+#        kind: ClusterIssuer
+#      dnsNames:
+#        - api.example.com
+#
+# 3. service-monitor.yaml:
+#    apiVersion: monitoring.coreos.com/v1
+#    kind: ServiceMonitor
+#    metadata:
+#      name: ml-api-monitor
+#    spec:
+#      selector:
+#        matchLabels:
+#          app: ml-api
+#      endpoints:
+#        - port: http
+#          path: /metrics
+#          interval: 30s
+#
+# TODO: Pre-deployment checklist:
+#
+# Before deploying to production:
+#
+# [ ] All tests passing in staging
+# [ ] Security scan passed (no critical/high vulnerabilities)
+# [ ] Load testing completed successfully
+# [ ] Disaster recovery plan tested
+# [ ] Rollback procedure tested
+# [ ] Monitoring and alerting configured
+# [ ] On-call rotation in place
+# [ ] Runbooks updated
+# [ ] Change request approved (if required)
+# [ ] Backup verified
+# [ ] Team notified of deployment window
+# [ ] Smoke tests prepared
+#
+# TODO: Deployment procedure:
+#
+# 1. Preview changes:
+#    kubectl kustomize kubernetes/overlays/production/ | less
+#
+# 2. Backup current production:
+#    kubectl get all -n ml-system-production -o yaml > backup-$(date +%Y%m%d-%H%M%S).yaml
+#
+# 3. Apply canary deployment (10% traffic):
+#    # Use CD pipeline (manual approval required)
+#
+# 4. Monitor canary for 10-15 minutes:
+#    # Watch error rates, latency, logs
+#    # If issues detected, rollback immediately
+#
+# 5. Promote to full deployment:
+#    # Gradual rollout: 10% → 25% → 50% → 100%
+#    # Monitor at each step
+#
+# 6. Verify deployment:
+#    kubectl get pods -n ml-system-production
+#    kubectl rollout status deployment/ml-api -n ml-system-production
+#
+# 7. Run smoke tests:
+#    curl https://api.example.com/health
+#    # Run full test suite
+#
+# 8. Monitor for 1 hour:
+#    # Watch Grafana dashboards
+#    # Check error rates, latency
+#    # Review logs for errors
+#
+# 9. Declare success or rollback:
+#    # If all metrics healthy, deployment successful
+#    # If issues, rollback and investigate
+#
+# TODO: Rollback procedure:
+#
+# If deployment fails:
+#
+# 1. Immediate rollback:
+#    helm rollback ml-system -n ml-system-production
+#    # Or: kubectl rollout undo deployment/ml-api -n ml-system-production
+#
+# 2. Verify rollback:
+#    kubectl rollout status deployment/ml-api -n ml-system-production
+#
+# 3. Run smoke tests:
+#    curl https://api.example.com/health
+#
+# 4. Alert team:
+#    # Notify via Slack/PagerDuty
+#    # Create incident report
+#
+# 5. Investigate root cause:
+#    # Review logs, metrics
+#    # Identify what went wrong
+#    # Plan fix for next deployment
+#
+# TODO: Post-deployment:
+#
+# [ ] Monitor metrics for 24 hours
+# [ ] Check for any degradation
+# [ ] Update documentation
+# [ ] Tag Git commit (e.g., prod-v1.2.3)
+# [ ] Update MLflow model registry
+# [ ] Write deployment summary
+# [ ] Schedule post-mortem if issues occurred
+#
+# ==============================================================================
+# PRODUCTION BEST PRACTICES
+# ==============================================================================
+
+# 1. Never deploy on Friday (or before long weekend)
+# 2. Always have two people involved in production deployments
+# 3. Deploy during low-traffic hours
+# 4. Have rollback plan ready BEFORE deploying
+# 5. Monitor continuously during and after deployment
+# 6. Keep staging environment identical to production
+# 7. Test disaster recovery regularly (quarterly)
+# 8. Document everything
+# 9. Use feature flags for risky changes
+# 10. Never skip staging - even for "small changes"

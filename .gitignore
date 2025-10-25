@@ -1,0 +1,443 @@
+# AI Infrastructure Project - Git Ignore File
+# Python and ML-specific patterns for educational repository
+
+# ==============================================================================
+# Python
+# ==============================================================================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+.pybuilder/
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb_checkpoints/
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# poetry
+poetry.lock
+
+# pdm
+.pdm.toml
+
+# PEP 582
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# Cython debug symbols
+cython_debug/
+
+# ==============================================================================
+# Machine Learning & Data Science
+# ==============================================================================
+
+# Model files
+*.h5
+*.hdf5
+*.pkl
+*.pickle
+*.joblib
+*.pt
+*.pth
+*.onnx
+*.pb
+*.tflite
+*.ckpt
+*.safetensors
+saved_models/
+checkpoints/
+models/*.h5
+models/*.pkl
+models/*.pth
+
+# Large data files
+*.csv
+*.tsv
+*.parquet
+*.feather
+*.arrow
+data/raw/
+data/processed/
+data/interim/
+data/external/
+datasets/
+*.db
+*.sqlite
+
+# Except example/sample data
+!data/examples/*.csv
+!data/samples/*.csv
+
+# MLflow
+mlruns/
+mlartifacts/
+
+# DVC
+.dvc/
+*.dvc
+
+# Weights & Biases
+wandb/
+
+# TensorBoard
+logs/
+tensorboard/
+runs/
+
+# Experiment tracking
+experiments/
+outputs/
+
+# ==============================================================================
+# Cloud & Infrastructure
+# ==============================================================================
+
+# AWS
+.aws/
+*.pem
+*.key
+
+# GCP
+*.json
+!**/example.json
+.gcp/
+gcp-credentials.json
+service-account.json
+
+# Azure
+.azure/
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+terraform.tfvars
+*.tfvars
+
+# Kubernetes
+*.kubeconfig
+kubeconfig
+
+# Docker
+.dockerignore.swp
+
+# ==============================================================================
+# IDEs & Editors
+# ==============================================================================
+
+# VSCode
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+Session.vim
+Sessionx.vim
+.netrwhist
+*~
+tags
+[._]*.un~
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# ==============================================================================
+# Operating Systems
+# ==============================================================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+.directory
+.Trash-*
+.nfs*
+
+# ==============================================================================
+# Project Specific
+# ==============================================================================
+
+# Secrets and credentials
+secrets/
+*.secret
+credentials/
+.credentials/
+api_keys.txt
+.password
+token.txt
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+scratch/
+
+# User-specific progress tracking
+progress/user_*.json
+.user_progress/
+
+# Student solutions (should not be committed to learning repo)
+solutions/
+my_solutions/
+student_work/
+
+# Local configuration
+config.local.yml
+settings.local.py
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Cache directories
+.cache/
+cache/
+
+# Logs
+*.log
+logs/
+*.log.*
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# ==============================================================================
+# Documentation Build Artifacts
+# ==============================================================================
+
+# MkDocs
+site/
+
+# Sphinx
+_build/
+_static/
+_templates/
+
+# ==============================================================================
+# Testing & Quality
+# ==============================================================================
+
+# Coverage reports
+.coverage
+htmlcov/
+coverage/
+
+# pytest
+.pytest_cache/
+
+# tox
+.tox/
+
+# ==============================================================================
+# Dependencies & Package Managers
+# ==============================================================================
+
+# Node (if using any JS tools)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ==============================================================================
+# Special Cases - Keep These
+# ==============================================================================
+
+# Keep empty directories with .gitkeep
+!.gitkeep
+
+# Keep example configuration files
+!config.example.yml
+!.env.example
+!settings.example.py
+
+# Keep documentation assets
+!docs/images/
+!docs/diagrams/
+
+# Keep test fixtures
+!tests/fixtures/
+!tests/data/
+
+# ==============================================================================
+# Large Binary Files Warning
+# ==============================================================================
+
+# If you need to track large files, use Git LFS
+# Install: git lfs install
+# Track: git lfs track "*.psd"

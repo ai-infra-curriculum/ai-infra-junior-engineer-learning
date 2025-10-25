@@ -1,0 +1,116 @@
+# Kustomize Overlay - Development Environment
+# ============================================
+# This overlay customizes the base configuration for local development.
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# TODO: Reference base configuration
+bases:
+  - ../../base
+
+# TODO: Add environment-specific labels
+commonLabels:
+  environment: development
+
+# TODO: Override namespace (if different from base)
+namespace: ml-system-dev
+
+# TODO: Patch resources for development
+patchesStrategicMerge:
+  # TODO: Add patches
+  # - replica-count-patch.yaml
+  # - resource-limits-patch.yaml
+  # - ingress-patch.yaml
+
+# TODO: Override replica count
+replicas:
+  # - name: ml-api-deployment
+  #   count: 1  # Only 1 replica for dev
+
+# TODO: Override images
+images:
+  # - name: ml-api
+  #   newName: ghcr.io/your-org/ml-api
+  #   newTag: dev-latest
+
+# TODO: Override ConfigMap values
+configMapGenerator:
+  - name: ml-model-config
+    behavior: merge  # Merge with base ConfigMap
+    literals:
+      # TODO: Add dev-specific config
+      # - MODEL_NAME=image-classifier
+      # - MODEL_VERSION=latest
+      # - MLFLOW_TRACKING_URI=http://localhost:5000
+      # - LOG_LEVEL=DEBUG
+      # - ENVIRONMENT=development
+
+# TODO: Override Secrets
+secretGenerator:
+  - name: api-keys
+    behavior: merge
+    literals:
+      # TODO: Add dev API key (change in production!)
+      # - API_KEY=dev-test-key-123
+
+# ==============================================================================
+# DEVELOPMENT ENVIRONMENT CHARACTERISTICS
+# ==============================================================================
+
+# The development overlay should configure:
+#
+# 1. Single Replica:
+#    - Only 1 pod for simplicity and resource efficiency
+#    - No HPA in dev
+#
+# 2. Relaxed Resource Limits:
+#    - Lower CPU/memory requests
+#    - Allow more resource usage for debugging
+#
+# 3. Debug Logging:
+#    - LOG_LEVEL=DEBUG
+#    - Verbose output for troubleshooting
+#
+# 4. No TLS:
+#    - HTTP only (no need for certificates)
+#    - Simplifies local testing
+#
+# 5. Local Services:
+#    - Point to local MLflow, databases
+#    - Use localhost or minikube service URLs
+#
+# 6. Test Data:
+#    - Use small test datasets
+#    - Fast model loading
+#
+# 7. Simplified Ingress:
+#    - NodePort or port-forward access
+#    - No domain name required
+#
+# ==============================================================================
+# STUDENT IMPLEMENTATION
+# ==============================================================================
+
+# TODO: Create patch files in this directory:
+#
+# 1. replica-count-patch.yaml:
+#    Reduce replicas to 1 for development
+#
+# 2. resource-limits-patch.yaml:
+#    Set lower resource requests/limits:
+#    - CPU request: 100m, limit: 500m
+#    - Memory request: 256Mi, limit: 1Gi
+#
+# 3. ingress-patch.yaml (optional):
+#    Configure ingress for local access
+#
+# Test this overlay:
+#   kubectl kustomize kubernetes/overlays/dev/
+#
+# Apply this overlay:
+#   kubectl apply -k kubernetes/overlays/dev/
+#
+# Access the service:
+#   kubectl port-forward -n ml-system-dev svc/ml-api 5000:80
+#   curl http://localhost:5000/health

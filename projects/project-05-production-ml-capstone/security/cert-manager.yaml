@@ -1,0 +1,290 @@
+# cert-manager Configuration for TLS Certificate Management
+# ========================================================
+# This file configures cert-manager to automatically provision and renew
+# TLS certificates for the ML API using Let's Encrypt.
+
+# TODO: Install cert-manager first:
+# helm repo add jetstack https://charts.jetstack.io
+# helm repo update
+# helm install cert-manager jetstack/cert-manager \
+#   --namespace cert-manager \
+#   --create-namespace \
+#   --set installCRDs=true
+
+---
+# ClusterIssuer for Let's Encrypt Staging
+# Use this for testing to avoid rate limits
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-staging
+spec:
+  acme:
+    # TODO: Set your email address for Let's Encrypt notifications
+    email: your-email@example.com
+
+    # Let's Encrypt staging server (for testing)
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+
+    # TODO: Create secret to store ACME account private key
+    privateKeySecretRef:
+      name: letsencrypt-staging
+
+    # TODO: Configure HTTP-01 challenge solver
+    solvers:
+      - http01:
+          ingress:
+            class: nginx
+
+---
+# ClusterIssuer for Let's Encrypt Production
+# Use this for production after testing with staging
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    # TODO: Set your email address
+    email: your-email@example.com
+
+    # Let's Encrypt production server
+    # WARNING: Rate limits apply (50 certificates per domain per week)
+    server: https://acme-v02.api.letsencrypt.org/directory
+
+    # TODO: Create secret to store ACME account private key
+    privateKeySecretRef:
+      name: letsencrypt-prod
+
+    # TODO: Configure HTTP-01 or DNS-01 challenge solver
+    solvers:
+      # HTTP-01 challenge (simpler, works for most cases)
+      - http01:
+          ingress:
+            class: nginx
+
+      # TODO: DNS-01 challenge (required for wildcard certificates)
+      # Uncomment and configure if you need wildcard certs
+      # - dns01:
+      #     cloudDNS:  # For Google Cloud DNS
+      #       project: your-gcp-project
+      #       serviceAccountSecretRef:
+      #         name: clouddns-dns01-solver-sa
+      #         key: key.json
+      #
+      # Or for AWS Route53:
+      # - dns01:
+      #     route53:
+      #       region: us-east-1
+      #       accessKeyID: YOUR_ACCESS_KEY_ID
+      #       secretAccessKeySecretRef:
+      #         name: route53-credentials
+      #         key: secret-access-key
+
+---
+# Example Certificate Resource (Staging)
+# This can be created automatically by Ingress annotations,
+# or manually like this for more control
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: staging-tls
+  namespace: ml-system-staging
+spec:
+  # TODO: Set your staging domain
+  dnsNames:
+    - staging.example.com
+
+  # TODO: Secret name where certificate will be stored
+  secretName: staging-tls
+
+  # TODO: Reference the ClusterIssuer
+  issuerRef:
+    name: letsencrypt-staging
+    kind: ClusterIssuer
+
+  # Optional: Configure certificate renewal
+  renewBefore: 360h  # Renew 15 days before expiry
+
+  # Optional: Configure private key
+  privateKey:
+    algorithm: RSA
+    size: 2048
+
+---
+# Example Certificate Resource (Production)
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: production-tls
+  namespace: ml-system-production
+spec:
+  # TODO: Set your production domain
+  dnsNames:
+    - api.example.com
+    # Add additional domains if needed:
+    # - www.example.com
+
+  # TODO: Secret name where certificate will be stored
+  secretName: production-tls
+
+  # TODO: Reference the production ClusterIssuer
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+
+  # Renew 15 days before expiry
+  renewBefore: 360h
+
+  # Use strong key
+  privateKey:
+    algorithm: RSA
+    size: 4096
+
+---
+# Example Ingress with cert-manager annotations
+# This automatically creates a Certificate resource
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ml-api-ingress
+  namespace: ml-system-production
+  annotations:
+    # TODO: Add cert-manager annotation to auto-create certificate
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+
+    # TODO: Add NGINX-specific annotations
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/ssl-protocols: "TLSv1.2 TLSv1.3"
+    nginx.ingress.kubernetes.io/ssl-ciphers: "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384"
+
+    # TODO: Add security headers
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      more_set_headers "Strict-Transport-Security: max-age=31536000; includeSubDomains; preload";
+      more_set_headers "X-Frame-Options: DENY";
+      more_set_headers "X-Content-Type-Options: nosniff";
+      more_set_headers "X-XSS-Protection: 1; mode=block";
+
+    # TODO: Add rate limiting
+    nginx.ingress.kubernetes.io/limit-rps: "100"
+spec:
+  ingressClassName: nginx
+  tls:
+    # TODO: Configure TLS
+    - hosts:
+        - api.example.com
+      secretName: production-tls
+  rules:
+    # TODO: Configure routing rules
+    - host: api.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ml-api
+                port:
+                  number: 80
+
+# ==============================================================================
+# STUDENT IMPLEMENTATION GUIDE
+# ==============================================================================
+
+# TODO: Implementation Steps:
+#
+# 1. Install cert-manager:
+#    helm repo add jetstack https://charts.jetstack.io
+#    helm repo update
+#    helm install cert-manager jetstack/cert-manager \
+#      --namespace cert-manager \
+#      --create-namespace \
+#      --set installCRDs=true \
+#      --version v1.13.0
+#
+# 2. Verify cert-manager installation:
+#    kubectl get pods -n cert-manager
+#    kubectl get crds | grep cert-manager
+#
+# 3. Update email address in ClusterIssuers above
+#
+# 4. Apply ClusterIssuers:
+#    kubectl apply -f security/cert-manager.yaml
+#
+# 5. Verify ClusterIssuers are ready:
+#    kubectl get clusterissuer
+#    kubectl describe clusterissuer letsencrypt-staging
+#
+# 6. Test with staging first:
+#    - Deploy to staging environment
+#    - Verify certificate is issued
+#    - Check certificate details
+#
+# 7. Check certificate status:
+#    kubectl get certificate -n ml-system-staging
+#    kubectl describe certificate staging-tls -n ml-system-staging
+#
+# 8. Check if certificate is ready:
+#    kubectl wait --for=condition=Ready certificate/staging-tls \
+#      -n ml-system-staging --timeout=5m
+#
+# 9. View certificate details:
+#    kubectl get secret staging-tls -n ml-system-staging -o yaml
+#
+# 10. Test HTTPS endpoint:
+#     curl -v https://staging.example.com/health
+#     # Should show valid TLS connection
+#
+# 11. Deploy to production:
+#     - After staging works, use production ClusterIssuer
+#     - Update Ingress to use letsencrypt-prod
+#     - Monitor certificate issuance
+#
+# TODO: Troubleshooting:
+#
+# 1. Certificate not issuing:
+#    kubectl describe certificate <name> -n <namespace>
+#    kubectl describe certificaterequest <name> -n <namespace>
+#    kubectl describe order <name> -n <namespace>
+#    kubectl describe challenge <name> -n <namespace>
+#
+# 2. Check cert-manager logs:
+#    kubectl logs -n cert-manager deploy/cert-manager -f
+#
+# 3. Common issues:
+#    - DNS not pointing to LoadBalancer IP
+#    - Firewall blocking HTTP-01 challenge (port 80)
+#    - Rate limits hit (use staging first!)
+#    - Invalid email address
+#
+# TODO: Certificate Renewal:
+#
+# - cert-manager automatically renews certificates
+# - Renewal starts 30 days before expiry by default
+# - Configure renewBefore to customize
+# - Monitor renewal in cert-manager logs
+#
+# TODO: Security Best Practices:
+#
+# 1. Use strong TLS protocols (TLS 1.2+, prefer TLS 1.3)
+# 2. Use strong cipher suites
+# 3. Enable HSTS headers
+# 4. Redirect HTTP to HTTPS
+# 5. Monitor certificate expiry
+# 6. Have alerts for renewal failures
+# 7. Test certificate renewal in staging
+# 8. Keep cert-manager up to date
+#
+# TODO: Monitoring:
+#
+# Add Prometheus alerts for certificate expiry:
+#
+# - alert: CertificateExpiringSoon
+#   expr: certmanager_certificate_expiration_timestamp_seconds - time() < 7 * 24 * 3600
+#   for: 1h
+#   labels:
+#     severity: warning
+#   annotations:
+#     summary: Certificate expiring soon
+#     description: Certificate {{ $labels.name }} expires in less than 7 days

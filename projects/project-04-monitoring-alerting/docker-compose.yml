@@ -1,0 +1,441 @@
+# Docker Compose for Monitoring Stack
+#
+# This file deploys the complete monitoring infrastructure:
+# - Prometheus (metrics)
+# - Alertmanager (alerting)
+# - Grafana (visualization)
+# - Elasticsearch (log storage)
+# - Logstash (log processing)
+# - Kibana (log visualization)
+# - Filebeat (log shipping)
+# - Node Exporter (system metrics)
+#
+# Learning Objectives:
+# - Deploy multi-container monitoring stack
+# - Configure service dependencies
+# - Set up persistent storage
+# - Configure networking between services
+#
+# Usage:
+#   docker-compose up -d        # Start all services
+#   docker-compose ps           # Check status
+#   docker-compose logs -f      # View logs
+#   docker-compose down         # Stop and remove
+
+version: '3.8'
+
+# =============================================================================
+# Networks
+# =============================================================================
+
+networks:
+  monitoring:
+    driver: bridge
+    # TODO: Configure custom network settings if needed
+    # ipam:
+    #   config:
+    #     - subnet: 172.20.0.0/16
+
+
+# =============================================================================
+# Volumes (Persistent Storage)
+# =============================================================================
+
+volumes:
+  # TODO: Create named volumes for persistent data
+  # These volumes persist data even when containers are removed
+  #
+  # prometheus_data:
+  #   driver: local
+  #
+  # alertmanager_data:
+  #   driver: local
+  #
+  # grafana_data:
+  #   driver: local
+  #
+  # elasticsearch_data:
+  #   driver: local
+  #
+  # filebeat_data:
+  #   driver: local
+
+
+# =============================================================================
+# Services
+# =============================================================================
+
+services:
+
+  # ---------------------------------------------------------------------------
+  # Prometheus - Metrics Collection & Storage
+  # ---------------------------------------------------------------------------
+
+  # TODO: Add Prometheus service
+  #
+  # prometheus:
+  #   image: prom/prometheus:v2.47.2
+  #   container_name: prometheus
+  #   restart: unless-stopped
+  #   ports:
+  #     - "9090:9090"
+  #   volumes:
+  #     - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+  #     - ./prometheus/alerts.yml:/etc/prometheus/alerts.yml:ro
+  #     - prometheus_data:/prometheus
+  #   command:
+  #     - '--config.file=/etc/prometheus/prometheus.yml'
+  #     - '--storage.tsdb.path=/prometheus'
+  #     - '--storage.tsdb.retention.time=30d'
+  #     - '--storage.tsdb.retention.size=10GB'
+  #     - '--web.enable-lifecycle'
+  #     - '--web.enable-admin-api'
+  #   networks:
+  #     - monitoring
+  #   depends_on:
+  #     - alertmanager
+  #
+  # Command flags explained:
+  # --config.file: Path to Prometheus config
+  # --storage.tsdb.path: Where to store metrics
+  # --storage.tsdb.retention.time: Keep metrics for 30 days
+  # --storage.tsdb.retention.size: Max 10GB storage
+  # --web.enable-lifecycle: Allow config reload via HTTP POST
+  # --web.enable-admin-api: Enable admin API (for delete, etc.)
+
+
+  # ---------------------------------------------------------------------------
+  # Alertmanager - Alert Routing & Notification
+  # ---------------------------------------------------------------------------
+
+  # TODO: Add Alertmanager service
+  #
+  # alertmanager:
+  #   image: prom/alertmanager:v0.26.0
+  #   container_name: alertmanager
+  #   restart: unless-stopped
+  #   ports:
+  #     - "9093:9093"
+  #   volumes:
+  #     - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+  #     - alertmanager_data:/alertmanager
+  #   command:
+  #     - '--config.file=/etc/alertmanager/alertmanager.yml'
+  #     - '--storage.path=/alertmanager'
+  #     - '--web.external-url=http://localhost:9093'
+  #   networks:
+  #     - monitoring
+  #
+  # TODO: Create alertmanager.yml configuration file
+  # mkdir -p alertmanager && touch alertmanager/alertmanager.yml
+
+
+  # ---------------------------------------------------------------------------
+  # Grafana - Visualization & Dashboards
+  # ---------------------------------------------------------------------------
+
+  # TODO: Add Grafana service
+  #
+  # grafana:
+  #   image: grafana/grafana:10.2.2
+  #   container_name: grafana
+  #   restart: unless-stopped
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
+  #     - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin123}
+  #     - GF_USERS_ALLOW_SIGN_UP=false
+  #     - GF_SERVER_ROOT_URL=http://localhost:3000
+  #     - GF_INSTALL_PLUGINS=grafana-piechart-panel,grafana-clock-panel
+  #   volumes:
+  #     - grafana_data:/var/lib/grafana
+  #     - ./grafana/provisioning:/etc/grafana/provisioning:ro
+  #     - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+  #   networks:
+  #     - monitoring
+  #   depends_on:
+  #     - prometheus
+  #
+  # Environment variables:
+  # GF_SECURITY_ADMIN_USER: Admin username (from .env)
+  # GF_SECURITY_ADMIN_PASSWORD: Admin password (from .env)
+  # GF_USERS_ALLOW_SIGN_UP: Disable self-registration
+  # GF_INSTALL_PLUGINS: Auto-install plugins on startup
+
+
+  # ---------------------------------------------------------------------------
+  # Elasticsearch - Log Storage & Search
+  # ---------------------------------------------------------------------------
+
+  # TODO: Add Elasticsearch service
+  #
+  # elasticsearch:
+  #   image: docker.elastic.co/elasticsearch/elasticsearch:8.11.1
+  #   container_name: elasticsearch
+  #   restart: unless-stopped
+  #   environment:
+  #     - discovery.type=single-node
+  #     - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+  #     - xpack.security.enabled=false
+  #     - xpack.security.http.ssl.enabled=false
+  #   ports:
+  #     - "9200:9200"
+  #     - "9300:9300"
+  #   volumes:
+  #     - elasticsearch_data:/usr/share/elasticsearch/data
+  #   networks:
+  #     - monitoring
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 5
+  #
+  # Environment variables:
+  # discovery.type=single-node: Run as single-node cluster (for dev/testing)
+  # ES_JAVA_OPTS: JVM heap size (512MB min, 512MB max)
+  # xpack.security.enabled=false: Disable security for local dev (NOT for production!)
+  #
+  # Note: For production, enable security and use proper authentication
+
+
+  # ---------------------------------------------------------------------------
+  # Logstash - Log Processing Pipeline
+  # ---------------------------------------------------------------------------
+
+  # TODO: Add Logstash service
+  #
+  # logstash:
+  #   image: docker.elastic.co/logstash/logstash:8.11.1
+  #   container_name: logstash
+  #   restart: unless-stopped
+  #   ports:
+  #     - "5000:5000/tcp"   # TCP input (optional)
+  #     - "5044:5044"       # Beats input
+  #   environment:
+  #     - "LS_JAVA_OPTS=-Xms256m -Xmx256m"
+  #     - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+  #   volumes:
+  #     - ./elasticsearch/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+  #     - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+  #   networks:
+  #     - monitoring
+  #   depends_on:
+  #     elasticsearch:
+  #       condition: service_healthy
+  #
+  # TODO: Create logstash.yml configuration
+  # mkdir -p logstash/config && echo "http.host: 0.0.0.0" > logstash/config/logstash.yml
+
+
+  # ---------------------------------------------------------------------------
+  # Kibana - Log Visualization & Search UI
+  # ---------------------------------------------------------------------------
+
+  # TODO: Add Kibana service
+  #
+  # kibana:
+  #   image: docker.elastic.co/kibana/kibana:8.11.1
+  #   container_name: kibana
+  #   restart: unless-stopped
+  #   ports:
+  #     - "5601:5601"
+  #   environment:
+  #     - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+  #     - ELASTICSEARCH_USERNAME=elastic
+  #     - ELASTICSEARCH_PASSWORD=${ELASTIC_PASSWORD:-changeme}
+  #   networks:
+  #     - monitoring
+  #   depends_on:
+  #     elasticsearch:
+  #       condition: service_healthy
+  #
+  # Access Kibana at: http://localhost:5601
+
+
+  # ---------------------------------------------------------------------------
+  # Filebeat - Log Shipping Agent
+  # ---------------------------------------------------------------------------
+
+  # TODO: Add Filebeat service
+  #
+  # filebeat:
+  #   image: docker.elastic.co/beats/filebeat:8.11.1
+  #   container_name: filebeat
+  #   restart: unless-stopped
+  #   user: root
+  #   command: filebeat -e -strict.perms=false
+  #   volumes:
+  #     - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+  #     - /var/lib/docker/containers:/var/lib/docker/containers:ro
+  #     - /var/run/docker.sock:/var/run/docker.sock:ro
+  #     - filebeat_data:/usr/share/filebeat/data
+  #   networks:
+  #     - monitoring
+  #   depends_on:
+  #     - logstash
+  #
+  # TODO: Create filebeat.yml configuration
+  # mkdir -p filebeat && touch filebeat/filebeat.yml
+  #
+  # Volumes explained:
+  # - filebeat.yml: Configuration file
+  # - /var/lib/docker/containers: Docker container logs
+  # - /var/run/docker.sock: Docker socket for container discovery
+  # - filebeat_data: Filebeat state (log offsets, etc.)
+
+
+  # ---------------------------------------------------------------------------
+  # Node Exporter - System Metrics
+  # ---------------------------------------------------------------------------
+
+  # TODO: Add Node Exporter service
+  #
+  # node-exporter:
+  #   image: prom/node-exporter:v1.6.1
+  #   container_name: node-exporter
+  #   restart: unless-stopped
+  #   ports:
+  #     - "9100:9100"
+  #   command:
+  #     - '--path.procfs=/host/proc'
+  #     - '--path.sysfs=/host/sys'
+  #     - '--path.rootfs=/rootfs'
+  #     - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+  #   volumes:
+  #     - /proc:/host/proc:ro
+  #     - /sys:/host/sys:ro
+  #     - /:/rootfs:ro
+  #   networks:
+  #     - monitoring
+  #
+  # Volumes mount host filesystem (read-only) for metrics collection
+  # Command flags filter out pseudo-filesystems
+
+
+  # ---------------------------------------------------------------------------
+  # Example ML Application (Your App Goes Here)
+  # ---------------------------------------------------------------------------
+
+  # TODO: Add your ML application service
+  # This is an example - replace with your actual application
+  #
+  # ml-api:
+  #   build: ./app
+  #   container_name: ml-api
+  #   restart: unless-stopped
+  #   ports:
+  #     - "5000:5000"
+  #   environment:
+  #     - PYTHONUNBUFFERED=1
+  #     - LOG_LEVEL=${LOG_LEVEL:-INFO}
+  #   volumes:
+  #     - ./app:/app
+  #     - ./logs:/var/log/app
+  #   networks:
+  #     - monitoring
+  #
+  # Your application should:
+  # 1. Expose /metrics endpoint for Prometheus
+  # 2. Write JSON-formatted logs
+  # 3. Include health check endpoint
+
+
+# =============================================================================
+# Usage Instructions
+# =============================================================================
+
+# Start all services:
+#   docker-compose up -d
+
+# Check status:
+#   docker-compose ps
+
+# View logs:
+#   docker-compose logs -f prometheus
+#   docker-compose logs -f grafana
+
+# Stop services:
+#   docker-compose down
+
+# Stop and remove volumes (DELETE ALL DATA):
+#   docker-compose down -v
+
+# Restart specific service:
+#   docker-compose restart prometheus
+
+# Rebuild and restart:
+#   docker-compose up -d --build
+
+# Access services:
+#   Prometheus:     http://localhost:9090
+#   Alertmanager:   http://localhost:9093
+#   Grafana:        http://localhost:3000  (admin/admin123)
+#   Elasticsearch:  http://localhost:9200
+#   Kibana:         http://localhost:5601
+#   Node Exporter:  http://localhost:9100/metrics
+
+
+# =============================================================================
+# Troubleshooting
+# =============================================================================
+
+# Service won't start:
+#   docker-compose logs <service-name>
+#   docker-compose up <service-name>  # Start in foreground to see errors
+
+# Permission issues (Elasticsearch, Filebeat):
+#   chmod -R 777 elasticsearch_data/
+#   sudo chown -R 1000:1000 elasticsearch_data/
+
+# Port already in use:
+#   lsof -i :9090  # Find process using port
+#   docker-compose down  # Stop conflicting services
+
+# Out of memory:
+#   Increase Docker memory limit (Docker Desktop settings)
+#   Reduce ES_JAVA_OPTS heap size
+
+# Network issues:
+#   docker network ls
+#   docker network inspect project-04-monitoring-alerting_monitoring
+
+# Clear all data and restart fresh:
+#   docker-compose down -v
+#   docker volume prune
+#   docker-compose up -d
+
+
+# =============================================================================
+# Production Considerations
+# =============================================================================
+
+# 1. Security:
+#    - Enable Elasticsearch security (xpack.security.enabled=true)
+#    - Use strong passwords (not default!)
+#    - Enable TLS for all services
+#    - Don't expose ports publicly without authentication
+
+# 2. Resource Limits:
+#    - Add resource limits to prevent services from consuming all resources
+#    deploy:
+#      resources:
+#        limits:
+#          cpus: '1'
+#          memory: 2G
+
+# 3. High Availability:
+#    - Run multiple Prometheus instances
+#    - Use Elasticsearch cluster (3+ nodes)
+#    - Use external storage (not local volumes)
+
+# 4. Monitoring the Monitors:
+#    - Set up alerts for monitoring stack health
+#    - Monitor Elasticsearch cluster status
+#    - Monitor Prometheus storage
+
+# 5. Backups:
+#    - Backup Grafana dashboards (export JSON)
+#    - Backup Prometheus data (snapshots)
+#    - Backup Elasticsearch indices
