@@ -21,6 +21,17 @@ By completing this curriculum, you will be able to:
 - **Implement CI/CD** for ML applications
 - **Apply security best practices** for production systems
 
+## ✨ What's New
+
+**Recently Added Content:**
+- 🤖 **LLM Basics Exercise** (Module 004) - Run your first language model with Hugging Face Transformers
+- ⚡ **GPU Fundamentals Exercise** (Module 004) - Learn GPU acceleration for ML inference
+- 🏗️ **Terraform/IaC Exercise** (Module 010) - Infrastructure as Code with hands-on AWS deployment
+- 🔄 **Airflow Workflow Exercise** (Module 009) - Orchestrate ML pipelines with monitoring
+- 📋 **Technology Versions Guide** - Comprehensive version specifications for all tools
+- 🗺️ **Curriculum Cross-Reference** - Complete mapping to Engineer track
+- 📈 **Career Progression Guide** - Junior to Principal Engineer roadmap
+
 ## 📚 Curriculum Overview
 
 **Total Duration:** 440 hours (11 weeks full-time, 22 weeks part-time)
@@ -29,18 +40,18 @@ By completing this curriculum, you will be able to:
 
 ### Learning Modules (10 modules, ~150 hours)
 
-| Module | Topic | Duration | Difficulty |
-|--------|-------|----------|------------|
-| **001** | Python Fundamentals for Infrastructure | 15 hours | Beginner |
-| **002** | Linux Essentials | 15 hours | Beginner |
-| **003** | Git & Version Control | 10 hours | Beginner |
-| **004** | ML Basics (PyTorch/TensorFlow) | 20 hours | Beginner |
-| **005** | Docker & Containerization | 15 hours | Beginner |
-| **006** | Kubernetes Introduction | 20 hours | Beginner+ |
-| **007** | APIs & Web Services | 15 hours | Beginner |
-| **008** | Databases & SQL | 15 hours | Beginner |
-| **009** | Monitoring & Logging Basics | 15 hours | Beginner+ |
-| **010** | Cloud Platforms (AWS/GCP/Azure) | 20 hours | Beginner+ |
+| Module | Topic | Duration | Difficulty | New Content |
+|--------|-------|----------|------------|-------------|
+| **001** | Python Fundamentals for Infrastructure | 15 hours | Beginner | — |
+| **002** | Linux Essentials | 15 hours | Beginner | — |
+| **003** | Git & Version Control | 10 hours | Beginner | — |
+| **004** | ML Basics (PyTorch/TensorFlow) | 20 hours | Beginner | ✨ **+LLM Basics +GPU Fundamentals** |
+| **005** | Docker & Containerization | 15 hours | Beginner | — |
+| **006** | Kubernetes Introduction | 20 hours | Beginner+ | — |
+| **007** | APIs & Web Services | 15 hours | Beginner | — |
+| **008** | Databases & SQL | 15 hours | Beginner | — |
+| **009** | Monitoring & Logging Basics | 15 hours | Beginner+ | ✨ **+Airflow Workflow** |
+| **010** | Cloud Platforms (AWS/GCP/Azure) | 20 hours | Beginner+ | ✨ **+Terraform/IaC** |
 
 ### Hands-On Projects (5 projects, ~290 hours)
 
@@ -310,6 +321,12 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) file for
 - **Students:** Your feedback makes this curriculum better
 
 ## 🔗 Related Resources
+
+### Curriculum Documentation
+
+- 📋 **[Technology Versions Guide](VERSIONS.md)** - Recommended versions for all tools and frameworks
+- 🗺️ **[Curriculum Cross-Reference](https://github.com/ai-infra-curriculum/.github/blob/main/CURRICULUM_CROSS_REFERENCE.md)** - Mapping between Junior and Engineer tracks
+- 📈 **[Career Progression Guide](https://github.com/ai-infra-curriculum/.github/blob/main/CAREER_PROGRESSION.md)** - Complete career ladder from Junior to Principal
 
 ### Other Curriculum Levels
 
