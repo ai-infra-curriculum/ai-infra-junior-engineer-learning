@@ -1,333 +1,42 @@
-# Lecture 04: Testing, Async Programming & Code Quality
+# Lecture 05: Testing with pytest & Code Quality
 
 ## Table of Contents
 1. [Introduction](#introduction)
-2. [Asynchronous Programming in Python](#asynchronous-programming-in-python)
-3. [Testing with pytest](#testing-with-pytest)
-4. [Code Quality & Tooling](#code-quality--tooling)
-5. [Summary](#summary)
+2. [Testing with pytest](#testing-with-pytest)
+3. [Code Quality & Tooling](#code-quality--tooling)
+4. [Summary](#summary)
 
 ---
 
 ## Introduction
 
-This lecture covers three critical topics for professional Python development in AI infrastructure:
+This lecture covers two critical topics for professional Python development in AI infrastructure:
 
-1. **Asynchronous Programming**: Writing concurrent code using `async`/`await` for handling I/O-bound operations efficiently
-2. **Testing**: Building comprehensive test suites using pytest to ensure code reliability
-3. **Code Quality**: Using linters, formatters, and type checkers to maintain professional standards
+1. **Testing**: Building comprehensive test suites using pytest to ensure code reliability
+2. **Code Quality**: Using linters, formatters, and type checkers to maintain professional standards
 
 These skills are essential for building production-grade AI infrastructure systems that are reliable, maintainable, and performant.
 
 ### Why These Topics Matter
 
 **In AI Infrastructure**:
-- **Async Programming**: Handle multiple API requests, database queries, or model serving calls concurrently
 - **Testing**: Ensure infrastructure code works correctly before deploying to production
 - **Code Quality**: Maintain codebases that multiple engineers can work on effectively
+- **Reliability**: Catch bugs early in the development cycle
+- **Maintainability**: Keep code readable and consistent across the team
 
----
+### Learning Objectives
 
-## Asynchronous Programming in Python
+By the end of this lecture, you will:
+- Write comprehensive unit tests using pytest
+- Use fixtures for reusable test data and setup
+- Test async functions with pytest-asyncio
+- Mock external dependencies to isolate tests
+- Use code formatters (Black), linters (Ruff), and type checkers (mypy)
+- Set up pre-commit hooks to automate quality checks
+- Understand code coverage and quality metrics
 
-### Understanding Async/Await
-
-**Asynchronous programming** allows you to write concurrent code that can handle multiple operations without blocking. This is crucial for I/O-bound operations like:
-- Making HTTP API calls
-- Reading/writing to databases
-- File I/O operations
-- Network communication
-
-### When to Use Async
-
-✅ **Use Async For**:
-- I/O-bound operations (network calls, file operations, database queries)
-- Handling many concurrent connections (web servers, API gateways)
-- Long-running operations that wait on external systems
-
-❌ **Don't Use Async For**:
-- CPU-bound operations (use multiprocessing instead)
-- Simple scripts without concurrent operations
-- Code that doesn't involve waiting
-
-### Basic Async Syntax
-
-```python
-import asyncio
-
-# Define an async function with 'async def'
-async def fetch_data(url: str) -> dict:
-    """Async function to fetch data from URL"""
-    await asyncio.sleep(1)  # Simulate network delay
-    return {"url": url, "data": "sample data"}
-
-# Run async function
-async def main():
-    result = await fetch_data("https://api.example.com/data")
-    print(result)
-
-# Execute the async code
-if __name__ == "__main__":
-    asyncio.run(main())
-```
-
-**Key Concepts**:
-- `async def`: Defines a coroutine function
-- `await`: Pauses execution until the awaited operation completes
-- `asyncio.run()`: Entry point for running async code
-
-### Running Multiple Tasks Concurrently
-
-The power of async is running multiple operations at once:
-
-```python
-import asyncio
-from typing import List
-
-async def fetch_model_metadata(model_id: str) -> dict:
-    """Fetch metadata for a single model"""
-    await asyncio.sleep(0.5)  # Simulate API call
-    return {
-        "model_id": model_id,
-        "version": "1.0",
-        "accuracy": 0.95
-    }
-
-async def fetch_all_models(model_ids: List[str]) -> List[dict]:
-    """Fetch metadata for multiple models concurrently"""
-    # Create tasks for all models
-    tasks = [fetch_model_metadata(mid) for mid in model_ids]
-
-    # Run all tasks concurrently
-    results = await asyncio.gather(*tasks)
-    return results
-
-async def main():
-    model_ids = [f"model-{i}" for i in range(5)]
-
-    # Sequential execution (slow)
-    print("Sequential execution:")
-    import time
-    start = time.time()
-    results = []
-    for mid in model_ids:
-        result = await fetch_model_metadata(mid)
-        results.append(result)
-    print(f"Time: {time.time() - start:.2f}s")  # ~2.5 seconds
-
-    # Concurrent execution (fast)
-    print("\nConcurrent execution:")
-    start = time.time()
-    results = await fetch_all_models(model_ids)
-    print(f"Time: {time.time() - start:.2f}s")  # ~0.5 seconds
-
-if __name__ == "__main__":
-    asyncio.run(main())
-```
-
-### Async with HTTP Requests
-
-Using `httpx` for async HTTP calls:
-
-```python
-import asyncio
-import httpx
-from typing import List, Dict
-
-async def check_model_health(endpoint: str) -> Dict[str, str]:
-    """Check if a model serving endpoint is healthy"""
-    async with httpx.AsyncClient(timeout=5.0) as client:
-        try:
-            response = await client.get(f"{endpoint}/health")
-            return {
-                "endpoint": endpoint,
-                "status": "healthy" if response.status_code == 200 else "unhealthy",
-                "response_time": response.elapsed.total_seconds()
-            }
-        except Exception as e:
-            return {
-                "endpoint": endpoint,
-                "status": "error",
-                "error": str(e)
-            }
-
-async def monitor_models(endpoints: List[str]) -> List[Dict]:
-    """Monitor multiple model endpoints concurrently"""
-    tasks = [check_model_health(ep) for ep in endpoints]
-    results = await asyncio.gather(*tasks, return_exceptions=True)
-    return results
-
-# Usage
-async def main():
-    endpoints = [
-        "http://model1.example.com",
-        "http://model2.example.com",
-        "http://model3.example.com"
-    ]
-
-    health_status = await monitor_models(endpoints)
-    for status in health_status:
-        print(f"{status['endpoint']}: {status['status']}")
-
-if __name__ == "__main__":
-    asyncio.run(main())
-```
-
-### Error Handling in Async Code
-
-```python
-import asyncio
-from typing import Optional
-
-async def fetch_with_retry(url: str, max_retries: int = 3) -> Optional[dict]:
-    """Fetch data with retry logic"""
-    for attempt in range(max_retries):
-        try:
-            async with httpx.AsyncClient() as client:
-                response = await client.get(url, timeout=10.0)
-                response.raise_for_status()
-                return response.json()
-        except httpx.TimeoutException:
-            print(f"Timeout on attempt {attempt + 1}")
-            if attempt < max_retries - 1:
-                await asyncio.sleep(2 ** attempt)  # Exponential backoff
-        except httpx.HTTPError as e:
-            print(f"HTTP error: {e}")
-            return None
-
-    return None  # All retries failed
-```
-
-### Async Context Managers
-
-```python
-import asyncio
-from typing import AsyncGenerator
-
-class AsyncModelClient:
-    """Async client for ML model serving"""
-
-    async def __aenter__(self):
-        """Setup when entering context"""
-        self.client = httpx.AsyncClient()
-        await self.connect()
-        return self
-
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
-        """Cleanup when exiting context"""
-        await self.disconnect()
-        await self.client.aclose()
-
-    async def connect(self):
-        """Establish connection"""
-        await asyncio.sleep(0.1)  # Simulate connection
-        print("Connected to model server")
-
-    async def disconnect(self):
-        """Close connection"""
-        await asyncio.sleep(0.1)
-        print("Disconnected from model server")
-
-    async def predict(self, data: dict) -> dict:
-        """Make prediction"""
-        response = await self.client.post(
-            "http://model.example.com/predict",
-            json=data
-        )
-        return response.json()
-
-# Usage
-async def main():
-    async with AsyncModelClient() as client:
-        result = await client.predict({"features": [1, 2, 3]})
-        print(result)
-```
-
-### Async Generators
-
-```python
-import asyncio
-from typing import AsyncGenerator
-
-async def stream_training_logs(job_id: str) -> AsyncGenerator[str, None]:
-    """Stream training logs asynchronously"""
-    for i in range(10):
-        await asyncio.sleep(0.5)
-        yield f"[{job_id}] Epoch {i+1}/10 - loss: {1.0/(i+1):.4f}"
-
-async def monitor_training():
-    """Monitor training job logs"""
-    async for log_line in stream_training_logs("job-123"):
-        print(log_line)
-
-if __name__ == "__main__":
-    asyncio.run(monitor_training())
-```
-
-### Common Async Patterns for AI Infrastructure
-
-#### Pattern 1: Concurrent Model Deployment
-
-```python
-import asyncio
-from typing import List
-
-async def deploy_model(model_id: str, environment: str) -> dict:
-    """Deploy a single model"""
-    print(f"Deploying {model_id} to {environment}...")
-    await asyncio.sleep(2)  # Simulate deployment time
-    return {
-        "model_id": model_id,
-        "environment": environment,
-        "status": "deployed"
-    }
-
-async def deploy_multiple_models(
-    models: List[str],
-    environment: str
-) -> List[dict]:
-    """Deploy multiple models concurrently"""
-    tasks = [deploy_model(mid, environment) for mid in models]
-    return await asyncio.gather(*tasks)
-```
-
-#### Pattern 2: Async Data Pipeline
-
-```python
-import asyncio
-from typing import List, Dict
-
-async def fetch_training_data(source: str) -> List[Dict]:
-    """Fetch training data from source"""
-    await asyncio.sleep(1)
-    return [{"id": i, "features": [i]*10} for i in range(100)]
-
-async def preprocess_batch(batch: List[Dict]) -> List[Dict]:
-    """Preprocess a batch of data"""
-    await asyncio.sleep(0.5)
-    return [{"id": item["id"], "processed": True} for item in batch]
-
-async def save_to_storage(data: List[Dict]) -> None:
-    """Save processed data to storage"""
-    await asyncio.sleep(0.3)
-    print(f"Saved {len(data)} records")
-
-async def data_pipeline():
-    """Execute data pipeline with async operations"""
-    # Fetch data
-    raw_data = await fetch_training_data("s3://bucket/data")
-
-    # Preprocess in batches concurrently
-    batch_size = 25
-    batches = [raw_data[i:i+batch_size] for i in range(0, len(raw_data), batch_size)]
-    processed_batches = await asyncio.gather(*[preprocess_batch(b) for b in batches])
-
-    # Flatten results
-    processed_data = [item for batch in processed_batches for item in batch]
-
-    # Save
-    await save_to_storage(processed_data)
-```
+This lecture builds on everything you've learned in Lectures 1-4, helping you maintain professional standards in your Python code.
 
 ---
 
@@ -856,12 +565,6 @@ quality: format lint typecheck test
 
 ### Key Takeaways
 
-#### Async Programming
-- Use `async`/`await` for I/O-bound concurrent operations
-- `asyncio.gather()` runs multiple tasks concurrently
-- Async is essential for efficient API calls and database queries
-- Always use `asyncio.run()` as the entry point
-
 #### Testing
 - Write tests using pytest for reliability
 - Use fixtures for reusable test data
@@ -879,44 +582,55 @@ quality: format lint typecheck test
 
 ### Best Practices for AI Infrastructure
 
-1. **Write Async Code for**:
-   - Model serving APIs (multiple concurrent requests)
-   - Batch inference with multiple model calls
-   - Health check monitoring across services
-   - Data pipeline operations
-
-2. **Test Everything**:
+1. **Test Everything**:
    - Model deployment logic
    - Configuration parsing
    - API endpoints
    - Error handling
    - Edge cases
 
-3. **Maintain Quality**:
+2. **Maintain Quality**:
    - Use formatters (no debates about style)
    - Run linters (catch bugs early)
    - Type check (document interfaces)
    - Automate with pre-commit hooks
 
-### Next Steps
+3. **Coverage Goals**:
+   - Aim for >80% test coverage
+   - Focus on critical paths first
+   - Test error conditions
+   - Mock external dependencies
 
+### Completing Module 001
+
+Congratulations! You've completed all five lectures in Module 001: Python Fundamentals for AI Infrastructure.
+
+**You've learned**:
+- Environment and dependency management (Lecture 01)
+- Advanced Python patterns (Lecture 02)
+- Python for DevOps operations (Lecture 03)
+- Asynchronous programming (Lecture 04)
+- Testing and code quality (Lecture 05)
+
+**Next Steps**:
 - Complete **Exercise 06: Async Programming** - Build concurrent model monitoring
 - Complete **Exercise 07: Testing** - Write comprehensive test suites
 - Practice using code quality tools in your projects
 - Set up pre-commit hooks in all your repositories
+- Move on to **Module 002: Linux Essentials for AI Infrastructure**
 
 ### Additional Resources
 
-- [asyncio Documentation](https://docs.python.org/3/library/asyncio.html)
 - [pytest Documentation](https://docs.pytest.org/)
-- [Real Python: Async IO](https://realpython.com/async-io-python/)
 - [Black Documentation](https://black.readthedocs.io/)
 - [Ruff Documentation](https://docs.astral.sh/ruff/)
 - [mypy Documentation](https://mypy.readthedocs.io/)
+- [Real Python: Testing in Python](https://realpython.com/python-testing/)
+- [Pre-commit Framework](https://pre-commit.com/)
 
 ---
 
-**Module 001, Lecture 04 Complete!**
+**Module 001, Lecture 05 Complete!**
 
 You now have the skills to:
 - Write efficient async code for concurrent operations
@@ -925,3 +639,7 @@ You now have the skills to:
 - Use modern Python tooling effectively
 
 These skills form the foundation for professional AI infrastructure development.
+
+**Lecture Version**: 1.0
+**Last Updated**: October 2025
+**Estimated Duration**: 8-10 hours
