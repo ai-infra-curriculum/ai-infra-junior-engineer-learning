@@ -1163,8 +1163,36 @@ submit_job(manifest)
 
 ---
 
+## Next Steps
+
+You've now completed the foundational Python programming lectures! You're ready to move forward with more advanced topics:
+
+### Continue Learning
+
+**Lecture 04: Asynchronous Programming** (`04-async-programming.md`)
+- Learn to write concurrent code with async/await
+- Handle multiple API requests simultaneously
+- Build efficient I/O-bound operations
+- Prepare for Exercise 06: Async Model Monitoring
+
+**Lecture 05: Testing and Code Quality** (`05-testing-code-quality.md`)
+- Master pytest for comprehensive testing
+- Implement code quality tools (Black, Ruff, mypy)
+- Set up automated quality checks
+- Write maintainable, professional Python code
+
+### Apply Your Knowledge
+
+Practice the skills from Lectures 1-3:
+- Build CLI tools for infrastructure automation
+- Write subprocess wrappers for external tools
+- Implement file processing utilities
+- Create configuration management scripts
+
+---
+
 **Lecture Version**: 1.0
 **Last Updated**: October 2025
 **Word Count**: ~3,800 words
 
-**Next**: Continue to `04-testing-quality.md`
+**Next**: Continue to `04-async-programming.md`

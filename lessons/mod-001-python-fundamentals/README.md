@@ -49,7 +49,7 @@ By the end of this module, you will be able to:
 
 ## Module Structure
 
-This module is organized into four comprehensive lectures, each building upon the previous:
+This module is organized into five comprehensive lectures, each building upon the previous:
 
 ### Lecture 01: Python Environment & Dependency Management (Week 1)
 **Duration**: 6-8 hours
@@ -75,13 +75,24 @@ This module is organized into four comprehensive lectures, each building upon th
 - Working with environment variables
 - Parsing command-line arguments
 
-### Lecture 04: Testing and Code Quality (Week 4)
+### Lecture 04: Asynchronous Programming (Week 4)
+**Duration**: 6-8 hours
+- Understanding async/await syntax
+- Running concurrent tasks with asyncio
+- Async HTTP requests with httpx
+- Error handling in async code
+- Async context managers and generators
+- Common async patterns for AI infrastructure
+
+### Lecture 05: Testing and Code Quality (Week 5)
 **Duration**: 8-10 hours
 - Unit testing with pytest
 - Test fixtures and parametrization
+- Testing async functions
 - Mocking and patching in tests
 - Code coverage analysis
-- Linting and formatting tools
+- Linting and formatting tools (Black, Ruff, isort)
+- Type checking with mypy
 - Pre-commit hooks and automation
 
 ## Prerequisites
@@ -123,12 +134,18 @@ This module is organized into four comprehensive lectures, each building upon th
 - **Day 3-4**: Practice exercises
 - **Day 5**: Integration practice
 
-### Week 4: Quality & Testing
-- **Day 1-2**: Lecture 04 (Testing & Quality)
-- **Day 3-4**: Practice and project work
+### Week 4: Asynchronous Programming
+- **Day 1-2**: Lecture 04 (Async Programming)
+- **Day 3**: Exercise 06 (Async Programming)
+- **Day 4-5**: Practice and experimentation
+
+### Week 5: Quality & Testing
+- **Day 1-2**: Lecture 05 (Testing & Code Quality)
+- **Day 3**: Exercise 07 (Testing)
+- **Day 4**: Practice and project work
 - **Day 5**: Complete module assessment
 
-**Total Estimated Time**: 30-40 hours
+**Total Estimated Time**: 38-48 hours
 
 ## Topics Covered
 
@@ -207,6 +224,7 @@ This module is organized into four comprehensive lectures, each building upon th
 ### Exercise 01: Environment Setup & Management
 **Difficulty**: Beginner
 **Duration**: 2-3 hours
+**Related to**: Lecture 01
 
 Create a complete Python project with proper environment management, including:
 - Virtual environment setup
@@ -218,6 +236,7 @@ Create a complete Python project with proper environment management, including:
 ### Exercise 02: Type Hints Implementation
 **Difficulty**: Intermediate
 **Duration**: 2-3 hours
+**Related to**: Lecture 02
 
 Take a provided untyped Python module and add comprehensive type hints:
 - Function signatures with input/output types
@@ -229,6 +248,7 @@ Take a provided untyped Python module and add comprehensive type hints:
 ### Exercise 03: Logging Implementation
 **Difficulty**: Intermediate
 **Duration**: 3-4 hours
+**Related to**: Lecture 02
 
 Implement a comprehensive logging strategy for a multi-module application:
 - Configure root and module-level loggers
@@ -236,6 +256,31 @@ Implement a comprehensive logging strategy for a multi-module application:
 - Add context to log messages
 - Configure file and console handlers
 - Implement log rotation
+
+### Exercise 06: Async Programming
+**Difficulty**: Intermediate
+**Duration**: 4-5 hours
+**Related to**: Lecture 04
+
+Build a concurrent model monitoring system using async/await:
+- Monitor multiple model endpoints concurrently
+- Implement async HTTP health checks
+- Handle timeouts and retries
+- Aggregate monitoring results
+- Generate health status reports
+
+### Exercise 07: Testing with pytest
+**Difficulty**: Intermediate
+**Duration**: 4-5 hours
+**Related to**: Lecture 05
+
+Write comprehensive test suites for infrastructure code:
+- Unit tests with pytest
+- Test fixtures for reusable setup
+- Parametrized tests for multiple scenarios
+- Test async functions
+- Mock external dependencies
+- Achieve >80% code coverage
 
 ## Quizzes & Assessments
 
@@ -340,7 +385,7 @@ The Python skills you develop here will be used extensively in all subsequent mo
 
 **Module Version**: 1.0
 **Last Updated**: October 2025
-**Estimated Completion Time**: 30-40 hours
+**Estimated Completion Time**: 38-48 hours
 **Difficulty Level**: Beginner to Intermediate
 
 **Ready to begin?** Start with `lecture-notes/01-python-environment.md`
