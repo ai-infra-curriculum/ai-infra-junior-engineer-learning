@@ -1,4 +1,4 @@
-# Lecture 01: Linux Fundamentals and File System Navigation
+# Lecture 02: File System and Navigation
 
 ## Table of Contents
 1. [Introduction](#introduction)
@@ -13,7 +13,9 @@
 
 ## Introduction
 
-As an AI Infrastructure Engineer, you'll spend significant time working with Linux systems. Whether deploying machine learning models, managing GPU servers, or orchestrating containers, Linux is the foundation of modern AI infrastructure. This lecture introduces you to the Linux file system and essential commands that form the basis of all your future work.
+As an AI Infrastructure Engineer, you'll spend significant time working with Linux file systems. Whether deploying machine learning models, managing GPU servers, or orchestrating containers, understanding the file system structure and navigation is fundamental to all your future work.
+
+This lecture introduces you to the Linux file system hierarchy and essential commands for navigating and managing files and directories in AI infrastructure scenarios.
 
 ### Learning Objectives
 
@@ -27,19 +29,20 @@ By the end of this lecture, you will:
 - Apply Linux fundamentals to AI infrastructure scenarios
 
 ### Prerequisites
+- Lecture 01: Introduction to Linux and Command Line
 - Access to a Linux system (Ubuntu 22.04 LTS, CentOS 8, or similar)
 - Basic understanding of what an operating system does
 - Terminal emulator installed and accessible
 
-### Why Linux for AI Infrastructure?
+### Why File System Knowledge for AI Infrastructure?
 
-**Industry Standard**: Over 90% of cloud infrastructure runs on Linux. Major AI platforms like TensorFlow, PyTorch, and CUDA are optimized for Linux environments.
+**Data Management**: Training datasets, model files, and results must be organized properly across potentially hundreds of GB or TB.
 
-**Performance**: Linux provides direct hardware access, critical for GPU computing and high-performance ML workloads.
+**Model Storage**: Understanding where and how to store models, checkpoints, and configurations ensures reproducible deployments.
 
-**Automation**: Shell scripting and command-line tools enable infrastructure automation at scale.
+**Performance**: Knowing which filesystems to use for different workloads (NVMe SSDs for training data, network storage for archives) impacts performance.
 
-**Open Source**: Free, customizable, and supported by extensive community resources.
+**Collaboration**: Proper file organization enables teams to work together on ML projects effectively.
 
 ## Understanding the Linux File System
 
@@ -82,24 +85,67 @@ Unlike Windows with drive letters (C:\, D:\), Linux uses a single unified tree s
 
 **`/home/username/`**: Your personal workspace. Store ML notebooks, training scripts, and datasets here during development.
 
+**Example**:
+```bash
+/home/alice/
+├── ml-projects/
+│   ├── image-classifier/
+│   │   ├── data/
+│   │   ├── models/
+│   │   ├── notebooks/
+│   │   └── train.py
+│   └── nlp-sentiment/
+└── datasets/
+```
+
 **`/opt/`**: Install custom ML frameworks, CUDA toolkits, or proprietary software here.
+
+**Example**:
+```bash
+/opt/
+├── cuda-11.8/
+├── ml-framework/
+└── custom-models/
+```
 
 **`/var/log/`**: Critical for troubleshooting. Training logs, service logs, and error messages live here.
 
+**Example**:
+```bash
+/var/log/
+├── training/
+│   ├── model-2024-01-15.log
+│   └── errors.log
+├── inference/
+└── system/
+```
+
 **`/etc/`**: Configuration files for services like Docker, Kubernetes, and NVIDIA drivers.
 
-**`/tmp/`**: Temporary storage for intermediate training data or model checkpoints. Warning: Contents may be deleted on reboot!
+**Example**:
+```bash
+/etc/
+├── docker/
+│   └── daemon.json
+├── kubernetes/
+└── nvidia/
+    └── cuda.conf
+```
+
+**`/tmp/`**: Temporary storage for intermediate training data or model checkpoints. **Warning: Contents may be deleted on reboot!**
 
 **`/usr/local/`**: Custom-built software like specific Python versions or ML libraries compiled from source.
 
 ### Path Concepts
 
-**Absolute Path**: Starts from root directory
+**Absolute Path**: Starts from root directory `/`
+
 ```bash
 /home/alice/ml-projects/image-classifier/train.py
 ```
 
 **Relative Path**: Relative to current location
+
 ```bash
 # If currently in /home/alice/
 ml-projects/image-classifier/train.py
@@ -119,6 +165,7 @@ cd ~                    # Go to home directory
 cd ..                   # Go up one level
 cd -                    # Return to previous directory
 cd ~/ml-projects        # Go to ml-projects in home
+./script.sh             # Run script in current directory
 ```
 
 ## Essential Navigation Commands
@@ -137,6 +184,17 @@ echo "Running training from: $CURRENT_DIR"
 ```
 
 **AI Infrastructure Use Case**: When running training jobs, always verify the working directory to ensure data paths are correct.
+
+```bash
+#!/bin/bash
+# Verify we're in the right place before training
+if [[ $(pwd) != "/opt/ml-training" ]]; then
+    echo "Error: Must run from /opt/ml-training"
+    exit 1
+fi
+
+python train.py
+```
 
 ### ls - List Directory Contents
 
@@ -227,6 +285,27 @@ cd ../another-project   # From /home/alice/project-a to project-b
 cd /var/lo<TAB>         # Autocompletes to /var/log/
 ```
 
+**AI Infrastructure Example**:
+```bash
+# Navigate to training directory
+cd ~/ml-projects/image-classifier
+
+# Check where we are
+pwd
+
+# Go to data directory
+cd data/raw
+
+# Back to project root
+cd ../..
+
+# Check training logs
+cd /var/log/training
+
+# Return to project
+cd -
+```
+
 ### tree - Visual Directory Structure
 
 Display directory hierarchy as a tree (may need installation: `sudo apt install tree`).
@@ -253,6 +332,15 @@ tree -L 3 ml-project/
 #     └── evaluate.py
 ```
 
+**Exclude Patterns**:
+```bash
+# Exclude Python cache and git directories
+tree -I '__pycache__|.git'
+
+# Exclude large data directories
+tree -I 'data|*.h5|*.pt'
+```
+
 ## File Operations
 
 ### Creating Files and Directories
@@ -263,7 +351,7 @@ touch train.py                    # Create single file
 touch model.py utils.py          # Create multiple files
 touch experiment_{1..5}.log      # Create numbered files
 
-# Update modification time
+# Update modification time of existing file
 touch -t 202310151430 model.h5   # Set specific timestamp
 ```
 
@@ -289,7 +377,18 @@ tree experiments/
 ```bash
 # Set up ML project structure
 mkdir -p ml-project/{data/{raw,processed},models/{checkpoints,final},notebooks,src,logs}
+
 tree ml-project/
+# ml-project/
+# ├── data/
+# │   ├── raw/
+# │   └── processed/
+# ├── logs/
+# ├── models/
+# │   ├── checkpoints/
+# │   └── final/
+# ├── notebooks/
+# └── src/
 ```
 
 ### Copying Files and Directories
@@ -318,6 +417,9 @@ cp -r /mnt/nas/datasets/imagenet /local/ssd/datasets/
 
 # Duplicate experiment configuration
 cp -r experiments/baseline experiments/experiment_2
+
+# Backup with timestamp
+cp model.h5 backups/model_$(date +%Y%m%d_%H%M%S).h5
 ```
 
 ### Moving and Renaming
@@ -348,6 +450,9 @@ mv experiment_temp experiment_resnet50_baseline
 
 # Move logs to archive
 mv logs/training_$(date -d '30 days ago' +%Y%m).log logs/archive/
+
+# Stage model for deployment
+mv models/checkpoints/best_model.h5 models/production/
 ```
 
 ### Deleting Files and Directories
@@ -391,6 +496,28 @@ find ~/.trash -mtime +30 -delete    # Delete files older than 30 days
 
 # For critical operations, use interactive mode
 rm -ri experiments/failed_*         # Confirm each deletion
+```
+
+**AI Infrastructure Safety**:
+```bash
+# Before deleting training data, verify
+ls -lh data/to_delete/
+du -sh data/to_delete/
+# Then delete
+rm -rf data/to_delete/
+
+# Create a cleanup script with confirmation
+cat > cleanup.sh << 'EOF'
+#!/bin/bash
+echo "This will delete:"
+find checkpoints/ -mtime +7 -name "*.ckpt"
+read -p "Proceed? (y/n) " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+    find checkpoints/ -mtime +7 -name "*.ckpt" -delete
+    echo "Cleanup complete"
+fi
+EOF
 ```
 
 ### Viewing File Contents
@@ -444,11 +571,16 @@ cat model_architecture.txt
 
 # Compare configurations
 cat config_v1.yaml config_v2.yaml
+
+# Extract specific lines
+sed -n '100,200p' large_dataset.csv  # Lines 100-200
 ```
 
 ## Finding Files and Directories
 
 ### find - Powerful File Search
+
+The `find` command is one of the most powerful tools for locating files and directories.
 
 **Basic Syntax**: `find [path] [expression]`
 
@@ -509,7 +641,7 @@ find logs/ -name "*.log" -mtime +30 -exec gzip {} \;
 find . -name "*.ipynb"
 
 # Find model files larger than 500MB
-find . -name "*.h5" -o -name "*.pt" -size +500M
+find . \( -name "*.h5" -o -name "*.pt" \) -size +500M
 
 # Find recently modified training scripts
 find . -name "train*.py" -mtime -7
@@ -528,6 +660,9 @@ find . -type d -name "__pycache__" -exec rm -rf {} +
 
 # Find datasets not accessed in 90 days
 find /data/datasets -type f -atime +90 -size +1G
+
+# Find broken symlinks
+find . -type l ! -exec test -e {} \; -print
 ```
 
 ### locate - Fast Database Search
@@ -585,6 +720,10 @@ docker --version
 
 # Find pip location (virtual env check)
 which pip
+
+# Verify virtual environment is active
+which python
+# Should show: /path/to/venv/bin/python
 ```
 
 ### whereis - Locate Binary, Source, Manual
@@ -641,6 +780,9 @@ ln -s /etc/ml-service/config.prod.yaml /etc/ml-service/config.yaml
 
 # Quick access to log directory
 ln -s /var/log/ml-training ~/logs
+
+# Shared model repository
+ln -s /mnt/shared/models ~/shared-models
 ```
 
 ### Hard Links
@@ -675,18 +817,23 @@ ls -li original.txt hardlink.txt
 ls -l file.txt                         # Shows -> if symlink
 file file.txt                          # Shows symbolic link info
 readlink file.txt                      # Shows target of symlink
+readlink -f file.txt                   # Follow all symlinks to final target
 
 # Find broken symlinks
-find . -type l -! -exec test -e {} \; -print
+find . -type l ! -exec test -e {} \; -print
 
 # Remove symlink (doesn't affect target)
 rm symlink_name                        # Safe - only removes link
+unlink symlink_name                    # Alternative command
 
 # Update symlink
 ln -sf new_target existing_link        # Force update
 
 # List all symlinks
 find . -type l -ls
+
+# List symlinks in current directory
+ls -l | grep ^l
 ```
 
 ## Archiving and Compression
@@ -746,7 +893,7 @@ tar -cJvf imagenet_subset.tar.xz data/imagenet_subset/
 # Extract pretrained weights
 tar -xzvf pretrained_weights.tar.gz -C models/pretrained/
 
-# Backup configuration and code
+# Backup configuration and code (excluding large files)
 tar -czvf project_backup_$(date +%Y%m%d).tar.gz \
     --exclude='*.h5' \
     --exclude='*.pt' \
@@ -756,6 +903,9 @@ tar -czvf project_backup_$(date +%Y%m%d).tar.gz \
 
 # Verify archive integrity
 tar -tzvf archive.tar.gz > /dev/null && echo "Archive OK" || echo "Archive corrupted"
+
+# Create split archives for large datasets
+tar -czvf - large_dataset/ | split -b 1G - dataset.tar.gz.
 ```
 
 ### gzip/gunzip - Compression
@@ -776,6 +926,9 @@ zgrep "pattern" file.txt.gz            # Search compressed file
 
 # Compress multiple files
 gzip -r directory/                     # Recursive compression
+
+# Check compression ratio
+gzip -l file.txt.gz
 ```
 
 ### zip/unzip - Cross-Platform Archives
@@ -783,6 +936,7 @@ gzip -r directory/                     # Recursive compression
 ```bash
 zip archive.zip file1.txt file2.txt    # Create zip archive
 zip -r archive.zip directory/          # Recursive
+zip -9 archive.zip files/              # Maximum compression
 unzip archive.zip                      # Extract
 unzip -l archive.zip                   # List contents
 unzip archive.zip -d /target/dir       # Extract to directory
@@ -790,20 +944,26 @@ unzip archive.zip -d /target/dir       # Extract to directory
 # AI Infrastructure use
 zip -r model_package.zip models/ config.yaml requirements.txt
 unzip -q pretrained_model.zip          # Quiet extraction
+
+# Password protected
+zip -e -r secure.zip sensitive_data/
+unzip secure.zip  # Will prompt for password
 ```
 
 ### Compression Comparison
 
 ```bash
-# Original file: 1GB
-# gzip:  ~300MB, fast compression/decompression
-# bzip2: ~250MB, slower but better compression
-# xz:    ~200MB, slowest but best compression
+# Original file: 1GB model
+# gzip (.gz):  ~300MB, fast compression/decompression
+# bzip2 (.bz2): ~250MB, slower but better compression
+# xz (.xz):    ~200MB, slowest but best compression
+# zip:         ~300MB, cross-platform compatible
 
 # Choose based on priority:
 # Speed: gzip (.tar.gz)
 # Compression ratio: xz (.tar.xz)
 # Compatibility: zip
+# Balance: bzip2 (.tar.bz2)
 ```
 
 **Practical Workflow**:
@@ -817,9 +977,10 @@ tar -cJvf archive_$(date +%Y%m).tar.xz completed_projects/
 # Sharing with Windows users
 zip -r project_share.zip project/
 
-# Large dataset distribution
-tar -czvf --split=1G dataset.tar.gz data/
+# Large dataset distribution (split into chunks)
+tar -czvf - dataset/ | split -b 1G - dataset.tar.gz.
 # Creates dataset.tar.gz.aa, dataset.tar.gz.ab, etc.
+# To reconstruct: cat dataset.tar.gz.* | tar -xzvf -
 ```
 
 ## Best Practices for AI Infrastructure
@@ -872,6 +1033,7 @@ log.txt
 ```bash
 # Use symlinks for dataset versions
 ln -s /data/imagenet/2023 ~/projects/classifier/data/imagenet
+
 # Easy to update when new data arrives
 rm ~/projects/classifier/data/imagenet
 ln -s /data/imagenet/2024 ~/projects/classifier/data/imagenet
@@ -889,6 +1051,19 @@ find logs/ -name "*.log" -mtime +30 -exec gzip {} \;
 # Clean Python cache
 find . -type d -name "__pycache__" -exec rm -rf {} +
 find . -type f -name "*.pyc" -delete
+
+# Automated cleanup script
+cat > cleanup.sh << 'EOF'
+#!/bin/bash
+echo "Cleaning old checkpoints..."
+find checkpoints/ -name "*.ckpt" -mtime +7 -delete
+echo "Compressing old logs..."
+find logs/ -name "*.log" -mtime +30 ! -name "*.gz" -exec gzip {} \;
+echo "Removing Python cache..."
+find . -type d -name "__pycache__" -exec rm -rf {} +
+echo "Cleanup complete"
+EOF
+chmod +x cleanup.sh
 ```
 
 ### 5. Use Absolute Paths in Scripts
@@ -904,17 +1079,37 @@ python /home/alice/ml-project/src/train.py \
 # Better - use variables
 PROJECT_ROOT="/home/alice/ml-project"
 python $PROJECT_ROOT/src/train.py --data $PROJECT_ROOT/data/train
+
+# Best - detect script location
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+python $PROJECT_ROOT/src/train.py --data $PROJECT_ROOT/data/train
 ```
 
 ### 6. Document File Operations
 
 ```bash
 # Create README files in data directories
-echo "ImageNet 2023 dataset - Downloaded 2023-10-15" > data/imagenet/README.txt
-echo "Preprocessing applied: resize to 224x224, normalize to [-1,1]" >> data/imagenet/README.txt
+cat > data/imagenet/README.txt << EOF
+ImageNet 2023 dataset
+Downloaded: 2023-10-15
+Source: http://www.image-net.org/
+Preprocessing: Resized to 224x224, normalized to [-1,1]
+Classes: 1000
+Total images: 1,281,167 training, 50,000 validation
+EOF
 
 # Log model metadata
-echo "Model: ResNet50, Accuracy: 0.92, Date: $(date)" > models/model_v1_metadata.txt
+cat > models/model_v1_metadata.txt << EOF
+Model: ResNet50
+Training date: $(date)
+Accuracy: 0.92
+Dataset: ImageNet 2023
+Hyperparameters:
+  - Learning rate: 0.001
+  - Batch size: 32
+  - Epochs: 100
+EOF
 ```
 
 ### 7. Check Before Destructive Operations
@@ -928,6 +1123,17 @@ rm checkpoints/*.ckpt
 
 # Use echo to preview
 echo rm -rf experiments/failed_*     # Shows what would be deleted
+
+# Create confirmation wrapper
+safe_rm() {
+    echo "About to delete:"
+    ls -lh "$@"
+    read -p "Continue? (y/n) " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        rm "$@"
+    fi
+}
 ```
 
 ### 8. Handle Disk Space Proactively
@@ -936,14 +1142,23 @@ echo rm -rf experiments/failed_*     # Shows what would be deleted
 # Check available space before large operations
 df -h /data                          # Check disk space
 du -sh data/                         # Check directory size
+du -h --max-depth=1 /data | sort -h  # Find large directories
 
 # Monitor while training
 watch -n 60 'df -h /data && du -sh checkpoints/'
 
 # Set up alerts
-if [ $(df -h /data | awk 'NR==2 {print $5}' | sed 's/%//') -gt 90 ]; then
-    echo "Warning: Disk space above 90%!"
+DISK_USAGE=$(df -h /data | awk 'NR==2 {print $5}' | sed 's/%//')
+if [ "$DISK_USAGE" -gt 90 ]; then
+    echo "WARNING: Disk space above 90%!"
+    # Send alert (email, Slack, etc.)
 fi
+
+# Find largest files
+find /data -type f -size +1G -exec ls -lh {} \; | sort -k5 -h
+
+# Disk usage report
+du -h --max-depth=2 /data | sort -hr | head -20
 ```
 
 ## Summary and Key Takeaways
@@ -1031,19 +1246,12 @@ fi
 
 ### Next Steps
 
-In **Lecture 02: File Permissions and Security**, you'll learn:
+In **Lecture 03: Permissions and Security**, you'll learn:
 - Understanding Linux permission model
 - Managing users and groups
 - Securing ML infrastructure
 - Setting up multi-user environments
 - Access control best practices
-
-### Additional Resources
-
-- **Man Pages**: `man ls`, `man find`, `man tar`
-- **Linux Journey**: https://linuxjourney.com
-- **The Linux Command Line** (book): Free PDF online
-- **Explain Shell**: https://explainshell.com (command breakdown)
 
 ### Quick Reference Card
 
@@ -1082,6 +1290,6 @@ unzip archive.zip           # Extract zip
 
 ---
 
-**End of Lecture 01**
+**End of Lecture 02**
 
-Continue to **Lecture 02: File Permissions and Security** to learn how to secure your Linux systems and manage multi-user environments for AI infrastructure.
+Continue to **Lecture 03: Permissions and Security** to learn how to secure your Linux systems and manage multi-user environments for AI infrastructure.
