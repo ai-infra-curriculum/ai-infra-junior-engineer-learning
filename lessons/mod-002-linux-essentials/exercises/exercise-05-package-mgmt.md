@@ -19,7 +19,7 @@ By completing this exercise, you will:
 ## Prerequisites
 
 - Completed Exercises 01-04
-- Completed Lecture 05: Package Management
+- Completed Lecture 04: System Administration Basics (package management section)
 - Access to a Linux system (Ubuntu/Debian or RHEL/CentOS)
 - Sudo privileges (for system package installation)
 - Internet connection for downloading packages

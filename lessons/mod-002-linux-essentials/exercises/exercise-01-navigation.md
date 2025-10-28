@@ -16,7 +16,8 @@ By completing this exercise, you will:
 
 ## Prerequisites
 
-- Completed Lecture 01: Linux Fundamentals
+- Completed Lecture 01: Introduction to Linux and Command Line
+- Completed Lecture 02: File System and Navigation
 - Access to a Linux system (VM, WSL, or cloud instance)
 - Terminal emulator
 - At least 1GB free disk space

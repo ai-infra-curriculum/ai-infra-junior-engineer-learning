@@ -17,8 +17,8 @@ By completing this exercise, you will:
 
 ## Prerequisites
 
-- Completed Exercise 01: Linux Navigation
-- Completed Lecture 02: File Systems and Permissions
+- Completed Exercises 01
+- Completed Lecture 03: Permissions and Security
 - Access to a Linux system with sudo privileges (for some tasks)
 - Understanding of Linux user and group concepts
 - At least 2GB free disk space

@@ -19,7 +19,8 @@ By completing this exercise, you will:
 ## Prerequisites
 
 - Completed Exercises 01-03
-- Completed Lecture 04: Shell Scripting Basics
+- Completed Lecture 05: Introduction to Shell Scripting
+- Completed Lecture 06: Advanced Shell Scripting
 - Comfortable with Linux command line
 - Basic understanding of ML workflows
 - Text editor (vim, nano, or VS Code)

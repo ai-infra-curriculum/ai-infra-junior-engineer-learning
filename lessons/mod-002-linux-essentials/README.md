@@ -345,40 +345,131 @@ This module is designed for flexibility. You can move faster through familiar to
 
 ## Hands-On Exercises
 
-> **Note:** Detailed exercise instructions are being developed. Placeholder files are available in the `exercises/` directory. Complete exercises will be added in upcoming updates.
+> **Status Update (2025-10-28):** All 8 comprehensive exercises are now complete! Each exercise includes detailed instructions, real-world ML infrastructure scenarios, and complete solutions.
 
-### Exercise Categories
+### Exercise Overview
 
-#### Basic Skills (10 exercises)
-1. Command-line navigation challenge
-2. File manipulation workflow
-3. Permission configuration scenarios
-4. User management tasks
-5. Package installation exercise
-6. Process management practice
-7. Service configuration
-8. Basic script writing
-9. Text search and manipulation
-10. Network configuration basics
+The module includes 8 progressive exercises that build practical Linux skills for AI Infrastructure:
 
-#### Intermediate Challenges (10 exercises)
-11. Advanced file operations and scripting
-12. System monitoring and analysis
-13. Log analysis pipeline
-14. Backup script creation
-15. Service deployment automation
-16. Multi-step troubleshooting scenarios
-17. Network diagnostics challenge
-18. Performance tuning exercise
-19. Security hardening tasks
-20. Complete system administration workflow
+### Exercise 01: Linux Navigation and File System Mastery
+**Time**: 60-90 minutes | **Difficulty**: Beginner | **Lectures**: 01-02
 
-#### Integration Projects (5 exercises)
-21. System health check script
-22. Automated deployment pipeline (basic)
-23. Log monitoring and alerting system
-24. User provisioning automation
-25. Complete system setup from scratch
+Create ML project directory structures, master file operations, and learn efficient navigation techniques.
+
+**Skills Practiced**:
+- File system navigation (pwd, cd, ls)
+- Creating complex directory structures
+- File operations (cp, mv, rm)
+- Finding files (find, locate)
+- Symbolic links
+- ML project organization
+
+---
+
+### Exercise 02: File Permissions and Access Control for ML Teams
+**Time**: 75-90 minutes | **Difficulty**: Intermediate | **Lectures**: 01-03
+
+Configure permissions for multi-user ML teams, implement access control, and secure ML assets.
+
+**Skills Practiced**:
+- Linux permission model (rwx)
+- chmod (numeric and symbolic)
+- chown and chgrp
+- umask configuration
+- Access Control Lists (ACLs)
+- Secure multi-user environments
+
+---
+
+### Exercise 03: Process Management for ML Workloads
+**Time**: 90 minutes | **Difficulty**: Intermediate | **Lectures**: 01-04
+
+Manage long-running ML training processes, monitor resource usage, and handle process priorities.
+
+**Skills Practiced**:
+- Process viewing (ps, top, htop)
+- Process control (kill, nice, renice)
+- Background/foreground jobs
+- Screen and tmux for persistent sessions
+- GPU process monitoring
+- Resource management
+
+---
+
+### Exercise 04: Shell Scripting for ML Operations
+**Time**: 90-120 minutes | **Difficulty**: Intermediate to Advanced | **Lectures**: 01-05, 06
+
+Write automation scripts for ML workflows including model deployment, data preprocessing, and training pipelines.
+
+**Skills Practiced**:
+- Script structure and best practices
+- Variables and control structures
+- Functions and error handling
+- Command-line arguments
+- Practical ML automation
+- Script debugging
+
+---
+
+### Exercise 05: Package Management for AI/ML Environments
+**Time**: 75-90 minutes | **Difficulty**: Intermediate | **Lectures**: 01-04
+
+Manage system packages, Python environments, CUDA toolkit, and ML frameworks.
+
+**Skills Practiced**:
+- apt/yum package management
+- Python package management (pip, conda)
+- Virtual environment creation
+- CUDA installation
+- Docker installation
+- Dependency resolution
+
+---
+
+### Exercise 06: Log Analysis for ML Systems
+**Time**: 90 minutes | **Difficulty**: Intermediate to Advanced | **Lectures**: 01-07
+
+Analyze training logs, parse metrics, and build log processing pipelines using grep, sed, and awk.
+
+**Skills Practiced**:
+- grep for pattern matching
+- sed for stream editing
+- awk for field processing
+- Building log analysis pipelines
+- Extracting ML metrics
+- Automated report generation
+
+---
+
+### Exercise 07: Real-World Troubleshooting Scenarios
+**Time**: 90 minutes | **Difficulty**: Intermediate to Advanced | **Lectures**: ALL
+
+Diagnose and fix real-world issues: disk full, permission errors, hung processes, OOM, CUDA problems, and network issues.
+
+**Skills Practiced**:
+- Systematic troubleshooting methodology
+- Disk space management
+- Permission debugging
+- Process troubleshooting
+- GPU/CUDA diagnostics
+- Network debugging
+- Creating runbooks
+
+---
+
+### Exercise 08: System Automation and Maintenance for ML Infrastructure
+**Time**: 120 minutes | **Difficulty**: Advanced | **Lectures**: 01-08 (focus on 04, 06)
+
+Build complete automation suite: backups, monitoring, log rotation, cleanup tasks, and health checks.
+
+**Skills Practiced**:
+- Automated backup scripts
+- Cron and systemd timers
+- GPU health monitoring
+- Log rotation (logrotate)
+- Cleanup automation
+- System health checks
+- End-to-end automation workflows
 
 ## Assessment and Evaluation
 

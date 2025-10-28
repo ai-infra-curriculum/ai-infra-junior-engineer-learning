@@ -18,8 +18,8 @@ By completing this exercise, you will:
 
 ## Prerequisites
 
-- Completed exercises 01-07 in this module
-- All lectures in Module 002, especially Lecture 06 (Networking & System Services)
+- Completed exercises 01-07
+- All lectures in Module 002, especially Lecture 04: System Administration Basics and Lecture 06: Advanced Shell Scripting
 - Understanding of systemd and cron
 - Access to a Linux system with sudo privileges
 - Basic understanding of ML workflows

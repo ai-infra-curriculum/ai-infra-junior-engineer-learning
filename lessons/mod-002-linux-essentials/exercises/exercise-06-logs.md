@@ -19,6 +19,7 @@ By completing this exercise, you will:
 ## Prerequisites
 
 - Completed Exercises 01-05
+- Completed Lecture 07: Text Processing Tools
 - Understanding of Linux command line
 - Basic regex knowledge
 - Text editor familiarity
