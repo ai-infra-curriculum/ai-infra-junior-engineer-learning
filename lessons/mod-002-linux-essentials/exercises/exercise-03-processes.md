@@ -18,8 +18,8 @@ By completing this exercise, you will:
 
 ## Prerequisites
 
-- Completed Exercise 01 and 02
-- Completed Lecture 03: Process Management
+- Completed Exercises 01-02
+- Completed Lecture 04: System Administration Basics
 - Access to a Linux system
 - Basic Python knowledge (for ML training examples)
 - Optional: NVIDIA GPU for GPU monitoring sections
