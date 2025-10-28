@@ -464,57 +464,146 @@ This module is organized into 5 comprehensive lectures over 3-4 weeks:
 
 ## Hands-On Exercises
 
-> **Note:** Detailed exercise instructions are being developed. Placeholder files are available in the `exercises/` directory. Complete exercises will be added in upcoming updates.
+> **Status Update (2025-10-28):** All 8 comprehensive exercises are now complete! Each exercise includes detailed step-by-step instructions, ML infrastructure examples, and validation checkpoints.
 
-### Exercise Categories
+**Total Time**: 10-14 hours of hands-on practice
 
-#### Basic Operations (10 exercises)
-1. Repository initialization and first commits
-2. Commit message practice
-3. Viewing and interpreting history
-4. Working with .gitignore
-5. Staging strategies
-6. Undoing changes safely
-7. Amending commits
-8. Searching history
-9. Using git diff effectively
-10. Basic workflow integration
+The module includes 8 progressive exercises that build practical Git skills for AI Infrastructure:
 
-#### Branching and Merging (10 exercises)
-11. Creating feature branches
-12. Merge workflow practice
-13. Resolving simple conflicts
-14. Resolving complex conflicts
-15. Fast-forward merges
-16. Three-way merge scenarios
-17. Rebase practice
-18. Interactive rebase exercises
-19. Branch management
-20. Merge strategy selection
+---
 
-#### GitHub and Collaboration (10 exercises)
-21. Setting up GitHub repository
-22. Push and pull operations
-23. Forking workflow
-24. Creating pull requests
-25. Code review practice
-26. Issue management
-27. Linking PRs and issues
-28. Synchronizing forks
-29. Managing multiple remotes
-30. Collaborative project
+### Exercise 01: Creating Your First ML Project Repository
+**Time**: 60-90 minutes | **Difficulty**: Beginner | **Prerequisites**: Lecture 01
 
-#### Advanced Techniques (10 exercises)
-31. Stashing and applying changes
-32. Cherry-picking commits
-33. Tagging releases
-34. Using git bisect
-35. Recovering with reflog
-36. Git hooks implementation
-37. History rewriting scenarios
-38. Submodule basics
-39. Advanced troubleshooting
-40. Complete workflow scenarios
+Initialize and configure Git repositories with ML-specific considerations.
+
+**Skills Practiced**:
+- `git init`, `git config`, `git status`, `git add`, `git commit`
+- Creating comprehensive `.gitignore` for ML projects
+- ML project directory structure
+- Writing professional commit messages
+- Three-state Git workflow (working → staging → committed)
+
+---
+
+### Exercise 02: Working with Commits and History
+**Time**: 75-90 minutes | **Difficulty**: Beginner | **Prerequisites**: Lecture 01, Exercise 01
+
+Master commit techniques and history navigation.
+
+**Skills Practiced**:
+- Conventional commit messages (feat:, fix:, docs:)
+- `git log` variations (--oneline, --stat, --grep, -S)
+- `git commit --amend` for fixing mistakes
+- `git revert` vs `git reset` for undoing changes
+- Searching commit history
+- Commit inspection with `git show`
+
+---
+
+### Exercise 03: Branching for Feature Development
+**Time**: 75-90 minutes | **Difficulty**: Beginner-Intermediate | **Prerequisites**: Lecture 02, Exercise 02
+
+Implement parallel development with branches.
+
+**Skills Practiced**:
+- Creating and switching branches (`git branch`, `git switch`)
+- Branch naming conventions (feature/, fix/, hotfix/)
+- Working on multiple features simultaneously
+- Viewing and comparing branches
+- Deleting branches safely
+- `git stash` for context switching
+
+---
+
+### Exercise 04: Merging and Conflict Resolution
+**Time**: 90-120 minutes | **Difficulty**: Intermediate | **Prerequisites**: Lecture 02, Exercise 03
+
+Master branch integration and conflict resolution.
+
+**Skills Practiced**:
+- Fast-forward vs three-way merges
+- `git merge --no-ff`, `git merge --squash`
+- Identifying and resolving merge conflicts
+- Conflict markers in Python code and YAML configs
+- Using merge tools
+- `git merge --abort` for canceling merges
+- Post-merge validation
+
+---
+
+### Exercise 05: Collaboration and Pull Requests
+**Time**: 90-120 minutes | **Difficulty**: Intermediate | **Prerequisites**: Lecture 03, Exercise 04
+
+Implement team collaboration workflows with GitHub.
+
+**Skills Practiced**:
+- Fork and clone workflows
+- Managing remotes (origin vs upstream)
+- Creating and managing pull requests
+- Code review best practices
+- Addressing feedback professionally
+- GitHub CLI (`gh pr create`, `gh pr checkout`)
+- `git push --force-with-lease` (safe force push)
+
+---
+
+### Exercise 06: Git for ML Workflows - DVC and Model Versioning
+**Time**: 90-120 minutes | **Difficulty**: Intermediate-Advanced | **Prerequisites**: Lectures 03-04, Exercise 05
+
+Version control for data, models, and experiments with DVC.
+
+**Skills Practiced**:
+- DVC setup and configuration (`dvc init`, `dvc add`)
+- Tracking datasets with DVC
+- Model artifact versioning
+- DVC pipelines for reproducibility
+- DVC remote storage (S3, GCS, local)
+- Experiment tracking with YAML configs
+- Pre-commit hooks for ML validation
+
+---
+
+### Exercise 07: Advanced Git Techniques
+**Time**: 120-150 minutes | **Difficulty**: Advanced | **Prerequisites**: Lecture 04, Exercises 01-06
+
+Master expert-level Git operations.
+
+**Skills Practiced**:
+- Interactive rebase (`git rebase -i`) for history cleanup
+- Custom Git hooks (pre-commit, pre-push)
+- Cherry-picking commits across branches
+- Advanced stashing workflows
+- `git bisect` for bug hunting
+- Recovery with `git reflog`
+- Git submodules for dependencies
+- `git worktree` for parallel development
+
+---
+
+### Exercise 08: Git LFS and Managing Large ML Projects
+**Time**: 90-120 minutes | **Difficulty**: Intermediate | **Prerequisites**: Lecture 05, All prior exercises
+
+Handle large files for ML projects with Git LFS.
+
+**Skills Practiced**:
+- Installing and configuring Git LFS
+- Tracking models and datasets with LFS
+- `.gitattributes` configuration
+- Semantic versioning for models (X.Y.Z)
+- DVC + LFS integration
+- Efficient cloning (`GIT_LFS_SKIP_SMUDGE=1`)
+- Storage optimization with `git lfs prune`
+- Migrating existing projects to LFS
+
+---
+
+### Skills Progression
+
+**Foundation (Exercises 01-02)**: Repository management, commits, history
+**Branching (Exercises 03-04)**: Branches, merging, conflicts
+**Collaboration (Exercise 05)**: Remotes, PRs, code review
+**ML Workflows (Exercises 06-08)**: DVC, Git LFS, advanced techniques
 
 ## Assessment and Evaluation
 
