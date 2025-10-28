@@ -1,4 +1,4 @@
-# Lecture 02: File Permissions and Security
+# Lecture 03: Permissions and Security
 
 ## Table of Contents
 1. [Introduction](#introduction)
