@@ -38,38 +38,40 @@ By completing this module, you will be able to:
 
 ## Time Commitment
 
-- **Total Estimated Time:** 35-45 hours
-- **Lectures & Reading:** 12-15 hours
-- **Hands-on Exercises:** 18-22 hours
-- **Projects & Collaboration:** 5-8 hours
+- **Total Estimated Time:** 28-35 hours
+- **Lectures & Reading:** 9-11 hours (5 comprehensive lectures)
+- **Hands-on Exercises:** 15-19 hours
+- **Projects & Collaboration:** 4-5 hours
 
 **Recommended Pace:**
-- Part-time (5-10 hrs/week): 4-5 weeks
-- Full-time (20-30 hrs/week): 2 weeks
+- Part-time (5-10 hrs/week): 3-4 weeks
+- Full-time (20-30 hrs/week): 1-2 weeks
 
 Git mastery comes from practice. Expect to spend time experimenting, making mistakes safely, and building muscle memory for common workflows.
 
 ## Module Structure
 
-### Week 1: Git Fundamentals
-- **Topics:** Version control concepts, basic commands, commit workflow
-- **Key Skills:** init, clone, add, commit, status, log, diff
-- **Practice:** Creating repositories, making commits, viewing history
+This module is organized into 5 comprehensive lectures over 3-4 weeks:
 
-### Week 2: Branching and Merging
-- **Topics:** Branch management, merging strategies, conflict resolution
-- **Key Skills:** branch, checkout, merge, rebase, conflict resolution
-- **Practice:** Feature branches, merge scenarios, conflict handling
+### Week 1: Git Fundamentals & Branching
+- **Lecture 1:** Git Fundamentals (120 min)
+- **Lecture 2:** Branching and Merging (120 min)
+- **Topics:** Version control concepts, basic commands, commit workflow, branches, conflicts
+- **Key Skills:** init, clone, add, commit, status, log, diff, branch, merge, conflict resolution
+- **Practice:** Creating repositories, making commits, feature branches, resolving conflicts
 
-### Week 3: Collaboration with GitHub
-- **Topics:** Remote repositories, pull requests, code review, issues
-- **Key Skills:** push, pull, fetch, pull requests, forking workflow
-- **Practice:** Contributing to projects, code review, team collaboration
+### Week 2: Collaboration with GitHub
+- **Lecture 3:** Collaboration with Git and GitHub (120 min)
+- **Topics:** Remote repositories, pull requests, code review, collaboration workflows
+- **Key Skills:** push, pull, fetch, pull requests, forking, code review
+- **Practice:** Contributing to projects, PR workflow, team collaboration
 
-### Week 4: Advanced Techniques
-- **Topics:** Advanced commands, workflows, troubleshooting, best practices
-- **Key Skills:** stash, cherry-pick, reset, revert, hooks, submodules
-- **Practice:** Complex scenarios, recovery techniques, automation
+### Week 3: Advanced Techniques & Best Practices
+- **Lecture 4:** Advanced Git Techniques (120 min)
+- **Lecture 5:** Git for ML and Infrastructure Projects (90 min)
+- **Topics:** Advanced commands, workflows, troubleshooting, ML/IaC patterns
+- **Key Skills:** stash, rebase, cherry-pick, hooks, Git LFS, CI/CD integration
+- **Practice:** Complex scenarios, recovery techniques, infrastructure repositories
 
 ## Detailed Topic Breakdown
 
@@ -383,73 +385,82 @@ Git mastery comes from practice. Expect to spend time experimenting, making mist
 
 ## Lecture Outline
 
-> **Note:** Full lecture materials are currently in development. Placeholder files are available in the `lecture-notes/` directory. Complete lecture notes will be added in upcoming updates.
+> **Status Update (2025-10-28):** All 5 comprehensive lectures are now complete! Each lecture combines related topics for efficient learning and includes hands-on labs with AI Infrastructure examples.
 
-### Lecture 1: Introduction to Version Control and Git (90 min)
-- Why version control?
-- Git history and design philosophy
-- Git architecture and object model
-- Installation and configuration
-- First repository
-- **Lab:** Setting up Git and GitHub
-
-### Lecture 2: Basic Git Workflow (90 min)
-- Working directory, staging, repository
-- Making commits
-- Viewing history
+### Lecture 1: Git Fundamentals (120 min)
+**File**: `lecture-notes/01-git-fundamentals.md`
+- Introduction to version control systems
+- Why version control matters for AI Infrastructure
+- Git architecture and object model (commits, trees, blobs)
+- Installation and configuration across platforms
+- Setting up SSH keys for GitHub
+- Basic Git workflow: init, clone, add, commit, status
+- Understanding the three states (working, staging, repository)
+- Viewing history with git log
 - Understanding diffs
-- Undoing changes
-- **Lab:** Complete commit workflow practice
+- Undoing changes (checkout, restore, reset)
+- **Lab:** Complete Git setup and basic workflow practice
 
-### Lecture 3: Branching Fundamentals (90 min)
+### Lecture 2: Branching and Merging (120 min)
+**File**: `lecture-notes/02-branching-merging.md`
 - Branch concepts and theory
-- Creating and switching branches
-- Merging basics
-- Fast-forward vs three-way merges
-- Branch visualization
-- **Lab:** Feature branch workflow
-
-### Lecture 4: Conflict Resolution (90 min)
-- Why conflicts happen
+- Creating and switching branches (branch, checkout, switch)
+- Merging strategies (fast-forward, three-way merge)
+- Understanding merge commits
+- Branch visualization and history
+- **Merge conflicts**: why they happen
 - Conflict markers and structure
-- Resolution strategies
-- Using merge tools
-- Testing after resolution
+- Resolution strategies and tools
+- Testing after conflict resolution
 - Prevention strategies
-- **Lab:** Resolving merge conflicts
+- Best practices for branching
+- **Lab:** Feature branch workflow with conflict resolution
 
-### Lecture 5: Remote Repositories and GitHub (120 min)
+### Lecture 3: Collaboration with Git and GitHub (120 min)
+**File**: `lecture-notes/03-collaboration.md`
 - Remote repository concepts
-- Pushing and pulling
-- GitHub fundamentals
-- Forking vs cloning
-- Collaboration models
-- **Lab:** Contributing to a project
-
-### Lecture 6: Pull Requests and Code Review (90 min)
-- Pull request workflow
+- Pushing and pulling changes
+- Fetch vs pull differences
+- GitHub fundamentals and account setup
+- Forking vs cloning workflows
+- Contributing to open source projects
+- **Pull request workflow**: creating, updating, merging
 - Writing effective PR descriptions
 - Code review best practices
-- Iteration and feedback
-- Merging strategies
-- **Lab:** Complete PR workflow
+- Iteration and feedback loops
+- Collaboration models (fork-and-PR, shared repo)
+- GitHub issues and project management
+- **Lab:** Complete collaborative workflow with PRs
 
-### Lecture 7: Advanced Git Techniques (120 min)
-- Rebasing deep dive
-- Stashing changes
+### Lecture 4: Advanced Git Techniques (120 min)
+**File**: `lecture-notes/04-advanced-git.md`
+- Rebasing fundamentals and use cases
+- Interactive rebase for commit cleanup
+- Rebase vs merge: when to use each
+- Stashing changes (save, apply, pop, list)
 - Cherry-picking commits
-- Interactive rebase
-- Git hooks introduction
-- **Lab:** Advanced workflow scenarios
+- Reflog for recovery
+- Git bisect for debugging
+- Submodules introduction
+- Git hooks (pre-commit, pre-push)
+- Advanced troubleshooting
+- Recovery techniques (lost commits, mistakes)
+- **Lab:** Advanced workflow scenarios and recovery
 
-### Lecture 8: Git for Infrastructure as Code (90 min)
-- IaC version control patterns
-- Repository organization
-- Branch strategies for infrastructure
-- Secrets management
-- CI/CD integration
-- Best practices
-- **Lab:** Infrastructure repository setup
+### Lecture 5: Git for ML and Infrastructure Projects (90 min)
+**File**: `lecture-notes/05-git-for-ml-projects.md`
+- Version control for large-scale ML projects
+- Handling large files (Git LFS)
+- Jupyter notebook version control strategies
+- Infrastructure as Code (IaC) patterns
+- Repository organization for ML/infrastructure
+- Branch strategies for production systems
+- Secrets management (git-secret, encrypted configs)
+- CI/CD integration basics
+- Git workflows for teams (Git Flow, GitHub Flow, trunk-based)
+- Best practices for AI Infrastructure
+- Code review for infrastructure code
+- **Lab:** Setting up ML/Infrastructure repository
 
 ## Hands-On Exercises
 
