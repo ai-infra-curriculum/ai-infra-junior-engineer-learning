@@ -10,15 +10,19 @@
 - Exercise 01 (Container Operations)
 - Lecture 02 (Dockerfiles & Image Building)
 
-**What You'll Learn**:
-- Writing Dockerfiles from scratch
-- Multi-stage builds for optimization
-- Layer caching strategies
-- Building Python/ML applications
-- Image tagging and versioning
-- Pushing to Docker registries
-- Security best practices
-- Debugging build issues
+## Learning Objectives
+
+By completing this exercise, you will:
+- Write production-ready Dockerfiles from scratch
+- Implement multi-stage builds to reduce image size by 80%+
+- Apply layer caching strategies to accelerate build times
+- Containerize Python and ML applications with proper dependencies
+- Tag and version Docker images using semantic versioning
+- Push images to public and private Docker registries
+- Implement security best practices (non-root users, minimal base images)
+- Debug common Dockerfile build issues using inspection tools
+- Optimize ML model serving containers for CPU/GPU deployments
+- Create .dockerignore files to minimize build context
 
 ---
 

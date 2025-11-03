@@ -622,7 +622,9 @@ Cloud expertise requires extensive hands-on practice. Expect to spend significan
 
 ## Lecture Outline
 
-> **Note:** Full lecture materials are currently in development. Placeholder files are available in the `lecture-notes/` directory. Complete lecture notes will be added in upcoming updates.
+> **Status Update (2025-10-29):** All 5 comprehensive lecture notes are now complete and available! Each lecture includes hands-on AWS examples and cloud architecture patterns for ML infrastructure.
+
+This module includes **5 lectures** and **9 exercises** covering cloud platforms:
 
 ### Lecture 1: Cloud Computing Fundamentals (90 min)
 - Introduction to cloud computing
@@ -706,11 +708,13 @@ Cloud expertise requires extensive hands-on practice. Expect to spend significan
 
 ## Hands-On Exercises
 
-> **Note:** Detailed exercise instructions are being developed. Placeholder files are available in the `exercises/` directory. Complete exercises will be added in upcoming updates.
+> **Status Update (2025-10-29):** All 9 comprehensive exercises are now complete! Each exercise includes detailed AWS instructions with ML infrastructure deployment scenarios.
+
+This module includes **9 exercises** organized by cloud service category:
 
 ### Exercise Categories
 
-#### Getting Started (5 exercises)
+#### Getting Started (2 exercises)
 1. AWS account setup and configuration
 2. AWS CLI configuration
 3. Creating IAM users and roles
@@ -764,10 +768,39 @@ Cloud expertise requires extensive hands-on practice. Expect to spend significan
 39. Model training on AWS
 40. Model deployment and serving
 
+### Exercise 08: Multi-Cloud Architecture Strategy
+**Difficulty**: Advanced
+**Duration**: 3-4 hours
+**File**: `exercises/exercise-08-multi-cloud-architecture.md`
+
+Design and evaluate multi-cloud architectures for ML platforms:
+- Compare ML services across AWS, GCP, and Azure
+- Evaluate multi-cloud vs single-cloud trade-offs
+- Design hybrid architectures (Active-Passive DR, Best-of-Breed, Cloud-Agnostic K8s)
+- Calculate Total Cost of Ownership (TCO) including hidden costs
+- Implement cloud-agnostic infrastructure with Terraform
+- Create decision framework for cloud vendor selection
+
+### Exercise 09: FinOps and Cost Optimization
+**Difficulty**: Advanced
+**Duration**: 3-4 hours
+**File**: `exercises/exercise-09-finops-cost-optimization.md`
+
+Implement FinOps practices for ML infrastructure cost optimization:
+- Implement cloud cost visibility and tracking
+- Create cost allocation tagging strategy for chargebacks
+- Identify and eliminate waste (30%+ reduction target)
+- Right-size instances and implement reserved capacity
+- Optimize storage costs with lifecycle policies
+- Implement automated cost controls and budget alerts
+- Design FinOps reporting dashboard
+
 ## Assessment and Evaluation
 
 ### Knowledge Checks
-- Quiz after each major section
+- **2 comprehensive quizzes** covering all module content
+  - Quiz 1: Cloud Fundamentals, Compute, and Storage (Lectures 1-3)
+  - Quiz 2: Networking, IaC, and ML Services (Lectures 4-5)
 - Service selection scenarios
 - Architecture design questions
 - Security best practices

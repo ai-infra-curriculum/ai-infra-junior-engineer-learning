@@ -11,15 +11,19 @@
 - Module 005 (Docker volumes)
 - Lecture 02 (Deploying Apps)
 
-**What You'll Learn**:
-- StatefulSets vs Deployments
-- PersistentVolumes (PV) and PersistentVolumeClaims (PVC)
-- Storage Classes
-- Headless Services
-- Running databases on Kubernetes
-- Volume snapshots and backups
-- ML model storage patterns
-- Data persistence best practices
+## Learning Objectives
+
+By completing this exercise, you will:
+- Compare StatefulSets and Deployments for stateful application management
+- Configure PersistentVolumes (PV) and PersistentVolumeClaims (PVC)
+- Implement Storage Classes for dynamic volume provisioning
+- Set up Headless Services for stable network identities
+- Deploy stateful applications like databases on Kubernetes
+- Execute volume snapshots and backup procedures
+- Design ML model storage patterns with persistent volumes
+- Apply data persistence best practices for production workloads
+- Manage pod ordering and scaling guarantees with StatefulSets
+- Troubleshoot common persistent storage issues
 
 ---
 

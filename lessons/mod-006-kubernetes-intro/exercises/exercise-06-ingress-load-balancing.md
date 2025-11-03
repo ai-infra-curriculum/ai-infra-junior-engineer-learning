@@ -10,15 +10,19 @@
 - Exercise 01-05 (Kubernetes fundamentals)
 - Module 005 (Docker networking)
 
-**What You'll Learn**:
-- Ingress controllers (Nginx, Traefik)
-- Path-based and host-based routing
-- SSL/TLS termination
-- Load balancing strategies
-- Sticky sessions
-- Rate limiting
-- ML inference routing patterns
-- Production ingress patterns
+## Learning Objectives
+
+By completing this exercise, you will:
+- Install and configure Ingress controllers (Nginx, Traefik)
+- Implement path-based and host-based routing rules
+- Configure SSL/TLS termination with certificates
+- Design load balancing strategies for high-traffic applications
+- Enable sticky sessions for stateful applications
+- Apply rate limiting to protect backend services
+- Build ML inference routing patterns for A/B testing
+- Deploy production-grade ingress configurations
+- Troubleshoot common ingress and routing issues
+- Optimize ingress performance for ML workloads
 
 ---
 

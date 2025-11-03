@@ -536,7 +536,9 @@ Monitoring mastery requires hands-on experience. Expect to spend time setting up
 
 ## Lecture Outline
 
-> **Note:** Full lecture materials are currently in development. Placeholder files are available in the `lecture-notes/` directory. Complete lecture notes will be added in upcoming updates.
+> **Status Update (2025-10-29):** All 5 comprehensive lecture notes are now complete and available! This module includes the new Lecture 05 on Airflow workflow monitoring, essential for ML pipeline observability.
+
+This module includes **5 lectures** and **8 exercises** covering monitoring and observability:
 
 ### Lecture 1: Observability Fundamentals (90 min)
 - Introduction to observability
@@ -594,21 +596,36 @@ Monitoring mastery requires hands-on experience. Expect to spend time setting up
 - Incident response
 - **Lab:** Setting up alerts
 
-### Lecture 8: ML System Monitoring (90 min)
-- ML-specific challenges
-- Model performance monitoring
-- Data drift detection
-- ML pipeline observability
-- SLIs/SLOs for ML
-- **Lab:** Monitoring ML model serving
+### Lecture 4: Logging and Alerting (90 min)
+**File**: `lecture-notes/lecture-04-logging-alerting-ml-monitoring.md`
+- Structured logging
+- Log aggregation
+- Logging in containers
+- Alerting fundamentals
+- Prometheus Alertmanager
+- ML system monitoring basics
+- **Lab:** Complete logging and alerting setup
+
+### Lecture 5: Airflow Workflow Monitoring (90 min)
+**File**: `lecture-notes/lecture-05-airflow-workflow-monitoring.md`
+- Introduction to Apache Airflow
+- DAG monitoring and observability
+- Task-level metrics and logging
+- Airflow UI and monitoring tools
+- Integration with Prometheus/Grafana
+- ML pipeline monitoring with Airflow
+- Troubleshooting failed workflows
+- **Lab:** Monitoring Airflow ML pipelines
 
 ## Hands-On Exercises
 
-> **Note:** Detailed exercise instructions are being developed. Placeholder files are available in the `exercises/` directory. Complete exercises will be added in upcoming updates.
+> **Status Update (2025-10-29):** All 8 comprehensive exercises are now complete! Each exercise includes practical monitoring scenarios for ML infrastructure.
+
+This module includes **8 exercises** building comprehensive monitoring skills:
 
 ### Exercise Categories
 
-#### Monitoring Fundamentals (5 exercises)
+#### Monitoring Fundamentals (2 exercises)
 1. Identifying key metrics for systems
 2. Analyzing monitoring strategy
 3. Metric type selection
@@ -655,10 +672,38 @@ Monitoring mastery requires hands-on experience. Expect to spend time setting up
 34. Data drift detection
 35. Complete ML monitoring stack
 
+### Exercise 07: PromQL and Recording Rules
+**Difficulty**: Intermediate to Advanced
+**Duration**: 3-4 hours
+**File**: `exercises/exercise-07-promql-recording-rules.md`
+
+Master Prometheus Query Language and optimize performance:
+- Write effective PromQL queries for ML metrics
+- Use rate(), increase(), histogram_quantile() for time-series analysis
+- Implement recording rules to pre-compute expensive queries
+- Design alert rules with proper thresholds and inhibition
+- Optimize Prometheus performance with aggregation
+- Monitor ML-specific metrics (inference latency, prediction accuracy, model drift)
+
+### Exercise 08: SLO and Error Budget Management
+**Difficulty**: Advanced
+**Duration**: 3-4 hours
+**File**: `exercises/exercise-08-slo-error-budgets.md`
+
+Implement SLOs and error budgets for ML services:
+- Define Service Level Indicators (SLIs) for ML serving APIs
+- Set achievable Service Level Objectives (SLOs) with business justification
+- Calculate and track error budgets (30-day rolling windows)
+- Implement multi-window multi-burn-rate alerting (Google SRE approach)
+- Create SLO dashboards for stakeholder communication
+- Design error budget policy for decision-making (feature freeze, etc.)
+
 ## Assessment and Evaluation
 
 ### Knowledge Checks
-- Quiz after each major section
+- **2 comprehensive quizzes** covering all module content
+  - Quiz 1: Observability, Prometheus, and Grafana (Lectures 1-3)
+  - Quiz 2: Logging, Alerting, and Workflow Monitoring (Lectures 4-5)
 - PromQL comprehension
 - Dashboard design principles
 - Alert design best practices

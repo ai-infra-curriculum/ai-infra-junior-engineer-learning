@@ -395,7 +395,9 @@ Container mastery requires hands-on practice. Expect to spend time experimenting
 
 ## Lecture Outline
 
-> **Note:** Full lecture materials are currently in development. Placeholder files are available in the `lecture-notes/` directory. Complete lecture notes will be added in upcoming updates.
+> **Status Update (2025-10-29):** All 7 comprehensive lecture notes are now complete and available! Each lecture includes detailed coverage of containerization concepts with practical ML infrastructure examples.
+
+This module includes **7 lectures** and **8 exercises** covering Docker and container fundamentals:
 
 ### Lecture 1: Introduction to Containers and Docker (90 min)
 - Containerization concepts
@@ -463,7 +465,9 @@ Container mastery requires hands-on practice. Expect to spend time experimenting
 
 ## Hands-On Exercises
 
-> **Note:** Detailed exercise instructions are being developed. Placeholder files are available in the `exercises/` directory. Complete exercises will be added in upcoming updates.
+> **Status Update (2025-10-29):** All 8 comprehensive exercises are now complete! Each exercise includes step-by-step instructions with ML infrastructure scenarios and validation checkpoints.
+
+This module includes **8 exercises** organized into progressive skill development:
 
 ### Exercise Categories
 

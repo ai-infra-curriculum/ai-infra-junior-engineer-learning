@@ -3,9 +3,20 @@
 ## Lecture Overview
 Logs complete the observability triad by recording contextual events, error details, and audit trails. Combined with alerting pipelines and ML-specific monitoring practices, they enable rapid incident response and continuous assurance of model performance. This lecture covers end-to-end logging architecture (collection, aggregation, storage, query), alerting strategy, incident management, and advanced ML observability patterns, closing the loop for Module 009.
 
-**Estimated Reading Time:** 80–95 minutes  
-**Hands-on Companion Lab:** Exercise 04 – Logging Pipeline, Exercise 05 – Alerting & Incident Response  
+**Estimated Reading Time:** 80–95 minutes
+**Hands-on Companion Lab:** Exercise 04 – Logging Pipeline, Exercise 05 – Alerting & Incident Response
 **Prerequisite Knowledge:** Lectures 01–03, familiarity with Prometheus/Grafana, basic knowledge of Kubernetes or containerized deployments.
+
+### Learning Objectives
+
+By the end of this lecture, you will:
+- Design end-to-end logging pipelines for distributed ML systems
+- Implement structured logging with proper context propagation
+- Deploy and configure Loki or ELK stack for log aggregation
+- Write effective alerting rules based on SLO error budgets
+- Integrate log correlation with metrics and distributed traces
+- Apply ML-specific monitoring patterns for model performance
+- Establish incident management workflows for production ML systems
 
 ---
 

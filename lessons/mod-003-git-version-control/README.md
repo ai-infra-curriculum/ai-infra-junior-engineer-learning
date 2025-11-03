@@ -385,7 +385,9 @@ This module is organized into 5 comprehensive lectures over 3-4 weeks:
 
 ## Lecture Outline
 
-> **Status Update (2025-10-28):** All 5 comprehensive lectures are now complete! Each lecture combines related topics for efficient learning and includes hands-on labs with AI Infrastructure examples.
+> **Status Update (2025-10-29):** All 5 comprehensive lectures are now complete and available! Each lecture combines related topics for efficient learning and includes hands-on labs with AI Infrastructure examples.
+
+This module includes **5 lectures** covering all aspects of Git and version control:
 
 ### Lecture 1: Git Fundamentals (120 min)
 **File**: `lecture-notes/01-git-fundamentals.md`
@@ -464,11 +466,11 @@ This module is organized into 5 comprehensive lectures over 3-4 weeks:
 
 ## Hands-On Exercises
 
-> **Status Update (2025-10-28):** All 8 comprehensive exercises are now complete! Each exercise includes detailed step-by-step instructions, ML infrastructure examples, and validation checkpoints.
+> **Status Update (2025-10-29):** All 8 comprehensive exercises are now complete and available! Each exercise includes detailed step-by-step instructions, ML infrastructure examples, and validation checkpoints.
 
 **Total Time**: 10-14 hours of hands-on practice
 
-The module includes 8 progressive exercises that build practical Git skills for AI Infrastructure:
+This module includes **8 exercises** that build practical Git skills for AI Infrastructure:
 
 ---
 
@@ -608,7 +610,9 @@ Handle large files for ML projects with Git LFS.
 ## Assessment and Evaluation
 
 ### Knowledge Checks
-- Quiz after each major section (6 quizzes total)
+- **2 comprehensive quizzes** covering all module content
+  - Quiz 1: Git Fundamentals and Branching (Lectures 1-2)
+  - Quiz 2: Collaboration and Advanced Git (Lectures 3-5)
 - Command understanding questions
 - Workflow scenario analysis
 - Best practices evaluation

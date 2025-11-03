@@ -277,9 +277,10 @@ This module is designed for flexibility. You can move faster through familiar to
 
 ## Lecture Outline
 
-> **Status Update (2025-10-28):** All 8 lecture notes are now complete and available in the `lecture-notes/` directory! Each lecture includes comprehensive coverage, AI Infrastructure examples, hands-on labs, and code samples.
+> **Status Update (2025-10-28):** All 9 lecture notes are now complete and available in the `lecture-notes/` directory! Each lecture includes comprehensive coverage, AI Infrastructure examples, hands-on labs, and code samples.
 
 ### Lecture 1: Introduction to Linux and Command Line (90 min)
+**File**: `lecture-notes/01-introduction-to-linux.md`
 - History and philosophy of Linux
 - Distribution landscape
 - Terminal emulators and shells
@@ -288,6 +289,7 @@ This module is designed for flexibility. You can move faster through familiar to
 - **Lab:** Setting up your Linux environment
 
 ### Lecture 2: File System and Navigation (90 min)
+**File**: `lecture-notes/02-file-system-navigation.md`
 - Linux filesystem hierarchy standard
 - Path concepts and navigation
 - File operations and manipulation
@@ -296,6 +298,7 @@ This module is designed for flexibility. You can move faster through familiar to
 - **Lab:** File system exploration exercises
 
 ### Lecture 3: Permissions and Security (90 min)
+**File**: `lecture-notes/03-permissions-security.md`
 - Linux permission model
 - Users and groups
 - Ownership and permissions
@@ -304,6 +307,7 @@ This module is designed for flexibility. You can move faster through familiar to
 - **Lab:** Setting up multi-user environment
 
 ### Lecture 4: System Administration Basics (120 min)
+**File**: `lecture-notes/04-system-administration.md`
 - Package management
 - Service management with systemd
 - Process management
@@ -312,6 +316,7 @@ This module is designed for flexibility. You can move faster through familiar to
 - **Lab:** Managing a Linux system
 
 ### Lecture 5: Introduction to Shell Scripting (90 min)
+**File**: `lecture-notes/05-shell-scripting-basics.md`
 - Why shell scripting?
 - Script structure and syntax
 - Variables and data types
@@ -320,6 +325,7 @@ This module is designed for flexibility. You can move faster through familiar to
 - **Lab:** Writing your first scripts
 
 ### Lecture 6: Advanced Shell Scripting (120 min)
+**File**: `lecture-notes/06-advanced-shell-scripting.md`
 - Advanced control structures
 - Error handling
 - Argument processing
@@ -328,6 +334,7 @@ This module is designed for flexibility. You can move faster through familiar to
 - **Lab:** Building automation scripts
 
 ### Lecture 7: Text Processing Tools (90 min)
+**File**: `lecture-notes/07-text-processing.md`
 - grep and regular expressions
 - sed for stream editing
 - awk for text processing
@@ -336,6 +343,7 @@ This module is designed for flexibility. You can move faster through familiar to
 - **Lab:** Analyzing web server logs
 
 ### Lecture 8: Networking Fundamentals (120 min)
+**File**: `lecture-notes/08-networking-fundamentals.md`
 - TCP/IP basics
 - Network configuration
 - SSH and remote access
@@ -343,13 +351,23 @@ This module is designed for flexibility. You can move faster through familiar to
 - Security considerations
 - **Lab:** Network troubleshooting scenarios
 
+### Lecture 9: Disk Management and Storage (90 min)
+**File**: `lecture-notes/09-disk-management-storage.md`
+- Understanding disk partitions and filesystems
+- Mounting and unmounting filesystems
+- Disk usage monitoring (df, du)
+- LVM (Logical Volume Management) basics
+- RAID concepts for ML data storage
+- Storage performance optimization
+- **Lab:** Managing storage for ML datasets
+
 ## Hands-On Exercises
 
-> **Status Update (2025-10-28):** All 8 comprehensive exercises are now complete! Each exercise includes detailed instructions, real-world ML infrastructure scenarios, and complete solutions.
+> **Status Update (2025-10-30):** All 9 comprehensive exercises are now complete! Each exercise includes detailed instructions, real-world ML infrastructure scenarios, and complete solutions.
 
 ### Exercise Overview
 
-The module includes 8 progressive exercises that build practical Linux skills for AI Infrastructure:
+The module includes 9 progressive exercises that build practical Linux skills for AI Infrastructure:
 
 ### Exercise 01: Linux Navigation and File System Mastery
 **Time**: 60-90 minutes | **Difficulty**: Beginner | **Lectures**: 01-02
@@ -459,6 +477,7 @@ Diagnose and fix real-world issues: disk full, permission errors, hung processes
 
 ### Exercise 08: System Automation and Maintenance for ML Infrastructure
 **Time**: 120 minutes | **Difficulty**: Advanced | **Lectures**: 01-08 (focus on 04, 06)
+**File**: `exercises/exercise-08-automation-maintenance.md`
 
 Build complete automation suite: backups, monitoring, log rotation, cleanup tasks, and health checks.
 
@@ -471,10 +490,46 @@ Build complete automation suite: backups, monitoring, log rotation, cleanup task
 - System health checks
 - End-to-end automation workflows
 
+---
+
+### Exercise 09: Disk Management and ML Data Storage
+**Time**: 90 minutes | **Difficulty**: Intermediate | **Lectures**: 01-09
+**File**: `exercises/exercise-09-disk-management.md`
+
+Configure and manage storage systems for ML workloads with proper partitioning, mounting, and performance optimization.
+
+**Skills Practiced**:
+- Disk partitioning (fdisk, parted)
+- Filesystem creation and mounting
+- fstab configuration
+- Disk space monitoring and alerts
+- LVM for flexible storage management
+- Storage performance benchmarking
+- Managing large ML datasets
+
+---
+
+### Exercise 09: Linux Networking and Troubleshooting for ML Infrastructure
+**Time**: 3-4 hours | **Difficulty**: Intermediate to Advanced | **Lectures**: 08
+**File**: `exercises/exercise-09-networking-troubleshooting.md`
+
+Master essential Linux networking tools and troubleshooting techniques for managing ML infrastructure. Learn to diagnose connectivity issues, secure SSH access, configure firewalls, and analyze network performance.
+
+**Skills Practiced**:
+- Modern network tools (ip, ss) to inspect and configure interfaces
+- Network connectivity troubleshooting (ping, traceroute, tcpdump)
+- SSH security hardening with key-based authentication
+- Firewall configuration (UFW, iptables) for ML services
+- DNS resolution troubleshooting
+- Network performance and latency analysis
+- Network segmentation for security
+
 ## Assessment and Evaluation
 
 ### Knowledge Checks
-- Quiz after each major section (6 quizzes total)
+- **2 comprehensive quizzes** covering all module content
+  - Quiz 1: Linux Fundamentals (Lectures 1-5)
+  - Quiz 2: Advanced Topics (Lectures 6-9)
 - Command recall exercises
 - Concept explanation questions
 - Troubleshooting scenario analysis

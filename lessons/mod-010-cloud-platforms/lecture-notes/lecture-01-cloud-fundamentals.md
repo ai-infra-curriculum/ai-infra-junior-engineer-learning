@@ -10,6 +10,17 @@ You'll learn to distinguish between IaaS, PaaS, and SaaS; understand the benefit
 **Hands-on Companion Lab:** Exercise 01 – AWS Account & IAM Bootstrap
 **Prerequisites:** Basic understanding of networking (IP addresses, ports), Linux command line, familiarity with virtualization concepts
 
+### Learning Objectives
+
+By the end of this lecture, you will:
+- Understand the five essential characteristics of cloud computing
+- Distinguish between IaaS, PaaS, and SaaS service models
+- Compare public, private, hybrid, and multi-cloud deployment models
+- Evaluate the economic drivers and cost models of cloud adoption
+- Navigate the service ecosystems of AWS, Google Cloud, and Azure
+- Apply cloud design patterns to ML infrastructure architecture
+- Assess when to use cloud vs on-premises infrastructure for AI workloads
+
 ---
 
 ## 1. What is Cloud Computing?

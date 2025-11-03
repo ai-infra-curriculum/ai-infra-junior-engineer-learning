@@ -11,16 +11,19 @@
 - Exercise 02 (Building Custom Images)
 - Lecture 03 (Docker Compose)
 
-**What You'll Learn**:
-- Writing docker-compose.yml files
-- Multi-container application architecture
-- Service dependencies and startup order
-- Environment configuration
-- Volume management in Compose
-- Network isolation and service discovery
-- Scaling services
-- Production deployment patterns
-- ML serving with supporting services
+## Learning Objectives
+
+By completing this exercise, you will:
+- Write docker-compose.yml files for multi-container applications
+- Design service architectures with proper dependency management
+- Configure environment variables and secrets for different environments
+- Implement volume strategies for data persistence across services
+- Set up custom networks for service isolation and discovery
+- Scale services horizontally using replica configuration
+- Deploy production-ready stacks with health checks and restart policies
+- Build ML serving infrastructure with databases, caching, and monitoring
+- Manage container lifecycle using Compose commands (up, down, logs, ps)
+- Debug multi-container applications using Compose tools
 
 ---
 

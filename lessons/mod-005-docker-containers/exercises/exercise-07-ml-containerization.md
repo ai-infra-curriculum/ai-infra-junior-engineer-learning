@@ -11,15 +11,19 @@
 - All Docker lectures
 - Module 004 (ML Basics)
 
-**What You'll Learn**:
-- Containerizing ML training pipelines
-- Building ML inference APIs
-- GPU-enabled containers
-- Model versioning and management
-- ML-specific monitoring
-- Distributed training setup
-- Feature serving
-- Complete ML deployment pipeline
+## Learning Objectives
+
+By completing this exercise, you will:
+- Containerize ML training pipelines with reproducible environments
+- Build production-ready ML inference APIs with FastAPI/Flask
+- Configure GPU-enabled containers with CUDA and appropriate drivers
+- Implement model versioning and management strategies
+- Set up ML-specific monitoring (inference latency, throughput, accuracy)
+- Design distributed training architectures using multi-container setups
+- Deploy feature serving infrastructure for real-time predictions
+- Create complete end-to-end ML deployment pipelines
+- Optimize ML containers for performance and resource efficiency
+- Integrate ML containers with model registries and experiment tracking
 
 ---
 

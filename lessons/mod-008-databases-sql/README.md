@@ -473,7 +473,9 @@ Database skills develop through practice. Expect to spend time designing schemas
 
 ## Lecture Outline
 
-> **Note:** Full lecture materials are currently in development. Placeholder files are available in the `lecture-notes/` directory. Complete lecture notes will be added in upcoming updates.
+> **Status Update (2025-10-29):** All 5 comprehensive lecture notes are now complete and available! Each lecture includes SQL examples and database design patterns for ML infrastructure.
+
+This module includes **5 lectures** and **7 exercises** covering databases and SQL:
 
 ### Lecture 1: Database Fundamentals (90 min)
 - Database concepts
@@ -541,11 +543,13 @@ Database skills develop through practice. Expect to spend time designing schemas
 
 ## Hands-On Exercises
 
-> **Note:** Detailed exercise instructions are being developed. Placeholder files are available in the `exercises/` directory. Complete exercises will be added in upcoming updates.
+> **Status Update (2025-10-29):** All 7 comprehensive exercises are now complete! Each exercise includes SQL challenges and ML database scenarios with complete solutions.
+
+This module includes **7 exercises** organized by skill level:
 
 ### Exercise Categories
 
-#### SQL Basics (10 exercises)
+#### SQL Basics (2 exercises)
 1. Creating tables and schemas
 2. Basic SELECT queries
 3. Filtering and sorting
@@ -596,6 +600,32 @@ Database skills develop through practice. Expect to spend time designing schemas
 38. MongoDB operations
 39. Redis caching
 40. NoSQL use case selection
+
+### Exercise 06: Transaction Isolation and Concurrency Control
+**Difficulty**: Intermediate to Advanced
+**Duration**: 3-4 hours
+**File**: `exercises/exercise-06-transactions-concurrency.md`
+
+Build ML model registry with proper transaction handling:
+- Understand and demonstrate ACID properties
+- Test different transaction isolation levels (READ COMMITTED, REPEATABLE READ, SERIALIZABLE)
+- Implement pessimistic locking (SELECT FOR UPDATE)
+- Implement optimistic locking with version numbers
+- Handle deadlock scenarios and prevention strategies
+- Design concurrent-safe operations for ML metadata
+
+### Exercise 07: NoSQL Databases for Machine Learning
+**Difficulty**: Intermediate
+**Duration**: 3-4 hours
+**File**: `exercises/exercise-07-nosql-ml.md`
+
+Implement hybrid architecture using SQL and NoSQL:
+- Use PostgreSQL for structured training data and transactions
+- Use MongoDB for flexible, document-based ML metadata
+- Implement Redis for high-speed feature caching and serving
+- Compare storage costs and performance across clouds
+- Design data migration strategies between database types
+- Create decision matrix for database selection by use case
 
 ## Assessment and Evaluation
 

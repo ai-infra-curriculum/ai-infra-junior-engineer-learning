@@ -10,17 +10,19 @@
 - Exercise 01-05 (All previous Docker exercises)
 - All Docker lectures
 
-**What You'll Learn**:
-- Production security best practices
-- Resource limits and quotas
-- Health checks and monitoring
-- Logging strategies
-- High availability patterns
-- Blue-green and canary deployments
-- CI/CD integration
-- Secret management
-- Multi-stage deployments
-- Rollback strategies
+## Learning Objectives
+
+By completing this exercise, you will:
+- Implement production security best practices (non-root users, read-only filesystems)
+- Configure resource limits and quotas for CPU and memory
+- Design health checks and monitoring strategies for containerized applications
+- Establish logging architectures with centralized log aggregation
+- Build high availability patterns with container orchestration
+- Deploy using blue-green and canary deployment strategies
+- Integrate Docker workflows into CI/CD pipelines
+- Manage secrets securely using Docker secrets and environment variables
+- Execute multi-stage deployments across environments (dev, staging, prod)
+- Implement rollback strategies and disaster recovery procedures
 
 ---
 

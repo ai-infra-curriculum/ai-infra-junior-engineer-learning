@@ -1,10 +1,10 @@
 # Exercise 01: Python Environment Setup and Management
 
-## Objective
+## Overview
 
 Set up a complete Python development environment for an ML training project with proper dependency management, reproducible configuration, and automation scripts.
 
-## Learning Outcomes
+## Learning Objectives
 
 By completing this exercise, you will:
 - Create and manage virtual environments

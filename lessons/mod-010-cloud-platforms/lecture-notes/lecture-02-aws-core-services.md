@@ -10,6 +10,17 @@ You'll learn through practical AWS CLI examples how to provision virtual machine
 **Hands-on Companion Lab:** Exercise 02 – Compute & Storage Foundations
 **Prerequisites:** AWS account with free tier, AWS CLI installed and configured, basic Linux command line skills
 
+### Learning Objectives
+
+By the end of this lecture, you will:
+- Configure AWS CLI with IAM credentials and named profiles
+- Launch and manage EC2 instances for ML workloads
+- Create and configure S3 buckets for ML data storage
+- Deploy RDS databases for application metadata
+- Implement IAM policies following least-privilege principles
+- Automate AWS resource management using CLI commands
+- Design security architectures using IAM roles and policies
+
 ---
 
 ## 1. AWS Account Setup and Configuration

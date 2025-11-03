@@ -10,16 +10,19 @@
 - Exercise 01-03 (Container Operations, Images, Compose)
 - Lecture 04 (Networking & Volumes)
 
-**What You'll Learn**:
-- Docker network drivers (bridge, host, overlay, macvlan)
-- Container DNS and service discovery
-- Network isolation and security
-- Custom bridge networks
-- Container-to-container communication
-- External connectivity
-- Load balancing patterns
-- Multi-host networking
-- Troubleshooting network issues
+## Learning Objectives
+
+By completing this exercise, you will:
+- Compare Docker network drivers (bridge, host, overlay, macvlan) and their use cases
+- Configure DNS-based service discovery for container communication
+- Implement network isolation strategies for security boundaries
+- Create custom bridge networks with specific IP ranges
+- Enable container-to-container communication within networks
+- Configure external connectivity and port mappings
+- Design load balancing patterns for distributed ML inference
+- Set up multi-host networking for distributed systems
+- Troubleshoot network issues using Docker and system tools
+- Apply networking best practices for ML infrastructure
 
 ---
 

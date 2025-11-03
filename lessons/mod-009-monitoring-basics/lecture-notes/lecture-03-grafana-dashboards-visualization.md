@@ -3,9 +3,20 @@
 ## Lecture Overview
 Grafana transforms raw Prometheus metrics into actionable insights by combining flexible dashboards, rich visualization options, and alerting workflows. This lecture shows how to design dashboards that accelerate on-call response, communicate platform health to stakeholders, and capture the nuances of AI/ML workloads. You will learn dashboard architecture, panel composition, Grafana data modeling, templating, sharing, provisioning, and alert configuration that complements your Prometheus pipeline.
 
-**Estimated Reading Time:** 70–85 minutes  
-**Hands-on Companion Lab:** Exercise 03 – Grafana Dashboards  
+**Estimated Reading Time:** 70–85 minutes
+**Hands-on Companion Lab:** Exercise 03 – Grafana Dashboards
 **Prerequisite Knowledge:** Lectures 01–02, familiarity with Prometheus queries, awareness of target SLIs/SLOs.
+
+### Learning Objectives
+
+By the end of this lecture, you will:
+- Configure Grafana data sources for Prometheus and other backends
+- Design dashboard taxonomies for different stakeholder audiences
+- Build actionable panels using appropriate visualization types
+- Implement dashboard templating with variables for dynamic filtering
+- Apply information architecture principles to dashboard layout
+- Configure Grafana alerting rules and notification channels
+- Provision dashboards as code for version-controlled deployments
 
 ---
 

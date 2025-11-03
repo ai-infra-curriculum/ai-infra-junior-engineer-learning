@@ -49,10 +49,11 @@ By the end of this module, you will be able to:
 
 ## Module Structure
 
-This module is organized into five comprehensive lectures, each building upon the previous:
+This module is organized into seven comprehensive lectures, each building upon the previous:
 
 ### Lecture 01: Python Environment & Dependency Management (Week 1)
 **Duration**: 6-8 hours
+**File**: `lecture-notes/01-python-environment.md`
 - Virtual environments and isolation
 - Package management with pip
 - Requirements files and lock files
@@ -61,6 +62,7 @@ This module is organized into five comprehensive lectures, each building upon th
 
 ### Lecture 02: Advanced Python for Infrastructure (Week 2)
 **Duration**: 8-10 hours
+**File**: `lecture-notes/02-advanced-python.md`
 - Type hints and static type checking
 - Logging best practices for production systems
 - Configuration management patterns
@@ -69,14 +71,34 @@ This module is organized into five comprehensive lectures, each building upon th
 
 ### Lecture 03: Python for DevOps Operations (Week 3)
 **Duration**: 8-10 hours
+**File**: `lecture-notes/03-python-devops.md`
 - Subprocess management and shell interaction
 - File and directory operations
 - Building CLI tools with argparse
 - Working with environment variables
 - Parsing command-line arguments
 
-### Lecture 04: Asynchronous Programming (Week 4)
+### Lecture 04: Python Data Structures (Week 3-4)
 **Duration**: 6-8 hours
+**File**: `lecture-notes/04-python-data-structures.md`
+- Lists, tuples, sets, and dictionaries in depth
+- Data structure performance characteristics
+- Collections module (Counter, defaultdict, deque)
+- Working with JSON and data serialization
+- Data structure patterns for infrastructure code
+
+### Lecture 05: Decorators and Packaging (Week 4)
+**Duration**: 6-8 hours
+**File**: `lecture-notes/05-decorators-and-packaging.md`
+- Understanding and creating decorators
+- Function wrapping and metadata preservation
+- Packaging Python projects
+- Creating distributable packages
+- Package structure best practices
+
+### Lecture 06: Asynchronous Programming (Week 4-5)
+**Duration**: 6-8 hours
+**File**: `lecture-notes/04-async-programming.md`
 - Understanding async/await syntax
 - Running concurrent tasks with asyncio
 - Async HTTP requests with httpx
@@ -84,8 +106,9 @@ This module is organized into five comprehensive lectures, each building upon th
 - Async context managers and generators
 - Common async patterns for AI infrastructure
 
-### Lecture 05: Testing and Code Quality (Week 5)
+### Lecture 07: Testing and Code Quality (Week 5)
 **Duration**: 8-10 hours
+**File**: `lecture-notes/05-testing-code-quality.md`
 - Unit testing with pytest
 - Test fixtures and parametrization
 - Testing async functions
@@ -145,7 +168,7 @@ This module is organized into five comprehensive lectures, each building upon th
 - **Day 4**: Practice and project work
 - **Day 5**: Complete module assessment
 
-**Total Estimated Time**: 38-48 hours
+**Total Estimated Time**: 41-52 hours
 
 ## Topics Covered
 
@@ -221,10 +244,13 @@ This module is organized into five comprehensive lectures, each building upon th
 
 ## Exercises
 
+This module includes 8 comprehensive exercises that build practical Python skills for AI Infrastructure:
+
 ### Exercise 01: Environment Setup & Management
 **Difficulty**: Beginner
 **Duration**: 2-3 hours
 **Related to**: Lecture 01
+**File**: `exercises/exercise-01-environment-setup.md`
 
 Create a complete Python project with proper environment management, including:
 - Virtual environment setup
@@ -237,6 +263,7 @@ Create a complete Python project with proper environment management, including:
 **Difficulty**: Intermediate
 **Duration**: 2-3 hours
 **Related to**: Lecture 02
+**File**: `exercises/exercise-02-type-hints.md`
 
 Take a provided untyped Python module and add comprehensive type hints:
 - Function signatures with input/output types
@@ -249,6 +276,7 @@ Take a provided untyped Python module and add comprehensive type hints:
 **Difficulty**: Intermediate
 **Duration**: 3-4 hours
 **Related to**: Lecture 02
+**File**: `exercises/exercise-03-logging.md`
 
 Implement a comprehensive logging strategy for a multi-module application:
 - Configure root and module-level loggers
@@ -257,10 +285,36 @@ Implement a comprehensive logging strategy for a multi-module application:
 - Configure file and console handlers
 - Implement log rotation
 
+### Exercise 04: CLI Tool Development
+**Difficulty**: Intermediate
+**Duration**: 3-4 hours
+**Related to**: Lecture 03
+**File**: `exercises/exercise-04-cli-tools.md`
+
+Build a command-line tool for infrastructure operations:
+- Implement argparse for command-line parsing
+- Create subcommands for different operations
+- Handle user input and validation
+- Implement proper error messages
+- Add help documentation
+
+### Exercise 05: Data Structure Patterns
+**Difficulty**: Intermediate
+**Duration**: 2-3 hours
+**Related to**: Lecture 04
+**File**: `exercises/exercise-05-data-structures.md`
+
+Work with Python data structures for infrastructure tasks:
+- Implement efficient data processing pipelines
+- Use appropriate collections for different scenarios
+- Serialize and deserialize complex data
+- Optimize performance with appropriate structures
+
 ### Exercise 06: Async Programming
 **Difficulty**: Intermediate
 **Duration**: 4-5 hours
-**Related to**: Lecture 04
+**Related to**: Lecture 06
+**File**: `exercises/exercise-06-async-programming.md`
 
 Build a concurrent model monitoring system using async/await:
 - Monitor multiple model endpoints concurrently
@@ -272,7 +326,8 @@ Build a concurrent model monitoring system using async/await:
 ### Exercise 07: Testing with pytest
 **Difficulty**: Intermediate
 **Duration**: 4-5 hours
-**Related to**: Lecture 05
+**Related to**: Lecture 07
+**File**: `exercises/exercise-07-testing.md`
 
 Write comprehensive test suites for infrastructure code:
 - Unit tests with pytest
@@ -281,6 +336,20 @@ Write comprehensive test suites for infrastructure code:
 - Test async functions
 - Mock external dependencies
 - Achieve >80% code coverage
+
+### Exercise 08: Python Packaging and Distribution
+**Difficulty**: Intermediate
+**Duration**: 3-4 hours
+**Related to**: Lecture 05
+**File**: `exercises/exercise-08-packaging-distribution.md`
+
+Create a distributable Python package for ML infrastructure utilities:
+- Structure Python package with proper layout
+- Write pyproject.toml for modern packaging
+- Build wheels and source distributions
+- Publish to a private package index (devpi)
+- Implement semantic versioning
+- Create comprehensive package documentation
 
 ## Quizzes & Assessments
 

@@ -24,6 +24,18 @@ By completing this curriculum, you will be able to:
 ## ✨ What's New
 
 **Recently Added Content:**
+- 🎯 **Comprehensive Exercise Expansion** - 12 new advanced exercises added across modules (80 total exercises, up from 68)
+  - Module 001: Python Packaging & Distribution
+  - Module 002: Linux Networking & Troubleshooting
+  - Module 004: ML System Design & Architecture
+  - Module 006: Kubernetes Autoscaling for ML Workloads
+  - Module 007: Flask to FastAPI Migration, Comprehensive API Testing
+  - Module 008: Transaction Isolation & Concurrency, NoSQL for ML
+  - Module 009: PromQL & Recording Rules, SLO & Error Budget Management
+  - Module 010: Multi-Cloud Architecture Strategy, FinOps & Cost Optimization
+- 📚 **New Comprehensive Lectures**
+  - **Module 009**: Lecture 05 - Workflow Orchestration and Airflow Monitoring (90 min)
+  - **Module 010**: Lecture 05 - Multi-Cloud Strategies and Cost Optimization (90 min)
 - 🤖 **LLM Basics Exercise** (Module 004) - Run your first language model with Hugging Face Transformers
 - ⚡ **GPU Fundamentals Exercise** (Module 004) - Learn GPU acceleration for ML inference
 - 🏗️ **Terraform/IaC Exercise** (Module 010) - Infrastructure as Code with hands-on AWS deployment
@@ -50,8 +62,8 @@ By completing this curriculum, you will be able to:
 | **006** | Kubernetes Introduction | 20 hours | Beginner+ | — |
 | **007** | APIs & Web Services | 15 hours | Beginner | — |
 | **008** | Databases & SQL | 15 hours | Beginner | — |
-| **009** | Monitoring & Logging Basics | 15 hours | Beginner+ | ✨ **+Airflow Workflow** |
-| **010** | Cloud Platforms (AWS/GCP/Azure) | 20 hours | Beginner+ | ✨ **+Terraform/IaC** |
+| **009** | Monitoring & Logging Basics | 15 hours | Beginner+ | ✨ **+Airflow Workflow Lecture** |
+| **010** | Cloud Platforms (AWS/GCP/Azure) | 20 hours | Beginner+ | ✨ **+Multi-Cloud & FinOps Lecture** |
 
 ### Hands-On Projects (5 projects, ~290 hours)
 

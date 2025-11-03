@@ -1,21 +1,28 @@
 # Exercise 01: Docker Container Operations
 
-## Exercise Overview
+## Overview
 
-**Objective**: Master fundamental Docker container operations including running, managing, and debugging containers.
+Master fundamental Docker container operations including running, managing, and debugging containers.
 
 **Difficulty**: Beginner
 **Estimated Time**: 2-3 hours
-**Prerequisites**: Lecture 01 (Docker Fundamentals)
 
-**What You'll Learn**:
-- Running containers in different modes
-- Managing container lifecycle
-- Viewing logs and debugging
-- Port mapping and networking basics
-- Environment variables
-- Resource constraints
-- Container inspection
+## Learning Objectives
+
+By completing this exercise, you will:
+- Execute Docker containers in interactive and detached modes
+- Manage container lifecycle (start, stop, restart, remove)
+- Inspect container logs and debug running containers
+- Configure port mapping for container networking
+- Set environment variables for containerized applications
+- Apply resource constraints (CPU, memory) to containers
+- Use docker inspect to examine container configuration
+
+## Prerequisites
+
+- Lecture 01 (Docker Fundamentals) completed
+- Docker installed and running
+- Basic command-line proficiency
 
 ---
 

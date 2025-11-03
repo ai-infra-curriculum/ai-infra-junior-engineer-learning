@@ -12,16 +12,19 @@
 - Understanding of primary keys and foreign keys
 - Basic ER diagram reading skills
 
-**What You'll Learn**:
-- Entity-Relationship (ER) modeling for ML systems
-- Database normalization (1NF, 2NF, 3NF)
-- Primary keys and foreign keys
-- One-to-many and many-to-many relationships
-- Junction tables for complex relationships
-- Referential integrity and CASCADE behavior
-- Lookup tables and enum alternatives
-- Indexing strategies for related tables
-- Schema documentation best practices
+## Learning Objectives
+
+By completing this exercise, you will:
+- Design Entity-Relationship (ER) models for ML systems
+- Apply database normalization principles (1NF, 2NF, 3NF)
+- Implement primary keys and foreign keys with referential integrity
+- Model one-to-many and many-to-many relationships
+- Create junction tables for complex relationship patterns
+- Configure CASCADE behavior for referential integrity
+- Design lookup tables as alternatives to enum types
+- Develop indexing strategies for optimal query performance on related tables
+- Document database schemas with clear conventions
+- Build production-grade ML model registry schemas
 
 ---
 

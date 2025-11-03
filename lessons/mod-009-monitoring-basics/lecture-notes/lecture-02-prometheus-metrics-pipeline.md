@@ -3,9 +3,20 @@
 ## Lecture Overview
 Prometheus has become the de facto standard for metrics collection in cloud-native environments. This lecture explains how to design, deploy, and operate a Prometheus-based metrics stack tailored to AI infrastructure workloads. You will learn the Prometheus data model, configuration patterns, exporter ecosystem, PromQL query design, and strategies for scaling the pipeline in production.
 
-**Estimated Reading Time:** 75–90 minutes  
-**Hands-on Companion Lab:** Exercise 02 – Prometheus Setup & Exporters  
+**Estimated Reading Time:** 75–90 minutes
+**Hands-on Companion Lab:** Exercise 02 – Prometheus Setup & Exporters
 **Prerequisite Knowledge:** Lecture 01 (observability foundations), Docker basics, familiarity with Linux services.
+
+### Learning Objectives
+
+By the end of this lecture, you will:
+- Understand Prometheus architecture and core components
+- Configure Prometheus for AI infrastructure monitoring
+- Implement service discovery patterns for Kubernetes environments
+- Write PromQL queries to extract meaningful metrics
+- Deploy and configure exporters for ML workloads
+- Apply relabeling strategies to optimize metric collection
+- Design Prometheus deployments for production scalability
 
 ---
 

@@ -76,8 +76,11 @@ By the end of this module, you will:
 
 ## Module Structure
 
+This module includes **5 comprehensive lectures** covering ML fundamentals for infrastructure engineers:
+
 ### Lecture 01: Machine Learning Overview for Infrastructure (Week 1)
 **Duration**: 6-8 hours
+**File**: `lecture-notes/01-ml-overview.md`
 - What is machine learning?
 - The ML workflow: data → training → inference
 - Types of ML: supervised, unsupervised, reinforcement
@@ -87,6 +90,7 @@ By the end of this module, you will:
 
 ### Lecture 02: PyTorch Basics for Infrastructure (Week 1-2)
 **Duration**: 8-10 hours
+**File**: `lecture-notes/02-pytorch-basics.md`
 - PyTorch architecture and ecosystem
 - Tensors, devices (CPU/GPU), and data types
 - Loading pre-trained models
@@ -97,6 +101,7 @@ By the end of this module, you will:
 
 ### Lecture 03: TensorFlow Basics for Infrastructure (Week 2-3)
 **Duration**: 8-10 hours
+**File**: `lecture-notes/03-tensorflow-basics.md`
 - TensorFlow/Keras architecture
 - TensorFlow model formats (SavedModel, H5, TFLite)
 - Loading pre-trained models
@@ -107,12 +112,24 @@ By the end of this module, you will:
 
 ### Lecture 04: Model Formats and Deployment Preparation (Week 3-4)
 **Duration**: 6-8 hours
+**File**: `lecture-notes/04-model-formats.md`
 - ONNX overview and benefits
 - Converting PyTorch models to ONNX
 - Converting TensorFlow models to ONNX
 - Model optimization techniques (quantization, pruning)
 - Choosing deployment formats
 - Model packaging best practices
+
+### Lecture 05: LLM and Transformers Basics (Week 4)
+**Duration**: 6-8 hours
+**File**: `lecture-notes/05-llm-transformers-basics.md`
+- Introduction to Large Language Models (LLMs)
+- Transformer architecture overview
+- Popular LLM frameworks (Hugging Face Transformers)
+- Loading and using pre-trained LLMs
+- LLM inference considerations (memory, latency)
+- Infrastructure requirements for LLMs
+- LLM deployment patterns
 
 ## Prerequisites
 
@@ -199,23 +216,65 @@ By the end of this module, you will:
 
 ## Hands-On Exercises
 
+This module includes **6 hands-on exercises** that build practical ML infrastructure skills:
+
 ### Exercise 01: PyTorch Model Inference
 **Difficulty**: Beginner
 **Duration**: 2-3 hours
+**File**: `exercises/exercise-01-pytorch-inference.md`
 
 Load a pre-trained PyTorch image classification model (ResNet50), run inference on sample images, and measure performance metrics.
 
 ### Exercise 02: TensorFlow Model Inference
 **Difficulty**: Beginner
 **Duration**: 2-3 hours
+**File**: `exercises/exercise-02-tensorflow-inference.md`
 
 Load a pre-trained TensorFlow/Keras model, run inference, and compare with PyTorch implementation from Exercise 01.
 
 ### Exercise 03: Model Format Conversion
 **Difficulty**: Intermediate
 **Duration**: 3-4 hours
+**File**: `exercises/exercise-03-model-conversion.md`
 
 Convert both PyTorch and TensorFlow models to ONNX format, verify outputs match original models, and measure performance differences.
+
+### Exercise 04: LLM Inference with Hugging Face
+**Difficulty**: Intermediate
+**Duration**: 3-4 hours
+**File**: `exercises/exercise-04-llm-inference.md`
+
+Work with pre-trained language models using Hugging Face Transformers:
+- Load and run inference with GPT-2 or similar LLM
+- Understand tokenization and decoding
+- Measure inference latency and memory usage
+- Compare different model sizes
+
+### Exercise 05: End-to-End Model Serving
+**Difficulty**: Advanced
+**Duration**: 4-5 hours
+**File**: `exercises/exercise-05-model-serving.md`
+
+Build a complete model serving solution:
+- Deploy model as REST API
+- Handle multiple model formats
+- Implement batch inference
+- Add logging and monitoring
+- Performance optimization
+
+### Exercise 06: ML System Design and Architecture
+**Difficulty**: Advanced
+**Duration**: 3-4 hours
+**Related to**: Lecture 01
+**File**: `exercises/exercise-06-ml-system-design.md`
+
+Design end-to-end ML systems for three real-world scenarios:
+- Recommendation system architecture
+- Fraud detection system design
+- Image moderation pipeline
+- Serving infrastructure planning
+- Data pipeline design
+- Cost and performance optimization
 
 ## Quizzes & Assessments
 

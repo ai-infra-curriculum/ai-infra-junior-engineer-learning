@@ -11,15 +11,19 @@
 - Module 004 (ML Basics)
 - Module 005 (Docker ML containers)
 
-**What You'll Learn**:
-- ML training Jobs and CronJobs
-- GPU resource management
-- Distributed training with PyTorch
-- Model serving deployment
-- ML pipeline orchestration
-- Kubeflow basics
-- ML monitoring patterns
-- Complete ML workflow on K8s
+## Learning Objectives
+
+By completing this exercise, you will:
+- Deploy ML training Jobs and scheduled CronJobs on Kubernetes
+- Configure GPU resource requests and limits for ML workloads
+- Implement distributed training with PyTorch using multiple pods
+- Build scalable model serving deployments with autoscaling
+- Orchestrate ML pipelines using Kubernetes primitives
+- Set up Kubeflow components for ML workflow management
+- Monitor ML-specific metrics (training progress, inference latency)
+- Design complete end-to-end ML workflows on Kubernetes
+- Optimize resource allocation for cost-effective ML operations
+- Implement experiment tracking and model versioning in K8s
 
 ---
 

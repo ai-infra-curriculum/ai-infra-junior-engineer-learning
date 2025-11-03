@@ -12,17 +12,19 @@
 - Comfort with terminal and text editor
 - Module 005 (Docker) for containerized PostgreSQL setup
 
-**What You'll Learn**:
-- PostgreSQL database initialization and management
-- Table schema design with constraints and data types
-- Primary keys, foreign keys, and unique constraints
-- CHECK constraints for data validation
-- JSONB data type for flexible metadata storage
-- Timestamps and timezone handling
-- INSERT, SELECT, UPDATE, DELETE operations
-- Filtering, sorting, and aggregation queries
-- Transaction basics
-- SQL best practices for ML infrastructure
+## Learning Objectives
+
+By completing this exercise, you will:
+- Initialize and manage PostgreSQL databases for ML applications
+- Design table schemas with appropriate constraints and data types
+- Implement primary keys, foreign keys, and unique constraints
+- Apply CHECK constraints for data validation rules
+- Utilize JSONB data type for flexible metadata storage
+- Handle timestamps and timezone conversions properly
+- Execute INSERT, SELECT, UPDATE, DELETE operations (CRUD)
+- Write filtering, sorting, and aggregation queries
+- Understand transaction basics and ACID properties
+- Follow SQL best practices for ML infrastructure
 
 ---
 

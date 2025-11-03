@@ -53,10 +53,13 @@ If you don't have a local Kubernetes cluster yet, see `resources/cluster-setup-g
 
 ## Module Structure
 
-This module is organized into four main sections:
+> **Status Update (2025-10-29):** All 5 comprehensive lectures are now complete and available! This module includes practical examples for ML workload deployment on Kubernetes.
+
+This module includes **5 lectures** and **8 exercises** organized into key sections:
 
 ### 1. Kubernetes Architecture (Lecture 01)
 **Duration**: 3-4 hours
+**File**: `lecture-notes/01-k8s-architecture.md`
 
 - Control plane components (API Server, Scheduler, Controller Manager, etcd)
 - Worker node components (kubelet, kube-proxy, container runtime)
@@ -66,6 +69,7 @@ This module is organized into four main sections:
 
 ### 2. Deploying Applications (Lecture 02)
 **Duration**: 4-5 hours
+**File**: `lecture-notes/02-deploying-apps.md`
 
 - Pods: The smallest deployable unit
 - Deployments: Managing application lifecycle
@@ -75,6 +79,7 @@ This module is organized into four main sections:
 
 ### 3. Helm Package Management (Lecture 03)
 **Duration**: 3-4 hours
+**File**: `lecture-notes/03-helm.md`
 
 - Introduction to Helm and package management
 - Helm charts structure and templating
@@ -84,12 +89,25 @@ This module is organized into four main sections:
 
 ### 4. Kubernetes Operations (Lecture 04)
 **Duration**: 3-4 hours
+**File**: `lecture-notes/04-k8s-operations.md`
 
 - kubectl command reference and shortcuts
 - Debugging Pods and Deployments
 - Viewing logs and executing commands in containers
 - Resource monitoring and metrics
 - Troubleshooting common issues
+
+### 5. ML Workloads and Kubeflow (Lecture 05)
+**Duration**: 4-5 hours
+**File**: `lecture-notes/05-ml-workloads-kubeflow.md`
+
+- Running ML workloads on Kubernetes
+- GPU resource management
+- Kubeflow introduction and components
+- ML pipelines on Kubernetes
+- Model serving with KServe/KFServing
+- Distributed training patterns
+- ML infrastructure best practices
 
 ## Learning Path
 
@@ -133,7 +151,9 @@ This module is organized into four main sections:
 
 ## Hands-on Exercises
 
-This module includes three comprehensive exercises:
+> **Status Update (2025-10-29):** All 8 comprehensive exercises are now complete! Each exercise builds practical Kubernetes skills with ML infrastructure examples.
+
+This module includes **8 exercises** that progress from basics to advanced Kubernetes operations:
 
 ### Exercise 01: First Deployment
 Deploy a simple web application to Kubernetes, expose it with a Service, and scale it up and down. This exercise reinforces core concepts of Pods, Deployments, and Services.
@@ -154,6 +174,8 @@ Create a Helm chart for a Python Flask application, parameterize the deployment,
 - Release management
 
 ### Exercise 03: Debugging
+**File**: `exercises/exercise-03-debugging.md`
+
 Troubleshoot a broken Kubernetes deployment, identify issues using kubectl, fix configuration problems, and verify the application works.
 
 **Skills practiced**:
@@ -161,6 +183,66 @@ Troubleshoot a broken Kubernetes deployment, identify issues using kubectl, fix 
 - Reading logs and events
 - Identifying common issues
 - Fixing misconfigurations
+
+### Exercise 04: ConfigMaps and Secrets
+**File**: `exercises/exercise-04-configmaps-secrets.md`
+
+Manage application configuration using ConfigMaps and Secrets.
+
+**Skills practiced**:
+- Creating ConfigMaps
+- Managing Secrets
+- Injecting configuration into Pods
+- Environment variables and volume mounts
+
+### Exercise 05: Persistent Storage
+**File**: `exercises/exercise-05-persistent-storage.md`
+
+Work with persistent storage for stateful applications.
+
+**Skills practiced**:
+- PersistentVolumeClaims
+- Storage classes
+- StatefulSets basics
+- Data persistence patterns
+
+### Exercise 06: Networking and Ingress
+**File**: `exercises/exercise-06-networking-ingress.md`
+
+Configure networking and expose applications externally.
+
+**Skills practiced**:
+- Service types (ClusterIP, NodePort, LoadBalancer)
+- Ingress resources
+- DNS and service discovery
+- Network policies basics
+
+### Exercise 07: ML Workload Deployment
+**File**: `exercises/exercise-07-ml-workload.md`
+
+Deploy a complete ML model serving application on Kubernetes.
+
+**Skills practiced**:
+- GPU resource requests
+- Model serving deployment
+- Horizontal Pod Autoscaling
+- ML-specific configurations
+- End-to-end ML infrastructure
+
+### Exercise 08: Autoscaling ML Workloads in Kubernetes
+**Difficulty**: Intermediate to Advanced
+**Duration**: 3-4 hours
+**File**: `exercises/exercise-08-autoscaling-ml-workloads.md`
+
+Master Kubernetes autoscaling for ML workloads.
+
+**Skills practiced**:
+- Configure Horizontal Pod Autoscaler (HPA) with CPU and custom metrics
+- Implement Vertical Pod Autoscaler (VPA) for resource optimization
+- Use Prometheus Adapter for custom metrics
+- Implement event-driven autoscaling with KEDA
+- Design autoscaling policies for cost-effective ML infrastructure
+- Handle GPU-based workload scaling considerations
 
 ## Assessment Criteria
 

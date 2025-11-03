@@ -12,15 +12,19 @@
 - Lecture 03 (Advanced SQL & Query Optimization)
 - Understanding of set theory (INNER vs OUTER joins)
 
-**What You'll Learn**:
-- All JOIN types (INNER, LEFT, RIGHT, FULL OUTER, CROSS, SELF)
-- Window functions (ROW_NUMBER, RANK, LAG, LEAD, SUM OVER)
-- Common Table Expressions (CTEs) with multiple steps
-- Subqueries (correlated and non-correlated)
-- Conditional aggregations (FILTER, CASE WHEN)
-- LATERAL joins for complex scenarios
-- Query performance analysis with EXPLAIN
-- Materialized views for caching expensive queries
+## Learning Objectives
+
+By completing this exercise, you will:
+- Master all JOIN types (INNER, LEFT, RIGHT, FULL OUTER, CROSS, SELF)
+- Implement window functions (ROW_NUMBER, RANK, LAG, LEAD, SUM OVER)
+- Write Common Table Expressions (CTEs) for complex multi-step queries
+- Construct subqueries (correlated and non-correlated)
+- Apply conditional aggregations using FILTER and CASE WHEN
+- Use LATERAL joins for advanced query scenarios
+- Analyze query performance with EXPLAIN and EXPLAIN ANALYZE
+- Create materialized views for caching expensive analytical queries
+- Build production-ready analytical queries for ML infrastructure dashboards
+- Optimize query performance for large datasets
 
 ---
 

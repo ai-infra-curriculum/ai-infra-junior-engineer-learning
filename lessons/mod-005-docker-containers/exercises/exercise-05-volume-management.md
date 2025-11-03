@@ -10,15 +10,19 @@
 - Exercise 01-04 (Container Operations, Images, Compose, Networking)
 - Lecture 04 (Networking & Volumes)
 
-**What You'll Learn**:
-- Volume types (named volumes, bind mounts, tmpfs)
-- Data persistence strategies
-- Sharing data between containers
-- Volume backup and restore
-- Volume drivers and plugins
-- ML model and dataset management
-- Performance considerations
-- Production volume patterns
+## Learning Objectives
+
+By completing this exercise, you will:
+- Distinguish between volume types (named volumes, bind mounts, tmpfs)
+- Implement data persistence strategies for stateful applications
+- Share data between containers using volumes
+- Execute volume backup and restore procedures
+- Configure volume drivers and plugins for different storage backends
+- Manage ML models and datasets with optimal volume strategies
+- Evaluate performance trade-offs between volume types
+- Apply production volume patterns for high-availability systems
+- Monitor volume usage and implement cleanup policies
+- Design disaster recovery strategies for containerized data
 
 ---
 

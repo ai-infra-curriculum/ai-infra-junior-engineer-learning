@@ -10,6 +10,17 @@ By the end, you'll understand how to create production-grade VPC architectures, 
 **Hands-on Companion Lab:** Exercise 03 – Networking & Security Lab
 **Prerequisites:** Lecture 02 (AWS Core Services), basic understanding of IP addressing and subnetting, familiarity with TCP/IP protocols
 
+### Learning Objectives
+
+By the end of this lecture, you will:
+- Design and create VPC architectures with proper CIDR block planning
+- Configure public and private subnets with appropriate routing
+- Implement security groups and NACLs following defense-in-depth principles
+- Deploy multi-tier network architectures for ML applications
+- Configure VPC endpoints for secure AWS service access
+- Troubleshoot network connectivity issues using AWS tools
+- Apply IAM security patterns for cross-account and service-to-service access
+
 ---
 
 ## 1. VPC (Virtual Private Cloud) Fundamentals

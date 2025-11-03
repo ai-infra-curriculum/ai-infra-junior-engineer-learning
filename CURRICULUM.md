@@ -833,3 +833,20 @@ Complete at your own pace. Typical timelines:
 **Last Updated:** October 2025
 **Maintained By:** AI Infrastructure Curriculum Team
 **Contact:** ai-infra-curriculum@joshua-ferguson.com
+
+---
+
+## Requirement-to-Module Mapping
+
+| Job Requirement | Curriculum Coverage |
+| --- | --- |
+| Assist in deploying and maintaining ML models in development and staging environments | Module 005 - Docker & Containerization<br>Module 006 - Kubernetes Introduction<br>Project 02 - Kubernetes Model Serving<br>Project 05 - Production-Ready ML System (Capstone) |
+| Write and maintain automation scripts for routine infrastructure tasks | Module 001 - Python Fundamentals for Infrastructure<br>Module 002 - Linux Essentials<br>Project 01 - Simple Model API |
+| Monitor ML infrastructure health and respond to basic alerts under guidance | Module 009 - Monitoring Basics<br>Project 04 - Monitoring & Alerting System |
+| Support data pipeline operations and troubleshoot simple pipeline failures | Module 004 - ML Basics (PyTorch/TensorFlow)<br>Module 008 - Databases & SQL<br>Project 03 - ML Pipeline Tracking |
+| Document infrastructure procedures and runbooks | Module 003 - Git & Version Control<br>Project 05 - Production-Ready ML System (Capstone) |
+| Assist with container builds and basic Docker operations | Module 005 - Docker & Containerization<br>Project 02 - Kubernetes Model Serving |
+| Help maintain experiment tracking and model versioning systems | Module 004 - ML Basics (PyTorch/TensorFlow)<br>Project 03 - ML Pipeline Tracking<br>Project 05 - Production-Ready ML System (Capstone) |
+| Contribute to infrastructure testing and validation procedures | Module 001 - Python Fundamentals for Infrastructure<br>Module 003 - Git & Version Control<br>Project 05 - Production-Ready ML System (Capstone) |
+| Maintain development environments for data science teams | Module 001 - Python Fundamentals for Infrastructure<br>Module 002 - Linux Essentials<br>Module 010 - Cloud Platforms |
+| Support incident response under supervision of senior engineers | Module 009 - Monitoring Basics<br>Project 04 - Monitoring & Alerting System |

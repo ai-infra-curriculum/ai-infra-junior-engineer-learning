@@ -10,15 +10,19 @@
 - Exercise 01-04 (Kubernetes basics, StatefulSets)
 - Module 005 (Docker environment variables)
 
-**What You'll Learn**:
-- Creating and using ConfigMaps
-- Managing Secrets securely
-- Environment variables in Kubernetes
-- Configuration injection patterns
-- External configuration (etcd, Vault)
-- ML model configuration
-- Multi-environment strategies
-- Configuration best practices
+## Learning Objectives
+
+By completing this exercise, you will:
+- Create and manage ConfigMaps from literals, files, and YAML manifests
+- Implement Secrets for secure credential management
+- Inject environment variables into pods using ConfigMaps and Secrets
+- Apply configuration injection patterns (volumes vs environment variables)
+- Integrate external configuration systems (etcd, HashiCorp Vault)
+- Configure ML model parameters and hyperparameters
+- Design multi-environment configuration strategies (dev, staging, prod)
+- Follow configuration security best practices
+- Update running applications with configuration changes
+- Debug configuration-related pod failures
 
 ---
 

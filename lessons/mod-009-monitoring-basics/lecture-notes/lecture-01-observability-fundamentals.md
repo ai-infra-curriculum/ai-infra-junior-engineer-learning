@@ -3,9 +3,20 @@
 ## Lecture Overview
 Monitoring and observability are indispensable for running production-grade AI infrastructure. This lecture establishes the conceptual foundation you will rely on throughout the module: key terminology, mental models, service level objectives (SLOs), observability signals, and the unique challenges involved in operating ML workloads. By the end, you will possess a practical checklist for instrumenting systems and a roadmap for elevating observability maturity inside your organization.
 
-**Estimated Reading Time:** 60–75 minutes  
-**Hands-on Companion Lab:** Exercise 01 – Observability Foundations Lab  
+**Estimated Reading Time:** 60–75 minutes
+**Hands-on Companion Lab:** Exercise 01 – Observability Foundations Lab
 **Prerequisite Knowledge:** Linux command line, Docker basics, familiarity with REST APIs, introductory AI/ML pipeline concepts.
+
+### Learning Objectives
+
+By the end of this lecture, you will:
+- Distinguish between monitoring and observability in production systems
+- Understand the three pillars of observability: metrics, logs, and traces
+- Apply the Four Golden Signals to AI/ML infrastructure monitoring
+- Define and implement Service Level Indicators (SLIs) and Objectives (SLOs)
+- Assess observability maturity levels within an organization
+- Design layered monitoring strategies for AI systems
+- Implement instrumentation principles for distributed ML workloads
 
 ---
 

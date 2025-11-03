@@ -482,7 +482,9 @@ API development requires practice building, testing, and refining endpoints. Exp
 
 ## Lecture Outline
 
-> **Note:** Full lecture materials are currently in development. Placeholder files are available in the `lecture-notes/` directory. Complete lecture notes will be added in upcoming updates.
+> **Status Update (2025-10-29):** All 4 comprehensive lecture notes are now complete and available! Each lecture includes practical API development examples for ML infrastructure.
+
+This module includes **4 lectures** and **8 exercises** covering API development:
 
 ### Lecture 1: HTTP and REST Fundamentals (90 min)
 - HTTP protocol overview
@@ -550,11 +552,13 @@ API development requires practice building, testing, and refining endpoints. Exp
 
 ## Hands-On Exercises
 
-> **Note:** Detailed exercise instructions are being developed. Placeholder files are available in the `exercises/` directory. Complete exercises will be added in upcoming updates.
+> **Status Update (2025-10-29):** All 8 comprehensive exercises are now complete! Each exercise includes detailed instructions with ML API examples and complete solutions.
+
+This module includes **8 exercises** building practical API development skills:
 
 ### Exercise Categories
 
-#### HTTP and REST (5 exercises)
+#### HTTP and REST (2 exercises)
 1. HTTP method and status code practice
 2. API design challenge
 3. Analyzing existing APIs
@@ -598,10 +602,38 @@ API development requires practice building, testing, and refining endpoints. Exp
 31. Batch prediction API
 32. Complete ML service
 
+### Exercise 07: Flask to FastAPI Migration
+**Difficulty**: Intermediate
+**Duration**: 3-4 hours
+**File**: `exercises/exercise-07-flask-fastapi-migration.md`
+
+Migrate a Flask ML API to FastAPI and compare performance:
+- Convert Flask routes to FastAPI endpoints
+- Implement Pydantic models for request/response validation
+- Add async endpoints for improved concurrency
+- Migrate authentication mechanisms
+- Performance benchmarking and comparison
+- Deploy both versions for A/B testing
+
+### Exercise 08: Comprehensive API Testing
+**Difficulty**: Intermediate to Advanced
+**Duration**: 3-4 hours
+**File**: `exercises/exercise-08-api-testing.md`
+
+Build comprehensive test suite for ML APIs:
+- Unit testing with pytest (fixtures, mocking, parametrized tests)
+- Integration testing for complete workflows
+- Contract testing with OpenAPI schema validation
+- Load testing with Locust (concurrent users, sustained load)
+- CI/CD integration with GitHub Actions
+- Coverage requirements and performance SLAs
+
 ## Assessment and Evaluation
 
 ### Knowledge Checks
-- Quiz after each major section
+- **2 comprehensive quizzes** covering all module content
+  - Quiz 1: HTTP, REST, and FastAPI Fundamentals (Lectures 1-2)
+  - Quiz 2: Authentication, Testing, and ML APIs (Lectures 3-4)
 - HTTP and REST concepts
 - Framework comparisons
 - Security principles
