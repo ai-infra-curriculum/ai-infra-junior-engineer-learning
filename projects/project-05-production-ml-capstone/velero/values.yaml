@@ -1,0 +1,100 @@
+# Helm values for the Velero backup tool on AWS EKS.
+#
+# Install:
+#   helm repo add vmware-tanzu https://vmware-tanzu.github.io/helm-charts
+#   helm upgrade --install velero vmware-tanzu/velero \
+#       -n velero --create-namespace \
+#       -f velero/values.yaml
+#
+# Prerequisites:
+#   - S3 bucket for backups (terraform-managed, versioned, encrypted)
+#   - IRSA role with permissions on that bucket and KMS key
+#   - Volume snapshot class on EKS (CSI driver)
+configuration:
+  backupStorageLocation:
+    - name: default
+      provider: aws
+      bucket: company-velero-ml-prod
+      config:
+        region: us-west-2
+        kmsKeyId: alias/velero-backups
+  volumeSnapshotLocation:
+    - name: default
+      provider: aws
+      config:
+        region: us-west-2
+
+credentials:
+  useSecret: false  # IRSA instead of static credentials
+
+serviceAccount:
+  server:
+    create: true
+    name: velero
+    annotations:
+      eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/velero-prod
+
+initContainers:
+  - name: velero-plugin-for-aws
+    image: velero/velero-plugin-for-aws:v1.9.0
+    imagePullPolicy: IfNotPresent
+    volumeMounts:
+      - mountPath: /target
+        name: plugins
+
+snapshotsEnabled: true
+deployNodeAgent: true
+
+# Default backup schedules. Override per-namespace by adding more entries.
+schedules:
+  cluster-daily:
+    schedule: "0 1 * * *"
+    template:
+      ttl: "720h"          # 30 days
+      includedNamespaces:
+        - "*"
+      excludedNamespaces:
+        - kube-system
+        - kube-public
+        - velero
+      snapshotVolumes: true
+      defaultVolumesToFsBackup: false
+      storageLocation: default
+
+  critical-hourly:
+    schedule: "0 * * * *"
+    template:
+      ttl: "168h"          # 7 days
+      includedNamespaces:
+        - model-api
+        - mlflow
+        - airflow
+      snapshotVolumes: true
+      storageLocation: default
+
+# Metrics for Prometheus.
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+    additionalLabels:
+      release: prometheus
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: "1"
+    memory: 512Mi
+
+nodeAgent:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+  tolerations:
+    - operator: Exists

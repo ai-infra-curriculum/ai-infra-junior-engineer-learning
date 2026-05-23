@@ -1,0 +1,93 @@
+# Alertmanager configuration for Project 04.
+#
+# Routing tree:
+#   - critical severity -> PagerDuty (24/7 paging) + #alerts-critical Slack channel
+#   - warning severity  -> #alerts-warnings Slack channel only
+#   - everything else   -> default Slack channel
+#
+# Inhibition rules suppress lower-severity alerts when a higher-severity alert
+# for the same component is already firing.
+#
+# Secrets (api_url, routing_key) come from environment variables loaded from
+# Kubernetes secrets — see `.env.example` and the Helm/Kustomize manifests.
+global:
+  resolve_timeout: 5m
+  slack_api_url_file: /etc/alertmanager/secrets/slack_webhook_url
+
+templates:
+  - /etc/alertmanager/templates/*.tmpl
+
+route:
+  receiver: default-slack
+  group_by: ['alertname', 'cluster', 'service']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 12h
+  routes:
+    - matchers:
+        - severity = "critical"
+      receiver: pagerduty-critical
+      continue: true
+    - matchers:
+        - severity = "critical"
+      receiver: slack-critical
+    - matchers:
+        - severity = "warning"
+      receiver: slack-warnings
+    - matchers:
+        - severity = "info"
+      receiver: default-slack
+      repeat_interval: 24h
+
+inhibit_rules:
+  - source_matchers:
+      - severity = "critical"
+    target_matchers:
+      - severity =~ "warning|info"
+    equal: ['alertname', 'service', 'cluster']
+
+  - source_matchers:
+      - alertname = "TargetDown"
+    target_matchers:
+      - alertname =~ "HighErrorRate|SlowResponse|LowThroughput"
+    equal: ['service', 'cluster']
+
+receivers:
+  - name: default-slack
+    slack_configs:
+      - channel: '#alerts'
+        send_resolved: true
+        title: '{{ template "slack.title" . }}'
+        text: '{{ template "slack.text" . }}'
+
+  - name: slack-warnings
+    slack_configs:
+      - channel: '#alerts-warnings'
+        send_resolved: true
+        title: '{{ template "slack.title" . }}'
+        text: '{{ template "slack.text" . }}'
+
+  - name: slack-critical
+    slack_configs:
+      - channel: '#alerts-critical'
+        send_resolved: true
+        color: danger
+        title: '[CRITICAL] {{ template "slack.title" . }}'
+        text: '{{ template "slack.text" . }}'
+
+  - name: pagerduty-critical
+    pagerduty_configs:
+      - service_key_file: /etc/alertmanager/secrets/pagerduty_routing_key
+        severity: '{{ .CommonLabels.severity }}'
+        description: '{{ template "pagerduty.description" . }}'
+        details:
+          firing: '{{ template "pagerduty.firing" . }}'
+          alertname: '{{ .CommonLabels.alertname }}'
+          service: '{{ .CommonLabels.service }}'
+          cluster: '{{ .CommonLabels.cluster }}'
+          runbook: '{{ .CommonAnnotations.runbook_url }}'
+        links:
+          - href: '{{ .CommonAnnotations.runbook_url }}'
+            text: Runbook
+          - href: '{{ .CommonAnnotations.dashboard_url }}'
+            text: Dashboard

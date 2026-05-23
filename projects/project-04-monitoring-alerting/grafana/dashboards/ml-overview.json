@@ -1,0 +1,78 @@
+{
+  "title": "ML Platform — Overview",
+  "uid": "ml-platform-overview",
+  "description": "Cross-cutting ML platform health: serving latency, drift, training runs, infra capacity.",
+  "tags": ["ml", "platform", "project-04"],
+  "schemaVersion": 38,
+  "refresh": "30s",
+  "time": {"from": "now-6h", "to": "now"},
+  "panels": [
+    {
+      "id": 1,
+      "title": "Predictions / sec",
+      "type": "timeseries",
+      "gridPos": {"h": 7, "w": 12, "x": 0, "y": 0},
+      "targets": [{"expr": "sum(rate(ml_predictions_total[1m])) by (model_name, model_version)", "legendFormat": "{{model_name}}@{{model_version}}"}],
+      "fieldConfig": {"defaults": {"unit": "ops"}}
+    },
+    {
+      "id": 2,
+      "title": "Inference p95 latency (ms)",
+      "type": "timeseries",
+      "gridPos": {"h": 7, "w": 12, "x": 12, "y": 0},
+      "targets": [{"expr": "1000 * histogram_quantile(0.95, sum(rate(ml_inference_duration_seconds_bucket[5m])) by (le, model_name))", "legendFormat": "{{model_name}}"}],
+      "fieldConfig": {"defaults": {"unit": "ms"}}
+    },
+    {
+      "id": 3,
+      "title": "Error rate (%) by service",
+      "type": "timeseries",
+      "gridPos": {"h": 7, "w": 12, "x": 0, "y": 7},
+      "targets": [{"expr": "100 * sum(rate(http_requests_total{status=~\"5..\"}[5m])) by (service) / sum(rate(http_requests_total[5m])) by (service)", "legendFormat": "{{service}}"}],
+      "fieldConfig": {"defaults": {"unit": "percent"}}
+    },
+    {
+      "id": 4,
+      "title": "Feature drift PSI (worst feature per model)",
+      "type": "timeseries",
+      "gridPos": {"h": 7, "w": 12, "x": 12, "y": 7},
+      "targets": [{"expr": "max(ml_feature_drift_psi) by (model_name)", "legendFormat": "{{model_name}}"}],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 0.1},
+              {"color": "red", "value": 0.2}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 5,
+      "title": "Training pipeline runs (last 24h)",
+      "type": "stat",
+      "gridPos": {"h": 5, "w": 6, "x": 0, "y": 14},
+      "targets": [{"expr": "sum(increase(airflow_dag_run_duration_seconds_count{dag_id=~\".*pipeline.*\"}[24h]))"}]
+    },
+    {
+      "id": 6,
+      "title": "Training success rate",
+      "type": "stat",
+      "gridPos": {"h": 5, "w": 6, "x": 6, "y": 14},
+      "targets": [{"expr": "sum(rate(airflow_dag_run_duration_seconds_count{state=\"success\"}[24h])) / sum(rate(airflow_dag_run_duration_seconds_count[24h]))"}],
+      "fieldConfig": {"defaults": {"unit": "percentunit"}}
+    },
+    {
+      "id": 7,
+      "title": "Cluster CPU saturation",
+      "type": "timeseries",
+      "gridPos": {"h": 5, "w": 12, "x": 12, "y": 14},
+      "targets": [{"expr": "avg(rate(node_cpu_seconds_total{mode!=\"idle\"}[2m]))", "legendFormat": "cluster avg"}],
+      "fieldConfig": {"defaults": {"unit": "percentunit"}}
+    }
+  ]
+}

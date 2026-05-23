@@ -1,510 +1,676 @@
-# Module 005: Docker Containers - Comprehensive Quiz
+# Module 005: Docker & Containerization - Comprehensive Quiz
 
-## Overview
+## Quiz Overview
 
-This quiz assesses your understanding of Docker containerization for AI infrastructure, covering all five lectures and exercises from Module 005. The quiz includes multiple choice, true/false, code analysis, and scenario-based questions focusing on Docker fundamentals, Dockerfiles, Docker Compose, networking, volumes, and best practices.
+**Total Questions**: 50
+**Passing Score**: 80% (40/50 correct)
+**Time Limit**: 90 minutes
+**Question Types**: Multiple choice, true/false, scenario-based
 
-**Time Limit**: 60 minutes
-**Total Questions**: 30
-**Passing Score**: 75% (23/30 correct)
+**Topics Covered**:
+- Docker fundamentals
+- Dockerfiles and image building
+- Docker Compose
+- Networking
+- Volumes and data persistence
+- Production deployment
+- ML containerization
+- Security and best practices
 
 ---
 
-## Section 1: Docker Fundamentals (Questions 1-6)
+## Section 1: Docker Fundamentals (10 questions)
 
-### Question 1: Containers vs Virtual Machines
+### Question 1
+What is the primary difference between a Docker image and a Docker container?
 
-**What is the PRIMARY difference between containers and virtual machines?**
-
-A) Containers include a full operating system, VMs don't
-B) Containers share the host OS kernel, VMs include their own OS
-C) VMs are faster to start than containers
-D) Containers require more disk space than VMs
+A) An image is a running instance, a container is a template
+B) An image is a template, a container is a running instance
+C) They are the same thing
+D) Images are for development, containers are for production
 
 **Answer**: B
 
-**Explanation**: Containers share the host operating system kernel and isolate the application processes, making them lightweight and fast to start. Virtual machines include a full guest operating system, which requires more resources. This makes B correct. Options A and D are backwards (VMs include full OS and use more space), and C is incorrect (containers start much faster than VMs).
+---
+
+### Question 2
+Which command would you use to run a container in detached mode with port 8080 on the host mapped to port 80 in the container?
+
+A) `docker run -p 8080:80 nginx`
+B) `docker run -d -p 80:8080 nginx`
+C) `docker run -d -p 8080:80 nginx`
+D) `docker run --detach --port 8080:80 nginx`
+
+**Answer**: C
 
 ---
 
-### Question 2: Docker Architecture
+### Question 3
+What happens to data inside a container when the container is removed?
 
-**Which component is responsible for building, running, and distributing Docker containers?**
+A) Data is automatically backed up
+B) Data persists on the host
+C) Data is lost unless stored in a volume
+D) Data is moved to a new container
 
-A) Docker CLI
-B) Docker Daemon (dockerd)
-C) Docker Registry
-D) Container Runtime
+**Answer**: C
+
+---
+
+### Question 4
+Which command shows only the running containers?
+
+A) `docker ps -a`
+B) `docker ps`
+C) `docker containers ls --all`
+D) `docker list running`
 
 **Answer**: B
 
-**Explanation**: The Docker Daemon (dockerd) is the background service that manages Docker objects (images, containers, networks, volumes) and handles building, running, and distributing containers. The Docker CLI (A) is the client interface, Docker Registry (C) stores images, and Container Runtime (D) executes containers but doesn't handle the full lifecycle.
+---
+
+### Question 5
+What is the purpose of `docker exec`?
+
+A) Execute a command inside a running container
+B) Start a stopped container
+C) Create a new container
+D) Export container filesystem
+
+**Answer**: A
 
 ---
 
-### Question 3: Images and Containers
+### Question 6
+How do you remove all stopped containers?
 
-**What is the relationship between Docker images and containers?**
-
-A) An image is a running instance of a container
-B) A container is a running instance of an image
-C) Images and containers are the same thing
-D) Containers are used to build images
+A) `docker rm --all`
+B) `docker container prune`
+C) `docker clean containers`
+D) `docker delete stopped`
 
 **Answer**: B
 
-**Explanation**: A Docker image is a read-only template containing application code, dependencies, and configuration. A container is a running instance created from an image. You can create multiple containers from the same image. Option A reverses the relationship, C is incorrect (they are different), and D is backwards (images are used to create containers, though containers can be committed to create new images).
+---
+
+### Question 7
+What does the `-it` flag combination do in `docker run -it ubuntu bash`?
+
+A) Interactive + TTY allocation
+B) Image + Tag specification
+C) Install + Test mode
+D) Internal + Temporary
+
+**Answer**: A
 
 ---
 
-### Question 4: Docker Commands
+### Question 8
+Which Docker command shows resource usage statistics for containers?
 
-**What does the command `docker run -d -p 8080:80 nginx` do?**
-
-A) Runs nginx in the foreground on port 8080
-B) Runs nginx in the background, mapping host port 8080 to container port 80
-C) Runs nginx in debug mode on port 80
-D) Downloads nginx image from port 8080
+A) `docker info`
+B) `docker stats`
+C) `docker top`
+D) `docker inspect`
 
 **Answer**: B
 
-**Explanation**: The `-d` flag runs the container in detached mode (background), and `-p 8080:80` maps port 8080 on the host to port 80 in the container. This allows you to access nginx at http://localhost:8080. Option A is incorrect (it runs in background, not foreground), C misinterprets `-d`, and D misunderstands the port mapping syntax.
+---
+
+### Question 9
+What is the default network driver for Docker containers?
+
+A) host
+B) none
+C) bridge
+D) overlay
+
+**Answer**: C
 
 ---
 
-### Question 5: Container Lifecycle
+### Question 10
+True or False: By default, containers on the default bridge network can resolve each other by container name.
 
-**Which command would you use to view logs from a running container named `ml-api`?**
+A) True
+B) False
 
-A) `docker inspect ml-api`
-B) `docker logs ml-api`
-C) `docker exec ml-api cat /var/log`
-D) `docker ps ml-api`
+**Answer**: B (False - requires custom bridge network for DNS)
+
+---
+
+## Section 2: Dockerfiles & Image Building (10 questions)
+
+### Question 11
+Which Dockerfile instruction sets the working directory for subsequent commands?
+
+A) `CD`
+B) `WORKDIR`
+C) `DIR`
+D) `SETDIR`
 
 **Answer**: B
 
-**Explanation**: `docker logs <container>` displays the stdout and stderr output from a container, which is the standard way to view container logs. `docker inspect` (A) shows container metadata, `docker exec` (C) would work but is overly complex and assumes logs are in that location, and `docker ps` (D) lists running containers.
+---
+
+### Question 12
+What's the difference between `COPY` and `ADD` in a Dockerfile?
+
+A) No difference
+B) `ADD` can extract tar files and download URLs
+C) `COPY` is faster
+D) `ADD` only works with local files
+
+**Answer**: B
 
 ---
 
-### Question 6: Image Layers
+### Question 13
+In a multi-stage Dockerfile, how do you copy files from a previous stage named "builder"?
 
-**True or False: Docker images are composed of read-only layers, and when you create a container, Docker adds a writable layer on top.**
+A) `COPY builder:/app /app`
+B) `COPY --from=builder /app /app`
+C) `COPY --stage=builder /app /app`
+D) `FROM builder COPY /app /app`
+
+**Answer**: B
+
+---
+
+### Question 14
+Which instruction creates a new layer in a Docker image?
+
+A) `ENV`
+B) `EXPOSE`
+C) `RUN`
+D) `CMD`
+
+**Answer**: C
+
+---
+
+### Question 15
+What's the best practice for installing packages in a Dockerfile?
+
+A) `RUN apt-get update && apt-get install -y package && rm -rf /var/lib/apt/lists/*`
+B) `RUN apt-get update` then `RUN apt-get install -y package`
+C) `RUN apt-get install -y package`
+D) Install packages after container starts
+
+**Answer**: A
+
+---
+
+### Question 16
+What's the difference between `CMD` and `ENTRYPOINT`?
+
+A) No difference
+B) `CMD` can be overridden easily, `ENTRYPOINT` defines the executable
+C) `CMD` is for development, `ENTRYPOINT` for production
+D) `ENTRYPOINT` is deprecated
+
+**Answer**: B
+
+---
+
+### Question 17
+What does `.dockerignore` do?
+
+A) Ignores errors during build
+B) Excludes files from build context
+C) Prevents container from starting
+D) Hides sensitive data
+
+**Answer**: B
+
+---
+
+### Question 18
+Which is the most optimized base image for production Python applications?
+
+A) `python:3.11`
+B) `python:3.11-slim`
+C) `python:3.11-alpine`
+D) `ubuntu:latest` with Python installed
+
+**Answer**: B (slim is generally better than alpine for Python due to compatibility)
+
+---
+
+### Question 19
+What's the purpose of `ARG` in a Dockerfile?
+
+A) Define environment variables
+B) Define build-time variables
+C) Pass arguments to CMD
+D) Configure arguments for ENTRYPOINT
+
+**Answer**: B
+
+---
+
+### Question 20
+True or False: Layer caching speeds up builds by reusing unchanged layers.
 
 A) True
 B) False
 
 **Answer**: A
 
-**Explanation**: This is TRUE. Docker images use a layered filesystem where each instruction in a Dockerfile creates a new read-only layer. When a container is created, Docker adds a thin writable layer (the container layer) on top of the image layers. Any changes made during container runtime are written to this writable layer, while the underlying image layers remain unchanged.
-
 ---
 
-## Section 2: Dockerfiles and Building Images (Questions 7-12)
+## Section 3: Docker Compose (8 questions)
 
-### Question 7: Dockerfile Instructions
+### Question 21
+What file format does Docker Compose use?
 
-**Which Dockerfile instruction is used to specify the command that runs when a container starts?**
-
-A) RUN
-B) CMD
-C) ENTRYPOINT
-D) EXECUTE
-
-**Answer**: B (or C, both are acceptable)
-
-**Explanation**: Both `CMD` and `ENTRYPOINT` specify the command to run when a container starts. `CMD` provides default arguments that can be overridden, while `ENTRYPOINT` configures the container to run as an executable. `RUN` executes commands during image build time (not container start), and `EXECUTE` is not a valid Dockerfile instruction. For this quiz, either B or C is acceptable.
-
----
-
-### Question 8: Multi-Stage Builds
-
-**What is the PRIMARY benefit of multi-stage Docker builds for ML applications?**
-
-A) Faster container startup times
-B) Smaller final image size by excluding build dependencies
-C) Better runtime performance
-D) Easier debugging
+A) JSON
+B) YAML
+C) XML
+D) TOML
 
 **Answer**: B
 
-**Explanation**: Multi-stage builds allow you to use one stage for building/compiling (with build tools, compilers, dev dependencies) and copy only the necessary artifacts to the final stage. This dramatically reduces image size by excluding build dependencies from the production image. While this may indirectly help startup (A), the primary benefit is size reduction. It doesn't directly improve runtime performance (C) or debugging (D).
-
 ---
 
-### Question 9: Layer Caching
-
-**To maximize Docker build cache efficiency, where should you place the `COPY requirements.txt` instruction in a Python ML Dockerfile?**
-
-A) At the very beginning, before any other instructions
-B) After `RUN pip install` commands
-C) After `FROM` but before installing dependencies with `RUN pip install`
-D) At the very end, after all RUN commands
-
-**Answer**: C
-
-**Explanation**: To maximize cache efficiency, copy `requirements.txt` and run `pip install` before copying the application code. This way, the dependency installation layer is cached and only rebuilt when requirements change, not when code changes. Option A would work but isn't after FROM (which must be first), B would install packages before having requirements.txt, and D would cause cache invalidation on every code change.
-
----
-
-### Question 10: Best Practices
-
-**Which Dockerfile instruction should you use to minimize the number of layers in your image?**
-
-A) Use multiple RUN commands, one per package
-B) Chain commands together using `&&` in a single RUN instruction
-C) Use multiple COPY commands
-D) Use ADD instead of COPY
-
-**Answer**: B
-
-**Explanation**: Chaining commands with `&&` in a single RUN instruction creates one layer instead of multiple layers. For example: `RUN apt-get update && apt-get install -y python3 && apt-get clean` creates one layer. Multiple RUN commands (A) create multiple layers, multiple COPY commands (C) aren't related to RUN layers, and using ADD vs COPY (D) doesn't reduce layers (and COPY is preferred for simple file copying).
-
----
-
-### Question 11: COPY vs ADD
-
-**When should you use ADD instead of COPY in a Dockerfile?**
-
-A) Always use ADD; it's more powerful
-B) When you need to extract tar files automatically or fetch from URLs
-C) When copying local files to the image
-D) Never use ADD; COPY is always better
-
-**Answer**: B
-
-**Explanation**: `ADD` has additional features like automatic tar extraction and URL fetching, but these features can lead to unexpected behavior. Use `ADD` only when you specifically need these features. For simple file copying (C), use `COPY` as it's more transparent. Options A and D are too absolute.
-
----
-
-### Question 12: Build Context
-
-**What is the Docker build context, and why does it matter?**
-
-A) The directory containing the Dockerfile
-B) The entire directory tree sent to the Docker daemon during build
-C) The environment variables available during build
-D) The CPU and memory allocated to the build process
-
-**Answer**: B
-
-**Explanation**: The build context is the entire directory tree (typically where you run `docker build`) that gets sent to the Docker daemon. Large build contexts (e.g., containing datasets, models) slow down builds significantly. Use `.dockerignore` to exclude unnecessary files. Option A is partial (it includes that directory and subdirectories), C refers to build args (different concept), and D refers to resource limits (different concept).
-
----
-
-## Section 3: Docker Compose (Questions 13-18)
-
-### Question 13: Docker Compose Purpose
-
-**What is the PRIMARY purpose of Docker Compose?**
-
-A) To build Docker images faster
-B) To define and run multi-container applications
-C) To deploy containers to production Kubernetes clusters
-D) To compress Docker images
-
-**Answer**: B
-
-**Explanation**: Docker Compose is a tool for defining and running multi-container Docker applications using a YAML file. It's ideal for development environments where you need to run multiple services (e.g., web app, database, cache) together. It doesn't primarily speed up builds (A), isn't designed for production Kubernetes deployments (C), or compress images (D).
-
----
-
-### Question 14: Docker Compose File Format
-
-**In a `docker-compose.yml` file, what does the `depends_on` key specify?**
-
-A) Which images to download first
-B) The startup order and dependencies between services
-C) Which services to run on which hosts
-D) The version of Docker Compose to use
-
-**Answer**: B
-
-**Explanation**: `depends_on` expresses startup order and dependency relationships between services. For example, a web service might depend on a database service, so Compose will start the database before the web app. It doesn't control download order (A), host placement (C), or Compose version (D - that's the `version` key).
-
----
-
-### Question 15: Compose Networking
-
-**How do services defined in the same `docker-compose.yml` file communicate with each other?**
-
-A) Using localhost and port numbers
-B) Using the service names as hostnames on a shared network
-C) They cannot communicate; you must use external networking
-D) Using IP addresses assigned by Docker
-
-**Answer**: B
-
-**Explanation**: Docker Compose automatically creates a default network for all services in the compose file. Services can reach each other using the service name as the hostname. For example, a `web` service can connect to a `db` service using `db:5432`. While D is technically true (IP addresses are assigned), B is the correct practice and abstraction.
-
----
-
-### Question 16: Compose Commands
-
-**Which command starts services defined in `docker-compose.yml` in detached mode?**
+### Question 22
+How do you start all services defined in `docker-compose.yml` in detached mode?
 
 A) `docker-compose start -d`
-B) `docker-compose run -d`
-C) `docker-compose up -d`
-D) `docker-compose deploy -d`
+B) `docker-compose up --detach`
+C) `docker-compose run -d`
+D) `docker-compose deploy`
+
+**Answer**: B
+
+---
+
+### Question 23
+In Docker Compose, how does service A wait for service B to be healthy before starting?
+
+```yaml
+services:
+  A:
+    depends_on:
+      ?
+```
+
+A) `B: required`
+B) `B: wait`
+C) `B: { condition: service_healthy }`
+D) `B: true`
 
 **Answer**: C
 
-**Explanation**: `docker-compose up -d` starts all services defined in the compose file in detached mode (background). `docker-compose start` (A) starts existing stopped containers but doesn't accept `-d`, `docker-compose run` (B) runs a one-off command, and `docker-compose deploy` (D) is not a standard command (deploy is for Docker Swarm stacks).
+---
+
+### Question 24
+How do you scale a service to 3 replicas in Docker Compose?
+
+A) `docker-compose scale service=3`
+B) `docker-compose up --scale service=3`
+C) `docker-compose replicas service 3`
+D) Modify `docker-compose.yml` and set `replicas: 3`
+
+**Answer**: B
 
 ---
 
-### Question 17: Environment Variables
+### Question 25
+Which Docker Compose command removes containers, networks, and volumes?
 
-**In Docker Compose, how can you pass environment variables from a `.env` file to your containers?**
+A) `docker-compose down`
+B) `docker-compose down -v`
+C) `docker-compose clean`
+D) `docker-compose remove --all`
 
-A) Docker Compose automatically loads `.env` files in the same directory
-B) You must use `docker-compose --env-file .env up`
-C) Environment files are not supported in Compose
-D) You must manually export variables before running compose
+**Answer**: B
+
+---
+
+### Question 26
+How do you reference environment variables from a `.env` file in `docker-compose.yml`?
+
+A) `$ENV_VAR`
+B) `${ENV_VAR}`
+C) `{ENV_VAR}`
+D) `@ENV_VAR`
+
+**Answer**: B
+
+---
+
+### Question 27
+What's the purpose of `networks` in Docker Compose?
+
+A) Configure internet access
+B) Define custom networks for service isolation
+C) Set up VPN connections
+D) Configure DNS servers
+
+**Answer**: B
+
+---
+
+### Question 28
+True or False: Docker Compose creates a default network for all services.
+
+A) True
+B) False
 
 **Answer**: A
 
-**Explanation**: Docker Compose automatically loads a `.env` file from the project directory and makes those variables available for variable substitution in the `docker-compose.yml` file. You can also use `env_file` in the service definition to load environment variables into containers. Option B is incorrect (--env-file is not standard), C is false, and D is unnecessary.
-
 ---
 
-### Question 18: Volumes in Compose
+## Section 4: Networking (8 questions)
 
-**What is the difference between a named volume and a bind mount in Docker Compose?**
+### Question 29
+Which network driver provides automatic DNS resolution between containers?
 
-A) Named volumes are managed by Docker, bind mounts map host directories
-B) Bind mounts are managed by Docker, named volumes map host directories
-C) They are the same thing with different names
-D) Named volumes are faster than bind mounts
-
-**Answer**: A
-
-**Explanation**: Named volumes are managed by Docker (created in Docker's storage directory) and are portable across environments. Bind mounts map specific host directories/files into containers, giving direct access to host filesystem. Named volumes are preferred for data persistence, while bind mounts are useful for development (e.g., live code reloading).
-
----
-
-## Section 4: Networking and Volumes (Questions 19-24)
-
-### Question 19: Docker Networks
-
-**Which Docker network driver allows containers to communicate as if they were on the host network?**
-
-A) bridge
-B) host
-C) overlay
+A) Default bridge
+B) Custom bridge
+C) host
 D) none
 
 **Answer**: B
 
-**Explanation**: The `host` network driver removes network isolation between container and host, making the container use the host's network directly. `bridge` (A) is the default isolated network, `overlay` (C) is for multi-host networking (Swarm), and `none` (D) disables networking completely.
-
 ---
 
-### Question 20: Port Publishing
+### Question 30
+What does the `host` network mode do?
 
-**In the port mapping `-p 5000:8080`, which port is on the host machine?**
-
-A) 8080
-B) 5000
-C) Both ports are on the host
-D) Neither; both are container ports
+A) Creates isolated network
+B) Container uses host's network stack directly
+C) Provides internet access
+D) Enables IPv6
 
 **Answer**: B
 
-**Explanation**: The port mapping syntax is `-p HOST_PORT:CONTAINER_PORT`. So `-p 5000:8080` maps host port 5000 to container port 8080. You would access the service at `localhost:5000`, which forwards to port 8080 inside the container.
-
 ---
 
-### Question 21: Data Persistence
+### Question 31
+How do you create a custom Docker network?
 
-**What happens to data stored in a container's filesystem when the container is removed?**
-
-A) Data is automatically backed up to the host
-B) Data is lost unless stored in a volume or bind mount
-C) Data persists indefinitely on the host
-D) Data is transferred to a new container
+A) `docker network new mynetwork`
+B) `docker network create mynetwork`
+C) `docker create network mynetwork`
+D) `docker network add mynetwork`
 
 **Answer**: B
 
-**Explanation**: Container filesystems are ephemeral - when a container is removed, its writable layer (and any data in it) is deleted. To persist data, you must use volumes or bind mounts, which store data outside the container's filesystem. This is critical for databases, ML model checkpoints, and training data.
+---
+
+### Question 32
+In Docker Compose, services can reach each other using:
+
+A) IP addresses only
+B) Service names as hostnames
+C) Container IDs
+D) MAC addresses
+
+**Answer**: B
 
 ---
 
-### Question 22: Volume Management
+### Question 33
+Which port mapping makes a service accessible only on localhost?
 
-**Which command creates a named volume called `model-data`?**
+A) `-p 8080:80`
+B) `-p 0.0.0.0:8080:80`
+C) `-p 127.0.0.1:8080:80`
+D) `-p localhost:8080:80`
 
-A) `docker volume create model-data`
-B) `docker create volume model-data`
-C) `docker volume new model-data`
-D) `docker make volume model-data`
+**Answer**: C
+
+---
+
+### Question 34
+What's the purpose of network aliases in Docker?
+
+A) Rename networks
+B) Provide alternative hostnames for containers
+C) Configure IP addresses
+D) Set up network bridges
+
+**Answer**: B
+
+---
+
+### Question 35
+How do you inspect a Docker network named "mynet"?
+
+A) `docker network show mynet`
+B) `docker network inspect mynet`
+C) `docker inspect network mynet`
+D) `docker network info mynet`
+
+**Answer**: B
+
+---
+
+### Question 36
+True or False: Containers on the same custom bridge network can communicate without port publishing.
+
+A) True
+B) False
 
 **Answer**: A
 
-**Explanation**: `docker volume create <volume-name>` is the correct command to create a named volume. The other options use incorrect syntax or non-existent commands.
-
 ---
 
-### Question 23: Network Isolation
+## Section 5: Volumes & Data Persistence (6 questions)
 
-**Why would you create a custom Docker network instead of using the default bridge network?**
+### Question 37
+What are the three types of Docker volumes/mounts?
 
-A) Custom networks are faster
-B) Custom networks provide automatic DNS resolution between containers by name
-C) Custom networks use less memory
-D) The default bridge network doesn't work
+A) Named, anonymous, temporary
+B) Named volumes, bind mounts, tmpfs
+C) Persistent, ephemeral, cached
+D) Local, remote, distributed
 
 **Answer**: B
 
-**Explanation**: Custom bridge networks provide automatic service discovery via DNS - containers can communicate using container names as hostnames. On the default bridge network, you must use `--link` (deprecated) or IP addresses. Performance is similar (A incorrect), memory usage is comparable (C incorrect), and the default bridge works fine (D incorrect).
+---
+
+### Question 38
+Which mount type stores data in host memory (RAM)?
+
+A) Named volume
+B) Bind mount
+C) tmpfs mount
+D) cached mount
+
+**Answer**: C
 
 ---
 
-### Question 24: Volume Drivers
+### Question 39
+How do you create a named volume?
 
-**What is a volume driver in Docker?**
+A) `docker volume new mydata`
+B) `docker volume create mydata`
+C) `docker create volume mydata`
+D) `docker volume add mydata`
 
-A) A software component that manages how and where volume data is stored
-B) The CPU driver for containers
-C) A network driver for volumes
-D) A deprecated feature replaced by bind mounts
+**Answer**: B
+
+---
+
+### Question 40
+What's the recommended way to backup a Docker volume?
+
+A) Copy from `/var/lib/docker/volumes/`
+B) Use `docker volume backup`
+C) Run container with volume mounted and create tar archive
+D) Use `docker cp` on the volume
+
+**Answer**: C
+
+---
+
+### Question 41
+In which scenario would you use a bind mount instead of a named volume?
+
+A) Database storage
+B) Development with hot-reload
+C) Production data
+D) Shared data between containers
+
+**Answer**: B
+
+---
+
+### Question 42
+True or False: Named volumes persist after containers are removed.
+
+A) True
+B) False
 
 **Answer**: A
 
-**Explanation**: Volume drivers are plugins that manage volume storage. The default `local` driver stores data on the host filesystem, but third-party drivers can store data on cloud storage (AWS EBS, Azure Disk), NFS, or distributed storage systems. This is especially useful for ML workflows that need shared storage across multiple hosts.
+---
+
+## Section 6: Production & Security (8 questions)
+
+### Question 43
+Which is a security best practice for production containers?
+
+A) Run as root user
+B) Use `latest` tag
+C) Run as non-root user
+D) Disable health checks
+
+**Answer**: C
 
 ---
 
-## Section 5: Best Practices and Production (Questions 25-30)
+### Question 44
+What does the `--read-only` flag do?
 
-### Question 25: Security - Running as Root
-
-**Why is it a security best practice to avoid running containers as the root user?**
-
-A) Root containers run slower
-B) If an attacker escapes the container, they have root access on the host
-C) Root users cannot install packages
-D) Docker doesn't allow root users
+A) Opens files in read-only mode
+B) Makes root filesystem read-only
+C) Prevents log writing
+D) Disables network access
 
 **Answer**: B
-
-**Explanation**: Containers share the host kernel. If a container runs as root and an attacker exploits a vulnerability to escape the container, they gain root access on the host system. Using a non-root user (via `USER` instruction) follows the principle of least privilege. Option A is false (no performance difference), C is backwards (root can install packages), and D is incorrect (Docker allows but discourages root).
 
 ---
 
-### Question 26: Image Tagging
+### Question 45
+Which deployment strategy allows testing new version with small traffic percentage?
 
-**What happens when you push an image without specifying a tag (e.g., `docker push myrepo/myimage`)?**
+A) Blue-green
+B) Rolling update
+C) Canary deployment
+D) Recreate
 
-A) Docker generates a random tag
-B) Docker uses the `latest` tag by default
-C) The push fails with an error
-D) Docker uses the current date as the tag
-
-**Answer**: B
-
-**Explanation**: When no tag is specified, Docker implicitly uses the `latest` tag. This can be dangerous in production because `latest` doesn't mean "most recent" - it's just a convention. Best practice is to use explicit semantic version tags (e.g., `v1.2.3`) for production images.
+**Answer**: C
 
 ---
 
-### Question 27: Health Checks
+### Question 46
+What's the purpose of `HEALTHCHECK` in a Dockerfile?
 
-**What is the purpose of a HEALTHCHECK instruction in a Dockerfile?**
-
-A) To check the size of the image
-B) To verify the container is functioning correctly by running a command periodically
-C) To scan for security vulnerabilities
-D) To check network connectivity
+A) Check if image is healthy
+B) Monitor container health
+C) Validate Dockerfile syntax
+D) Check disk space
 
 **Answer**: B
-
-**Explanation**: `HEALTHCHECK` defines a command that Docker runs periodically to check if the container is healthy. For example: `HEALTHCHECK CMD curl -f http://localhost/health || exit 1`. This allows orchestrators (like Kubernetes) to detect and restart unhealthy containers. It doesn't check image size (A), scan for vulnerabilities (C - that's image scanning), or just check network (D - though health checks often use network).
 
 ---
 
-### Question 28: .dockerignore
+### Question 47
+How do you limit a container to use maximum 512MB of memory?
 
-**What is the purpose of a `.dockerignore` file?**
+A) `docker run --memory 512M myapp`
+B) `docker run --mem-limit 512 myapp`
+C) `docker run --max-memory 512MB myapp`
+D) `docker run -m 512M myapp`
 
-A) To ignore containers during `docker ps`
-B) To exclude files from the build context sent to Docker daemon
-C) To hide images from `docker images` list
-D) To prevent certain containers from starting
-
-**Answer**: B
-
-**Explanation**: `.dockerignore` works like `.gitignore` - it excludes files and directories from the build context. This is critical for ML projects to exclude large datasets, model checkpoints, and `.git` directories, which speeds up builds and reduces image size. It doesn't affect running containers (A, D) or image listing (C).
+**Answer**: D (or A, both are correct - D is shorter form)
 
 ---
 
-### Question 29: Container Resource Limits
+### Question 48
+What's the recommended logging driver option for production?
 
-**Why would you set memory and CPU limits on a container running ML inference?**
-
-A) To make the container run faster
-B) To prevent one container from consuming all host resources
-C) To increase the container's priority
-D) Resource limits are not supported in Docker
+A) `none`
+B) `json-file` with rotation
+C) `console`
+D) Unlimited `json-file`
 
 **Answer**: B
-
-**Explanation**: Setting resource limits (`--memory`, `--cpus`) prevents a single container from starving other containers or the host system. This is especially important for ML workloads which can be resource-intensive. Limits don't make containers faster (A), don't directly affect priority (C - though CPU shares do), and are definitely supported (D is false).
 
 ---
 
-### Question 30: Production Readiness - Scenario
+### Question 49
+Which tool scans Docker images for vulnerabilities?
 
-**You're deploying an ML model API to production. Which combination of practices is MOST appropriate?**
+A) docker lint
+B) docker check
+C) Trivy or Docker Scout
+D) docker scan (deprecated)
 
-A) Run as root, use `latest` tag, no health checks, no resource limits
-B) Use non-root user, semantic version tags, add health checks, set resource limits
-C) Run in development mode, use bind mounts for models, no logging
-D) Use large base image with all tools, commit credentials to Dockerfile
+**Answer**: C
 
-**Answer**: B
+---
 
-**Explanation**: Production best practices include: running as non-root user (security), using semantic version tags instead of `latest` (reproducibility), implementing health checks (reliability), and setting resource limits (stability). Option A violates all best practices, C describes a development setup (not production), and D has security issues (large images, committed credentials).
+### Question 50
+True or False: Multi-stage builds help reduce final image size.
+
+A) True
+B) False
+
+**Answer**: A
+
+---
+
+## Answer Key
+
+### Section 1: Fundamentals
+1. B  2. C  3. C  4. B  5. A  6. B  7. A  8. B  9. C  10. B
+
+### Section 2: Dockerfiles
+11. B  12. B  13. B  14. C  15. A  16. B  17. B  18. B  19. B  20. A
+
+### Section 3: Compose
+21. B  22. B  23. C  24. B  25. B  26. B  27. B  28. A
+
+### Section 4: Networking
+29. B  30. B  31. B  32. B  33. C  34. B  35. B  36. A
+
+### Section 5: Volumes
+37. B  38. C  39. B  40. C  41. B  42. A
+
+### Section 6: Production
+43. C  44. B  45. C  46. B  47. D  48. B  49. C  50. A
 
 ---
 
 ## Scoring Guide
 
-| Score Range | Assessment |
-|-------------|------------|
-| 27-30 (90-100%) | Excellent - Production Ready |
-| 23-26 (75-89%) | Good - Passing Score |
-| 18-22 (60-74%) | Fair - Review Key Concepts |
-| Below 18 (<60%) | Needs Improvement - Revisit Lectures |
+- **45-50 correct (90-100%)**: Excellent! You have mastered Docker.
+- **40-44 correct (80-88%)**: Good! You passed. Review missed topics.
+- **35-39 correct (70-78%)**: Close! Review material and retake.
+- **Below 35 (<70%)**: Review all lectures and exercises before retaking.
 
 ---
 
-## Key Topics Covered
+## Topics to Review by Score
 
-This quiz assessed your understanding of:
+**If you scored below 80%**, review these topics based on your weakest sections:
 
-1. **Docker Fundamentals**: Containers vs VMs, architecture, images vs containers
-2. **Dockerfiles**: Building images, multi-stage builds, layer caching, best practices
-3. **Docker Compose**: Multi-container applications, networking, volumes, commands
-4. **Networking & Volumes**: Network drivers, port mapping, data persistence, volume management
-5. **Production Best Practices**: Security, tagging, health checks, resource limits, .dockerignore
-
----
-
-## Additional Resources
-
-For topics you found challenging, refer back to:
-
-- **Lecture 01**: Docker Fundamentals (Questions 1-6)
-- **Lecture 02**: Dockerfiles Basics (Questions 7-12)
-- **Lecture 03**: Docker Compose (Questions 13-18)
-- **Lecture 04**: Networking and Volumes (Questions 19-24)
-- **Lecture 05**: Best Practices (Questions 25-30)
-
-**Practice Exercises**:
-- Exercise 01-07 in the module exercises directory
-- Hands-on labs with real ML containerization scenarios
+- **Section 1**: Review Lecture 01 (Docker Fundamentals), Exercise 01
+- **Section 2**: Review Lecture 02 (Dockerfiles), Exercise 02
+- **Section 3**: Review Lecture 03 (Docker Compose), Exercise 03
+- **Section 4**: Review Lecture 04 (Networking), Exercise 04
+- **Section 5**: Review Lecture 04 (Volumes), Exercise 05
+- **Section 6**: Review Lecture 05 (Best Practices), Exercise 06
 
 ---
 
-**Good luck with your Docker journey in AI infrastructure!**
+**Quiz Version**: 1.0
+**Last Updated**: October 2025
+**Time to Complete**: 90 minutes
+**Passing Score**: 80% (40/50)

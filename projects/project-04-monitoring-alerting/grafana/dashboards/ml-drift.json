@@ -1,0 +1,59 @@
+{
+  "title": "ML Drift — Feature & Prediction Distribution",
+  "uid": "ml-drift",
+  "description": "Per-feature PSI/KS scores and prediction distribution drift for deployed models.",
+  "tags": ["ml", "drift", "project-04"],
+  "schemaVersion": 38,
+  "refresh": "5m",
+  "time": {"from": "now-7d", "to": "now"},
+  "templating": {
+    "list": [
+      {
+        "name": "model_name",
+        "type": "query",
+        "datasource": "Prometheus",
+        "query": "label_values(ml_predictions_total, model_name)",
+        "refresh": 1
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Feature PSI — top 10 (model: $model_name)",
+      "type": "bargauge",
+      "gridPos": {"h": 10, "w": 12, "x": 0, "y": 0},
+      "targets": [{"expr": "topk(10, ml_feature_drift_psi{model_name=\"$model_name\"})", "legendFormat": "{{feature}}"}],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {"mode": "absolute", "steps": [
+            {"color": "green", "value": null},
+            {"color": "yellow", "value": 0.1},
+            {"color": "red", "value": 0.2}
+          ]}
+        }
+      }
+    },
+    {
+      "id": 2,
+      "title": "Prediction distribution drift (KS) over time",
+      "type": "timeseries",
+      "gridPos": {"h": 10, "w": 12, "x": 12, "y": 0},
+      "targets": [{"expr": "ml_prediction_drift_ks{model_name=\"$model_name\"}", "legendFormat": "$model_name"}]
+    },
+    {
+      "id": 3,
+      "title": "Mean prediction over time",
+      "type": "timeseries",
+      "gridPos": {"h": 10, "w": 12, "x": 0, "y": 10},
+      "targets": [{"expr": "ml_prediction_mean{model_name=\"$model_name\"}", "legendFormat": "mean"}]
+    },
+    {
+      "id": 4,
+      "title": "Input volume by segment",
+      "type": "timeseries",
+      "gridPos": {"h": 10, "w": 12, "x": 12, "y": 10},
+      "targets": [{"expr": "sum(rate(ml_predictions_total{model_name=\"$model_name\"}[5m])) by (segment)", "legendFormat": "{{segment}}"}]
+    }
+  ]
+}

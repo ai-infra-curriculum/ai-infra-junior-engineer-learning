@@ -1,0 +1,13 @@
+apiVersion: v2
+name: model-api
+description: Helm chart for the ML model serving API used in Project 02
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - machine-learning
+  - api
+  - inference
+home: https://github.com/ai-infra-curriculum/ai-infra-junior-engineer-learning
+maintainers:
+  - name: Curriculum Team

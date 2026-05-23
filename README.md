@@ -23,7 +23,22 @@ By completing this curriculum, you will be able to:
 
 ## ✨ What's New
 
-**Recently Added Content:**
+**May 2026 Update — Content Completeness Pass:**
+- 🐍 **Flask Framework Lecture** (Module 007) - When to choose Flask vs FastAPI, app factories, blueprints, extensions, ML serving patterns
+- 🧮 **NoSQL Basics Lecture** (Module 008) - MongoDB, Redis, vector databases, polyglot persistence for ML platforms
+- ⎈ **Helm Chart** (Project 02) - Production-ready chart with HPA, ServiceMonitor, configurable model storage
+- 📊 **Grafana Dashboards** (Projects 02 & 04) - Model API overview, ML drift tracking, SLI/SLO error budget
+- 🔥 **Load Testing Plan** (Project 02) - Locust file with smoke/ramp/soak/spike scenarios and acceptance criteria
+- 📐 **DVC Pipeline** (Project 03) - 5-stage pipeline (ingest → preprocess → validate → train → evaluate) with parameter management
+- ✅ **Great Expectations Suite** (Project 03) - 13 expectations blocking training on bad data
+- ♻️ **Retraining DAG** (Project 03) - Weekly schedule with drift sensor and gated MLflow promotion
+- 🚨 **Alertmanager + Runbooks** (Project 04) - Routing tree, 5 structured runbooks for critical alerts
+- 🏗️ **Terraform Modules** (Project 05) - VPC, EKS, RDS, IAM modules with dev/staging/prod environments
+- 💾 **Velero Backup** (Project 05) - Helm values with daily/hourly schedules and quarterly restore drill
+- 📒 **Cheat Sheets** - Python, Linux, SQL, Prometheus quick references
+- 🗺️ **Intermediate + Advanced Reading Paths** - 6-month and 2-5 year curated reading lists
+
+**Earlier Additions:**
 - 🤖 **LLM Basics Exercise** (Module 004) - Run your first language model with Hugging Face Transformers
 - ⚡ **GPU Fundamentals Exercise** (Module 004) - Learn GPU acceleration for ML inference
 - 🏗️ **Terraform/IaC Exercise** (Module 010) - Infrastructure as Code with hands-on AWS deployment
@@ -48,8 +63,8 @@ By completing this curriculum, you will be able to:
 | **004** | ML Basics (PyTorch/TensorFlow) | 20 hours | Beginner | ✨ **+LLM Basics +GPU Fundamentals** |
 | **005** | Docker & Containerization | 15 hours | Beginner | — |
 | **006** | Kubernetes Introduction | 20 hours | Beginner+ | — |
-| **007** | APIs & Web Services | 15 hours | Beginner | — |
-| **008** | Databases & SQL | 15 hours | Beginner | — |
+| **007** | APIs & Web Services | 15 hours | Beginner | ✨ **+Flask Framework Lecture** |
+| **008** | Databases & SQL | 15 hours | Beginner | ✨ **+NoSQL Basics Lecture** |
 | **009** | Monitoring & Logging Basics | 15 hours | Beginner+ | ✨ **+Airflow Workflow** |
 | **010** | Cloud Platforms (AWS/GCP/Azure) | 20 hours | Beginner+ | ✨ **+Terraform/IaC** |
 
@@ -142,18 +157,43 @@ ai-infra-junior-engineer-learning/
 │   ├── project-01-simple-model-api/
 │   │   ├── README.md           # Project guide
 │   │   ├── requirements.md     # Requirements spec
+│   │   ├── architecture.md     # Architecture deep-dive
 │   │   ├── src/                # Code stubs
 │   │   ├── tests/              # Test stubs
-│   │   ├── docs/               # Documentation templates
 │   │   └── docker/             # Docker configs
-│   └── ...                     # More projects
+│   ├── project-02-kubernetes-serving/
+│   │   ├── kubernetes/         # Raw K8s manifests (teaching)
+│   │   ├── helm/model-api/     # Helm chart (operations)
+│   │   ├── grafana/            # Dashboard JSON
+│   │   ├── loadtest/           # Locust load tests
+│   │   └── monitoring/         # ServiceMonitor
+│   ├── project-03-ml-pipeline-tracking/
+│   │   ├── dags/               # Airflow DAGs (incl. retraining)
+│   │   ├── dvc/                # DVC pipeline + params
+│   │   ├── great_expectations/ # Data validation suite
+│   │   ├── mlflow/             # MLflow project
+│   │   └── src/                # Pipeline stages
+│   ├── project-04-monitoring-alerting/
+│   │   ├── prometheus/         # Prometheus + alerts
+│   │   ├── alertmanager/       # Routing + Slack/PagerDuty
+│   │   ├── grafana/dashboards/ # ML overview, drift, SLI/SLO
+│   │   ├── elasticsearch/      # ELK config
+│   │   └── runbooks/           # Incident playbooks
+│   └── project-05-production-ml-capstone/
+│       ├── terraform/          # VPC + EKS + RDS + IAM (dev/staging/prod)
+│       ├── kubernetes/         # Kustomize base + overlays
+│       ├── security/           # cert-manager + Vault
+│       ├── velero/             # Cluster backup
+│       ├── monitoring/         # SLOs
+│       ├── cicd/               # GitHub Actions
+│       └── docs/               # Deployment + DR plan
 ├── assessments/                # Quizzes & exams
 │   ├── quizzes/                # Module quizzes
 │   ├── practical-exams/        # Hands-on assessments
 │   └── rubrics/                # Grading criteria
 ├── resources/                  # Additional resources
-│   ├── cheat-sheets/           # Quick references
-│   ├── reading-lists/          # Recommended reading
+│   ├── cheat-sheets/           # Python, Linux, SQL, Git, Docker, K8s, Prometheus
+│   ├── reading-lists/          # Beginner, Intermediate, Advanced paths
 │   └── tools.md                # Tool recommendations
 ├── progress/                   # Track your learning
 │   ├── overall-progress.md     # Overall tracker
@@ -353,6 +393,6 @@ Begin with [Module 001: Python Fundamentals](lessons/mod-001-python-fundamentals
 
 **Questions?** Open an issue or join our community discussions!
 
-**Last Updated:** October 2025
-**Version:** 1.0.0
+**Last Updated:** May 2026
+**Version:** 1.1.0
 **Maintained by:** AI Infrastructure Curriculum Team

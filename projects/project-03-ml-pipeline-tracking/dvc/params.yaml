@@ -1,0 +1,27 @@
+# Centralized hyperparameters and tunable settings for the DVC pipeline.
+# Edit values here, then `dvc repro` re-runs only the stages that depend on them.
+ingest:
+  source_uri: "s3://example-bucket/raw/transactions.csv"
+  sample_fraction: 1.0
+
+preprocess:
+  fillna_strategy: median
+  train_test_split: 0.2
+  random_seed: 42
+
+train:
+  algorithm: gradient_boosting
+  random_seed: 42
+  hyperparameters:
+    learning_rate: 0.05
+    n_estimators: 400
+    max_depth: 6
+    min_samples_leaf: 50
+    subsample: 0.8
+
+evaluate:
+  primary_metric: roc_auc
+  thresholds:
+    roc_auc_min: 0.85
+    precision_min: 0.80
+    recall_min: 0.70

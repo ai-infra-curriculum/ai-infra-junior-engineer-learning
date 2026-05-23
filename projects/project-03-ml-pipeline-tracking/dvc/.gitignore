@@ -1,0 +1,3 @@
+# DVC-tracked artifacts (managed by DVC, not Git)
+/data
+/models

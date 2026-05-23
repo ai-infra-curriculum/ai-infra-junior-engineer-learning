@@ -216,6 +216,12 @@ outputs/
 # GCP
 *.json
 !**/example.json
+# Allow legitimate JSON content (dashboards, ML pipeline configs, etc.)
+!**/grafana/**/*.json
+!**/dashboards/**/*.json
+!**/great_expectations/**/*.json
+!**/expectations/**/*.json
+!**/checkpoints/**/*.json
 .gcp/
 gcp-credentials.json
 service-account.json

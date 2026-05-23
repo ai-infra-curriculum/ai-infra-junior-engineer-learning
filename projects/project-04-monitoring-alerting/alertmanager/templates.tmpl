@@ -1,0 +1,29 @@
+{{/* Slack title with status emoji and brief context */}}
+{{ define "slack.title" }}
+  {{- if eq .Status "firing" -}}:fire:{{- else -}}:white_check_mark:{{- end }}
+  [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}]
+  {{ .CommonLabels.alertname }} on {{ .CommonLabels.service }} ({{ .CommonLabels.cluster }})
+{{ end }}
+
+{{/* Slack body with summary, description, runbook, dashboard */}}
+{{ define "slack.text" }}
+{{ range .Alerts }}
+*Summary:* {{ .Annotations.summary }}
+*Description:* {{ .Annotations.description }}
+*Severity:* {{ .Labels.severity }}
+*Service:* {{ .Labels.service }}
+*Started:* {{ .StartsAt.Format "2006-01-02 15:04:05 MST" }}
+{{ if .Annotations.runbook_url }}*Runbook:* {{ .Annotations.runbook_url }}{{ end }}
+{{ if .Annotations.dashboard_url }}*Dashboard:* {{ .Annotations.dashboard_url }}{{ end }}
+{{ end }}
+{{ end }}
+
+{{/* PagerDuty description — first 1024 chars used as incident title */}}
+{{ define "pagerduty.description" }}
+{{ .CommonLabels.alertname }} on {{ .CommonLabels.service }} ({{ .CommonLabels.cluster }})
+{{ end }}
+
+{{ define "pagerduty.firing" }}
+{{ range .Alerts.Firing }}{{ .Annotations.summary }}
+{{ end }}
+{{ end }}

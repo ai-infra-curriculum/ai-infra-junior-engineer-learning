@@ -1,0 +1,82 @@
+# DVC pipeline for Project 03
+#
+# This file defines the stages that make up the end-to-end ML pipeline.
+# Each stage declares its command, its input dependencies, its outputs,
+# its parameters, and its metrics. DVC builds the DAG from these
+# declarations and re-runs only the stages whose dependencies have
+# changed.
+#
+# Run a stage:
+#   dvc repro ingest
+#
+# Run the whole pipeline:
+#   dvc repro
+#
+# Visualize:
+#   dvc dag
+stages:
+  ingest:
+    cmd: python -m src.data_ingestion --output data/raw
+    deps:
+      - src/data_ingestion.py
+    params:
+      - ingest.source_uri
+      - ingest.sample_fraction
+    outs:
+      - data/raw
+
+  preprocess:
+    cmd: python -m src.preprocessing --input data/raw --output data/processed
+    deps:
+      - data/raw
+      - src/preprocessing.py
+    params:
+      - preprocess.fillna_strategy
+      - preprocess.train_test_split
+      - preprocess.random_seed
+    outs:
+      - data/processed/train.parquet
+      - data/processed/test.parquet
+      - data/processed/feature_schema.json
+
+  validate:
+    cmd: python -m great_expectations.cli.cli checkpoint run training_data_checkpoint
+    deps:
+      - data/processed/train.parquet
+      - great_expectations/expectations
+      - great_expectations/checkpoints
+    metrics:
+      - data/processed/validation_report.json:
+          cache: false
+
+  train:
+    cmd: python -m src.training --train data/processed/train.parquet --output models/current
+    deps:
+      - data/processed/train.parquet
+      - src/training.py
+    params:
+      - train.algorithm
+      - train.hyperparameters
+      - train.random_seed
+    outs:
+      - models/current/model.pkl
+    metrics:
+      - models/current/training_metrics.json:
+          cache: false
+
+  evaluate:
+    cmd: python -m src.evaluation --model models/current/model.pkl --test data/processed/test.parquet --output models/current/evaluation.json
+    deps:
+      - models/current/model.pkl
+      - data/processed/test.parquet
+      - src/evaluation.py
+    metrics:
+      - models/current/evaluation.json:
+          cache: false
+    plots:
+      - models/current/roc_curve.json:
+          cache: false
+          x: fpr
+          y: tpr
+      - models/current/confusion_matrix.json:
+          cache: false

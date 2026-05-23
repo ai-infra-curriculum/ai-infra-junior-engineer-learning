@@ -1,0 +1,110 @@
+## Default values for model-api.
+## Override per environment with -f values-prod.yaml or --set.
+
+replicaCount: 2
+
+image:
+  repository: model-api
+  tag: "1.0.0"
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8000
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+  hosts:
+    - host: model-api.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 512Mi
+  limits:
+    cpu: "1"
+    memory: 1Gi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+env:
+  LOG_LEVEL: "INFO"
+  MODEL_PATH: "/models/current"
+  WORKERS: "4"
+
+envFromSecret: ""   # name of an existing Secret with extra env vars
+
+config:
+  ## Mounted as a ConfigMap and made available at /etc/model-api/config.yaml
+  serving:
+    batchSize: 32
+    timeoutSeconds: 30
+
+probes:
+  liveness:
+    path: /health
+    initialDelaySeconds: 30
+    periodSeconds: 10
+  readiness:
+    path: /ready
+    initialDelaySeconds: 10
+    periodSeconds: 5
+
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "8000"
+  prometheus.io/path: "/metrics"
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+serviceMonitor:
+  enabled: true
+  interval: 30s
+  scrapeTimeout: 10s
+
+modelStorage:
+  ## Where the model files live. Options: pvc | s3 | gcs | initContainer
+  type: pvc
+  pvc:
+    name: model-storage
+    size: 10Gi
+    storageClass: standard
+    accessMode: ReadOnlyMany

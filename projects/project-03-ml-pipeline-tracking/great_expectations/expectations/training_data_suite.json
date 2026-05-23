@@ -1,0 +1,89 @@
+{
+  "data_asset_type": null,
+  "expectation_suite_name": "training_data_suite",
+  "expectations": [
+    {
+      "expectation_type": "expect_table_row_count_to_be_between",
+      "kwargs": {"min_value": 1000, "max_value": 10000000},
+      "meta": {"notes": "Minimum row count guards against empty extracts; max guards against runaway joins."}
+    },
+    {
+      "expectation_type": "expect_table_columns_to_match_set",
+      "kwargs": {
+        "column_set": [
+          "transaction_id",
+          "user_id",
+          "amount",
+          "currency",
+          "merchant_category",
+          "country",
+          "hour_of_day",
+          "day_of_week",
+          "is_weekend",
+          "label"
+        ],
+        "exact_match": true
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {"column": "transaction_id"}
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_unique",
+      "kwargs": {"column": "transaction_id"}
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {"column": "label"}
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_in_set",
+      "kwargs": {"column": "label", "value_set": [0, 1]}
+    },
+    {
+      "expectation_type": "expect_column_value_lengths_to_be_between",
+      "kwargs": {"column": "currency", "min_value": 3, "max_value": 3}
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_between",
+      "kwargs": {"column": "amount", "min_value": 0, "max_value": 1000000, "mostly": 0.999}
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_between",
+      "kwargs": {"column": "hour_of_day", "min_value": 0, "max_value": 23}
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_between",
+      "kwargs": {"column": "day_of_week", "min_value": 0, "max_value": 6}
+    },
+    {
+      "expectation_type": "expect_column_proportion_of_unique_values_to_be_between",
+      "kwargs": {"column": "user_id", "min_value": 0.01, "max_value": 1.0},
+      "meta": {"notes": "Catch joined-too-broadly bug where every row is the same user."}
+    },
+    {
+      "expectation_type": "expect_column_mean_to_be_between",
+      "kwargs": {"column": "label", "min_value": 0.001, "max_value": 0.5},
+      "meta": {"notes": "Class balance sanity check — fraud rate should be small but non-zero."}
+    },
+    {
+      "expectation_type": "expect_column_kl_divergence_to_be_less_than",
+      "kwargs": {
+        "column": "amount",
+        "partition_object": null,
+        "threshold": 0.5,
+        "internal_weight_holdout": 0.01
+      },
+      "meta": {"notes": "Detects training-data drift vs baseline distribution. Populate partition_object from prior baseline."}
+    }
+  ],
+  "ge_cloud_id": null,
+  "meta": {
+    "great_expectations_version": "0.18.0",
+    "notes": {
+      "format": "markdown",
+      "content": "Expectation suite for the fraud-detection training dataset used by Project 03. Updates require review — these are quality gates that block training when violated."
+    }
+  }
+}
