@@ -2497,4 +2497,4 @@ You've completed Exercise 05 and mastered database performance optimization! You
 
 ---
 
-**Exercise 05 Complete** | [Return to Module 008 Overview](../README.md) | Next: [Module 009: Monitoring & Logging](../../mod-009-monitoring-logging/README.md)
+**Exercise 05 Complete** | [Return to Module 008 Overview](../README.md) | Next: [Module 009: Monitoring Basics](../../mod-009-monitoring-basics/README.md)
