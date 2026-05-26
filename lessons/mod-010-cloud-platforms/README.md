@@ -622,7 +622,6 @@ Cloud expertise requires extensive hands-on practice. Expect to spend significan
 
 ## Lecture Outline
 
-> **Note:** Full lecture materials are currently in development. Placeholder files are available in the `lecture-notes/` directory. Complete lecture notes will be added in upcoming updates.
 
 ### Lecture 1: Cloud Computing Fundamentals (90 min)
 - Introduction to cloud computing
@@ -706,7 +705,6 @@ Cloud expertise requires extensive hands-on practice. Expect to spend significan
 
 ## Hands-On Exercises
 
-> **Note:** Detailed exercise instructions are being developed. Placeholder files are available in the `exercises/` directory. Complete exercises will be added in upcoming updates.
 
 ### Exercise Categories
 

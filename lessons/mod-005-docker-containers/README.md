@@ -395,7 +395,6 @@ Container mastery requires hands-on practice. Expect to spend time experimenting
 
 ## Lecture Outline
 
-> **Note:** Full lecture materials are currently in development. Placeholder files are available in the `lecture-notes/` directory. Complete lecture notes will be added in upcoming updates.
 
 ### Lecture 1: Introduction to Containers and Docker (90 min)
 - Containerization concepts
@@ -463,7 +462,6 @@ Container mastery requires hands-on practice. Expect to spend time experimenting
 
 ## Hands-On Exercises
 
-> **Note:** Detailed exercise instructions are being developed. Placeholder files are available in the `exercises/` directory. Complete exercises will be added in upcoming updates.
 
 ### Exercise Categories
 

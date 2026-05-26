@@ -536,7 +536,6 @@ Monitoring mastery requires hands-on experience. Expect to spend time setting up
 
 ## Lecture Outline
 
-> **Note:** Full lecture materials are currently in development. Placeholder files are available in the `lecture-notes/` directory. Complete lecture notes will be added in upcoming updates.
 
 ### Lecture 1: Observability Fundamentals (90 min)
 - Introduction to observability
@@ -604,7 +603,6 @@ Monitoring mastery requires hands-on experience. Expect to spend time setting up
 
 ## Hands-On Exercises
 
-> **Note:** Detailed exercise instructions are being developed. Placeholder files are available in the `exercises/` directory. Complete exercises will be added in upcoming updates.
 
 ### Exercise Categories
 

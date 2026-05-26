@@ -473,7 +473,6 @@ Database skills develop through practice. Expect to spend time designing schemas
 
 ## Lecture Outline
 
-> **Note:** Full lecture materials are currently in development. Placeholder files are available in the `lecture-notes/` directory. Complete lecture notes will be added in upcoming updates.
 
 ### Lecture 1: Database Fundamentals (90 min)
 - Database concepts
@@ -541,7 +540,6 @@ Database skills develop through practice. Expect to spend time designing schemas
 
 ## Hands-On Exercises
 
-> **Note:** Detailed exercise instructions are being developed. Placeholder files are available in the `exercises/` directory. Complete exercises will be added in upcoming updates.
 
 ### Exercise Categories
 

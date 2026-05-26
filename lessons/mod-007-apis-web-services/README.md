@@ -482,7 +482,6 @@ API development requires practice building, testing, and refining endpoints. Exp
 
 ## Lecture Outline
 
-> **Note:** Full lecture materials are currently in development. Placeholder files are available in the `lecture-notes/` directory. Complete lecture notes will be added in upcoming updates.
 
 ### Lecture 1: HTTP and REST Fundamentals (90 min)
 - HTTP protocol overview
@@ -550,7 +549,6 @@ API development requires practice building, testing, and refining endpoints. Exp
 
 ## Hands-On Exercises
 
-> **Note:** Detailed exercise instructions are being developed. Placeholder files are available in the `exercises/` directory. Complete exercises will be added in upcoming updates.
 
 ### Exercise Categories
 
