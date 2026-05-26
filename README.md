@@ -344,10 +344,8 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ### Community Resources
 
-- **Study Groups:** Join or create study groups
-- **Office Hours:** Weekly virtual office hours (TBD)
-- **Discord Server:** Join our Discord for real-time chat (link TBD)
-- **LinkedIn Group:** Network with fellow learners (link TBD)
+- **Study Groups:** Join or create one via [GitHub Discussions](https://github.com/ai-infra-curriculum/ai-infra-junior-engineer-learning/discussions).
+- **Primary discussion channels:** GitHub Discussions and Issues are the supported channels today. Dedicated chat/office-hours slots are not currently scheduled — open a Discussion if you'd like to coordinate one with other learners.
 
 ## 📜 License
 
