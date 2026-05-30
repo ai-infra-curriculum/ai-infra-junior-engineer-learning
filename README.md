@@ -393,8 +393,6 @@ Begin with [Module 001: Python Fundamentals](lessons/mod-001-python-fundamentals
 
 **Last Updated:** May 2026
 **Version:** 1.1.0
-**Maintained by:** AI Infrastructure Curriculum Team
-
 
 ---
 
