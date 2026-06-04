@@ -36,7 +36,7 @@ A curated reading list for aspiring Junior AI Infrastructure Engineers, organize
    - Time: 2-3 weeks
    - Chapters 1-11 essential
    - Hands-on projects included
-   - [Available on Amazon](https://nostarch.com/pythoncrashcourse2e)
+   - [Available from No Starch Press](https://nostarch.com/python-crash-course-3rd-edition) — 3rd edition (latest)
 
 2. **"Automate the Boring Stuff with Python" by Al Sweigart** (Beginner)
    - Time: 2 weeks
@@ -91,9 +91,9 @@ A curated reading list for aspiring Junior AI Infrastructure Engineers, organize
    - Visual, interactive
    - Complete main and remote sections
 
-2. **GitHub Learning Lab** - FREE
-   - Link: https://lab.github.com/
-   - Hands-on exercises
+2. **GitHub Skills** - FREE — successor to GitHub Learning Lab (which shut down 2022)
+   - Link: https://skills.github.com/
+   - Hands-on exercises in real repos
 
 #### Books
 1. **"Pro Git" by Scott Chacon and Ben Straub** (Free)
@@ -116,7 +116,7 @@ A curated reading list for aspiring Junior AI Infrastructure Engineers, organize
 1. **Docker for Beginners** by KodeKloud - FREE/Paid
    - Duration: 4 hours
    - Hands-on labs included
-   - Link: https://kodekloud.com/courses/docker-for-the-absolute-beginner/
+   - Link: https://kodekloud.com/courses/docker-training-course-for-the-absolute-beginner/
 
 2. **Docker Tutorial for Beginners** by TechWorld with Nana - FREE
    - Duration: 3 hours
@@ -200,18 +200,18 @@ A curated reading list for aspiring Junior AI Infrastructure Engineers, organize
 #### Libraries to Learn
 1. **NumPy**
    - [Official Tutorial](https://numpy.org/doc/stable/user/quickstart.html)
-   - [NumPy for Machine Learning](https://machinelearningmastery.com/numpy-tutorials/)
+   - [NumPy User Guide — quickstart](https://numpy.org/doc/stable/user/quickstart.html)
 
 2. **Pandas**
    - [10 Minutes to Pandas](https://pandas.pydata.org/docs/user_guide/10min.html)
    - Practice with Kaggle datasets
 
 3. **Scikit-learn**
-   - [Official Tutorials](https://scikit-learn.org/stable/tutorial/index.html)
+   - [Official Tutorials](https://scikit-learn.org/stable/tutorial/)
    - Work through classification and regression examples
 
 #### Practice
-- [Kaggle Learn](https://www.kaggle.com/learn) - FREE
+- [Kaggle Learn courses](https://www.kaggle.com/learn/overview) - FREE
   - Python, Pandas, ML courses
   - Interactive notebooks
 - Complete 3 Kaggle "Getting Started" competitions
@@ -226,7 +226,7 @@ A curated reading list for aspiring Junior AI Infrastructure Engineers, organize
 1. **Kubernetes for Beginners** by KodeKloud - FREE/Paid
    - Duration: 6 hours
    - Hands-on labs
-   - Link: https://kodekloud.com/courses/kubernetes-for-the-absolute-beginners/
+   - Link: https://kodekloud.com/courses/kubernetes-for-the-absolute-beginner/
 
 2. **Kubernetes Tutorial for Beginners** by TechWorld with Nana - FREE
    - Duration: 4 hours
@@ -243,7 +243,7 @@ A curated reading list for aspiring Junior AI Infrastructure Engineers, organize
    - Regular updates
 
 #### Interactive Learning
-- [Katacoda Kubernetes Scenarios](https://www.katacoda.com/courses/kubernetes) - FREE
+- [Killercoda Kubernetes Scenarios](https://killercoda.com/playgrounds/scenario/kubernetes) - FREE (successor to Katacoda)
 - [Play with Kubernetes](https://labs.play-with-k8s.com/) - FREE
 
 #### Practice
@@ -277,7 +277,7 @@ A curated reading list for aspiring Junior AI Infrastructure Engineers, organize
 
 #### Courses
 1. **Prometheus Monitoring Tutorial** - FREE
-   - DevOpsCube guide: https://devopscube.com/prometheus-complete-tutorial/
+   - Prometheus getting-started guide: https://prometheus.io/docs/prometheus/latest/getting_started/
    - Step-by-step setup
 
 2. **Grafana Fundamentals** - FREE
@@ -383,7 +383,7 @@ Build these progressively:
    - [Dockerfile Best Practices](https://docs.docker.com/develop/develop-images/dockerfile_best-practices/)
 
 2. **Kubernetes Patterns**
-   - [Kubernetes Patterns](https://www.redhat.com/en/resources/oreilly-kubernetes-patterns-scalable-apps-ebook)
+   - [Kubernetes Patterns (2nd ed., O'Reilly)](https://www.oreilly.com/library/view/kubernetes-patterns-2nd/9781098131678/) — Ibryam & Huss
    - [12-Factor App](https://12factor.net/)
 
 3. **MLOps**

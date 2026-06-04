@@ -95,7 +95,7 @@ Curated resources for deepening your knowledge:
 - [Kubernetes Tutorials](https://kubernetes.io/docs/tutorials/)
 
 **Interactive Learning**:
-- [Katacoda Kubernetes Scenarios](https://www.katacoda.com/courses/kubernetes)
+- [Killercoda Kubernetes Scenarios](https://killercoda.com/playgrounds/scenario/kubernetes) — successor to Katacoda after O'Reilly shut it down in 2022
 - [Play with Kubernetes](https://labs.play-with-k8s.com/)
 
 **Books**:
@@ -141,7 +141,7 @@ Curated resources for deepening your knowledge:
 - [ELK Stack Guide](https://www.elastic.co/guide/index.html)
 
 **Tutorials**:
-- [Prometheus Monitoring Complete Guide](https://devopscube.com/prometheus-complete-tutorial/)
+- [Prometheus Getting Started](https://prometheus.io/docs/prometheus/latest/getting_started/) — first-party intro from the project
 - [Grafana Fundamentals](https://grafana.com/tutorials/grafana-fundamentals/)
 
 ### Databases
@@ -174,8 +174,8 @@ Curated resources for deepening your knowledge:
 
 ### Coding Practice
 - [LeetCode](https://leetcode.com/) - Algorithm practice
-- [HackerRank](https://www.hackerrank.com/) - Python, SQL, and more
-- [Exercism](https://exercism.io/) - Programming practice with mentorship
+- [HackerRank Domains](https://www.hackerrank.com/domains) - Python, SQL, and more
+- [Exercism](https://exercism.org/) - Programming practice with mentorship
 
 ### Infrastructure Practice
 - [Kubernetes the Hard Way](https://github.com/kelseyhightower/kubernetes-the-hard-way)
@@ -184,7 +184,7 @@ Curated resources for deepening your knowledge:
 - [Play with Docker](https://labs.play-with-docker.com/)
 
 ### ML Practice
-- [Kaggle](https://www.kaggle.com/) - Data science competitions and datasets
+- [Kaggle Competitions](https://www.kaggle.com/competitions) - Data science competitions and datasets
 - [Papers with Code](https://paperswithcode.com/) - ML papers with implementations
 - [Hugging Face](https://huggingface.co/) - Pre-trained models and datasets
 
@@ -206,7 +206,7 @@ Curated resources for deepening your knowledge:
 
 ### Conferences and Meetups
 - [KubeCon + CloudNativeCon](https://www.cncf.io/kubecon-cloudnativecon-events/)
-- [DockerCon](https://www.docker.com/dockercon/)
+- [DockerCon](https://www.docker.com/events/) — annual; URL updates per event
 - [MLOps World](https://mlopsworld.com/)
 - [Local meetup groups on Meetup.com](https://www.meetup.com/)
 
@@ -258,7 +258,7 @@ Curated resources for deepening your knowledge:
 
 ### Machine Learning
 - [Sentdex](https://www.youtube.com/c/sentdex)
-- [Two Minute Papers](https://www.youtube.com/c/KárolyZsolnai)
+- [Two Minute Papers](https://www.youtube.com/@TwoMinutePapers)
 - [Yannic Kilcher](https://www.youtube.com/c/YannicKilcher)
 
 ---
