@@ -113,19 +113,19 @@ ML: Here are 10,000 cat images and 10,000 dog images.
 
 ### What ML Is Good For
 
-✅ **Pattern recognition** - Identifying cats in images, detecting fraud
-✅ **Prediction** - Stock prices, equipment failure, customer churn
-✅ **Classification** - Spam detection, sentiment analysis, disease diagnosis
-✅ **Generation** - Text generation (GPT), image generation (DALL-E)
-✅ **Complex decision-making** - Game playing (AlphaGo), robotics
+✅ **Pattern recognition** - Identifying cats in images, detecting fraud  
+✅ **Prediction** - Stock prices, equipment failure, customer churn  
+✅ **Classification** - Spam detection, sentiment analysis, disease diagnosis  
+✅ **Generation** - Text generation (GPT), image generation (DALL-E)  
+✅ **Complex decision-making** - Game playing (AlphaGo), robotics  
 
 ### What ML Is NOT Good For
 
-❌ **Exact calculations** - Use traditional programming (2 + 2 = 4)
-❌ **Guaranteed correctness** - ML is probabilistic, not deterministic
-❌ **Explaining decisions** - Many models are "black boxes"
-❌ **Tasks without data** - ML needs examples to learn from
-❌ **Simple rule-based logic** - Don't use ML when `if/else` suffices
+❌ **Exact calculations** - Use traditional programming (2 + 2 = 4)  
+❌ **Guaranteed correctness** - ML is probabilistic, not deterministic  
+❌ **Explaining decisions** - Many models are "black boxes"  
+❌ **Tasks without data** - ML needs examples to learn from  
+❌ **Simple rule-based logic** - Don't use ML when `if/else` suffices  
 
 ---
 
