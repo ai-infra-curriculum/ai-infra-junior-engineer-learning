@@ -69,7 +69,7 @@ git config --list --show-origin
 ```
 
 **Expected Output:**
-```
+```text
 file:/home/user/.gitconfig    user.name=Your Name
 file:/home/user/.gitconfig    user.email=your.email@example.com
 ```
@@ -98,7 +98,7 @@ ls -la
 ```
 
 **Expected Output:**
-```
+```text
 Initialized empty Git repository in /path/to/ml-inference-api/.git/
 ```
 
@@ -207,7 +207,7 @@ tree -L 2
 ```
 
 **Expected Structure:**
-```
+```text
 ml-inference-api/
 ├── .env.example
 ├── .gitattributes
@@ -397,7 +397,7 @@ Configure file handling for ML projects.
 
 Create `.gitattributes` with this content:
 
-```
+```gitattributes
 # Auto detect text files and perform LF normalization
 * text=auto
 
@@ -587,7 +587,7 @@ Create dependency file for the project.
 
 Edit `requirements.txt`:
 
-```
+```text
 # Web Framework
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
@@ -614,7 +614,7 @@ httpx==0.25.1
 
 Edit `requirements-dev.txt`:
 
-```
+```text
 -r requirements.txt
 
 # Testing
@@ -778,7 +778,7 @@ git diff --staged
 ```
 
 **Expected Output:**
-```
+```text
 On branch main
 
 No commits yet
@@ -831,7 +831,7 @@ git show --stat
 ```
 
 **Expected Output:**
-```
+```text
 [main (root-commit) abc123] Initial project structure
  25 files changed, 350 insertions(+)
  create mode 100644 .env.example
@@ -1093,7 +1093,7 @@ git log --oneline
 ```
 
 **Expected Output:**
-```
+```text
 abc123 Add FastAPI app and image classifier
 def456 Initial project structure
 ```
@@ -1277,7 +1277,7 @@ git log --oneline
 ```
 
 **Expected Output:**
-```
+```text
 ghi789 Add structured logging configuration
 abc123 Add image preprocessing module
 def456 Add FastAPI app and image classifier

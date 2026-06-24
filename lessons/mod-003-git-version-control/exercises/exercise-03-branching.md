@@ -77,7 +77,7 @@ git log --oneline -1
 ```
 
 **Expected Output:**
-```
+```text
 * main
 ```
 
@@ -122,7 +122,7 @@ git branch -v
 ```
 
 **Expected Output:**
-```
+```text
 * feature/model-caching
   feature/batch-inference
   main
@@ -957,7 +957,7 @@ git branch
 ```
 
 **Expected Output:**
-```
+```text
 Deleted branch feature/update-readme (was abc123).
 ```
 
@@ -977,7 +977,7 @@ git branch -d feature/batch-inference
 ```
 
 **Expected Output:**
-```
+```text
 error: The branch 'feature/batch-inference' is not fully merged.
 If you are sure you want to delete it, run 'git branch -D feature/batch-inference'.
 ```
