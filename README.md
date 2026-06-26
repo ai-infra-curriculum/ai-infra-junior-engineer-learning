@@ -4,6 +4,10 @@
 > 🎓 Part of the free, open-source **AI Career Curriculum** ecosystem — [Infrastructure](https://github.com/ai-infra-curriculum) · [ML Engineering](https://github.com/ml-engineering-curriculum) · [AI Engineering](https://github.com/ai-engineering-curriculum) · [Governance](https://github.com/ai-governance-curriculum). Live cohorts &amp; team programs: **[ai-infra-curriculum.github.io](https://ai-infra-curriculum.github.io/)**.
 <!-- /aicg:site-banner -->
 
+<!-- aicg:sponsor -->
+> 💜 **[Sponsor this curriculum](https://github.com/sponsors/AI-Infra-Curriculum)** — sponsorships keep the whole open-source AI Career Curriculum free and moving.
+<!-- /aicg:sponsor -->
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GitHub Issues](https://img.shields.io/github/issues/ai-infra-curriculum/ai-infra-junior-engineer-learning)](https://github.com/ai-infra-curriculum/ai-infra-junior-engineer-learning/issues)
 [![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.md)
