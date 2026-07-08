@@ -447,3 +447,4 @@ yarn-error.log*
 # If you need to track large files, use Git LFS
 # Install: git lfs install
 # Track: git lfs track "*.psd"
+.aicg/
