@@ -241,6 +241,7 @@ Curated resources for deepening your knowledge:
 - [KubeWeekly](https://www.cncf.io/kubeweekly/)
 - [Docker Weekly](https://www.docker.com/newsletter-subscription)
 - [The Batch (Andrew Ng)](https://www.deeplearning.ai/the-batch/)
+- [AI Weekly](https://aiweekly.co/) - Discover what AI experts are reading and sharing right now
 - [MLOps.community Newsletter](https://mlops.community/)
 
 ---
