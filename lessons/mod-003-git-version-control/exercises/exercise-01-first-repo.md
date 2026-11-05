@@ -1579,6 +1579,94 @@ git commit
 
 ---
 
+## Troubleshooting
+
+**Issue**: `*** Please tell me who you are.` when running `git commit`
+```bash
+# Cause: user.name and user.email were never configured.
+# Solution: set them before committing (see Task 1.1).
+git config --global user.name "Your Name"
+git config --global user.email "your.email@example.com"
+
+# To attach the correct identity to a commit you just made with the wrong one,
+# re-run commit --amend after fixing the config:
+git commit --amend --reset-author --no-edit
+```
+
+**Issue**: `fatal: not a git repository (or any of the parent directories): .git`
+```bash
+# Cause: you're outside the project directory, or git init was never run.
+pwd                         # Confirm you're inside ml-inference-api
+ls -la | grep .git          # Should list a .git directory
+# If missing, re-run:
+git init
+```
+
+**Issue**: `hint: Using 'master' as the name for the initial branch.`
+```bash
+# Cause: init.defaultBranch was not set before git init.
+# Rename the existing branch in place:
+git branch -m master main
+
+# And set the default for future repos:
+git config --global init.defaultBranch main
+```
+
+**Issue**: A file in `.gitignore` still shows up in `git status`
+```bash
+# Cause: the file was committed before it was added to .gitignore.
+# .gitignore only applies to UNTRACKED files.
+# Solution: untrack it (keeping the working copy), then commit.
+git rm --cached path/to/file
+git commit -m "Stop tracking file now covered by .gitignore"
+```
+
+**Issue**: `warning: LF will be replaced by CRLF` (or vice versa) on `git add`
+```bash
+# Cause: core.autocrlf is interacting with the .gitattributes rules.
+# On Linux/macOS, use 'input' so Git stores LF but doesn't rewrite checkouts:
+git config core.autocrlf input
+
+# On Windows, 'true' converts to CRLF on checkout and back to LF on commit:
+# git config core.autocrlf true
+
+# .gitattributes rules like "* text=auto" take precedence and are the
+# recommended way to normalize line endings across the team.
+```
+
+**Issue**: `git commit` opens an editor you don't know how to exit
+```bash
+# Default editor is vi/vim. To write and quit:
+#   press Esc, then type :wq and press Enter
+# To abandon the commit:
+#   press Esc, then type :q! and press Enter
+
+# To switch to a friendlier default:
+git config --global core.editor "nano"      # or "code --wait" for VS Code
+```
+
+**Issue**: Accidentally ran `git init` in your home directory
+```bash
+# Cause: forgot to `cd ml-inference-api` first. Now your whole home
+# directory is a repo.
+# Solution: remove the stray .git directory. Make sure you are in $HOME
+# and that there is no work you want to keep in it.
+pwd                         # Must show /home/<you>, NOT the project dir
+rm -rf .git                 # Deletes only the repo metadata, not your files
+```
+
+**Issue**: `git status` shows thousands of untracked files from `venv/` or `__pycache__/`
+```bash
+# Cause: the virtual environment or build artifacts were created before
+# .gitignore existed, or the patterns don't match your directory names.
+# Solution: confirm the patterns are in .gitignore, then verify with:
+git check-ignore -v venv/
+git check-ignore -v src/__pycache__/some.pyc
+# Output names the .gitignore line that matched. No output = not ignored.
+```
+
+---
+
 ## Reflection Questions
 
 Answer these questions to solidify your understanding:
