@@ -1328,43 +1328,155 @@ chmod +x scripts/branch-report.sh
 
 ## Troubleshooting
 
-**Issue**: "Cannot switch branch, uncommitted changes"
+**Issue**: `error: Your local changes to the following files would be overwritten by checkout`
 ```bash
-# Solution 1: Commit changes
+# Cause: you have uncommitted edits to a file that also differs on the target
+# branch, so switching would silently lose your work. Git refuses by design.
+# Solution 1: commit the work on the current branch
 git add .
-git commit -m "wip: save work"
+git commit -m "wip: save work before switching branches"
 
-# Solution 2: Stash changes
-git stash
+# Solution 2: stash the work and reapply it after switching
+git stash push -m "WIP before switching branches"
+git switch target-branch
+# ...later, back on the original branch:
+git stash pop
 
-# Solution 3: Force switch (loses changes!)
-# git switch -f branch-name  # ⚠️ DANGEROUS
+# Solution 3: discard the local changes (destructive — only if you don't want them)
+# git restore .            # ⚠️  permanently drops unstaged edits
+# git switch -f target     # ⚠️  --force / --discard-changes
 ```
 
-**Issue**: "Deleted wrong branch"
+**Issue**: `fatal: A branch named 'feature/x' already exists.`
 ```bash
-# If you just deleted it:
-git reflog
-git branch branch-name <commit-hash>
+# Cause: you ran `git branch feature/x` or `git switch -c feature/x` but a
+# branch by that name is already in the repo (common after aborted work).
+# Inspect it before overwriting:
+git branch -v | grep feature/x
+git log --oneline feature/x
+
+# If it's safe to drop, delete first, then create:
+git branch -d feature/x        # or -D if it has unmerged commits you want to lose
+git switch -c feature/x
+
+# If you want to keep both, pick a distinct name:
+git switch -c feature/x-v2
+```
+
+**Issue**: `You are in 'detached HEAD' state.`
+```bash
+# Cause: you checked out a commit directly (e.g. `git checkout <sha>` or
+# `git switch --detach`) instead of a branch. New commits here are NOT on any
+# branch and will be garbage-collected once HEAD moves away.
+# Solution: capture the current commit on a real branch BEFORE switching.
+git switch -c rescue/detached-work
+# Now the commits you made are safely on `rescue/detached-work` and you can
+# merge, rebase, or discard them like any other branch.
+```
+
+**Issue**: `error: Cannot delete branch 'feature/x' checked out at '/path/to/repo'`
+```bash
+# Cause: you can't delete the branch you're currently on.
+# Solution: switch away first, then delete.
+git switch main
+git branch -d feature/x
+```
+
+**Issue**: `error: The branch 'feature/x' is not fully merged.`
+```bash
+# Cause: `git branch -d` only deletes branches whose commits are reachable
+# from another branch. The commits on feature/x would become unreachable.
+# Safe path: confirm the work is preserved somewhere first.
+git log --oneline main..feature/x      # Commits that would be lost
+
+# If the work is already merged under a different name (e.g. a squash-merge
+# from a PR), or you genuinely want to discard it, force-delete:
+git branch -D feature/x                # ⚠️  commits become unreachable
+
+# Recovery window: deleted commits linger in the reflog for ~90 days by default.
+```
+
+**Issue**: Deleted the wrong branch and want it back
+```bash
+# Cause: you ran `git branch -D` on a branch whose tip wasn't merged anywhere
+# else. The branch name is gone, but the commit is still in the reflog.
+# Find the last commit the branch pointed at:
+git reflog | grep feature/x            # Look for the sha before deletion
+
+# Recreate the branch at that commit:
+git branch feature/x <commit-sha>
+
+# Works as long as `gc.reflogExpireUnreachable` hasn't expired the entry
+# (90 days by default per the git-reflog manual).
 ```
 
 **Issue**: "Don't know which branch I'm on"
 ```bash
-git branch  # Shows * on current
-git status  # Shows "On branch X"
-echo $(__git_ps1)  # If configured
+git branch                 # Current branch is marked with *
+git status                 # First line: "On branch <name>"
+git branch --show-current  # Prints just the name, scripting-friendly
+```
+
+**Issue**: `git: 'switch' is not a git command.`
+```bash
+# Cause: `git switch` and `git restore` were introduced in Git 2.23 (2019).
+# Older systems may not have them.
+git --version                           # Check your version
+# Fallback to the older commands:
+git checkout feature/x                  # same as: git switch feature/x
+git checkout -b feature/x               # same as: git switch -c feature/x
+# Upgrading Git (via your package manager) is the better long-term fix.
+```
+
+**Issue**: `git branch -a` still lists remote branches that were deleted on the server
+```bash
+# Cause: remote-tracking refs (origin/feature/x) are cached locally and
+# don't update until you prune them.
+git fetch --prune                       # Removes stale remotes/origin/* refs
+# Or configure automatic pruning on every fetch:
+git config --global fetch.prune true
+```
+
+**Issue**: Created a branch from the wrong base (e.g. from `feature/x` instead of `main`)
+```bash
+# Cause: `git switch -c new-branch` branches from HEAD, so if you were on the
+# wrong branch, your new branch inherits its commits.
+# Fix before adding new commits: move the branch to the correct base.
+git switch wrong-base-branch
+git branch -f new-branch main          # Reset new-branch to point at main
+git switch new-branch
+
+# If you've already committed, rebase the new work onto main:
+git switch new-branch
+git rebase --onto main wrong-base-branch
 ```
 
 ---
 
 ## Reflection Questions
 
+Answer these to solidify your understanding:
+
 1. **Why use feature branches instead of committing to main?**
+   - What goes wrong if two engineers push half-finished features to `main` on the same day?
+
 2. **When should you create a branch vs. committing to main?**
+   - Is a one-line typo fix worth its own branch? What about a config tweak that ships to production?
+
 3. **What's the purpose of experiment branches?**
+   - What signal does the `experiment/` prefix send to a reviewer skimming `git branch -a`?
+
 4. **How do branches help with code review?**
+   - What would reviewing a pull request look like if everyone committed directly to `main`?
+
 5. **What's the difference between `-d` and `-D` when deleting branches?**
+   - Which one does Git use to protect you, and from what specific loss?
+
 6. **How do you handle switching branches with uncommitted work?**
+   - Compare committing a WIP, stashing, and force-switching. When is each the right choice?
+
+7. **Why does `git log --oneline` on a feature branch not show the feature branch's commits on `main`?**
+   - (Hint: think about what a branch *is* — a pointer, not a container.)
 
 ---
 
