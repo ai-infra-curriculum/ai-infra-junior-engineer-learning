@@ -2,7 +2,7 @@
 
 AI Infrastructure Curriculum · Level 10 · [learning](https://github.com/ai-infra-curriculum/ai-infra-junior-engineer-learning) · [solutions](https://github.com/ai-infra-curriculum/ai-infra-junior-engineer-solutions)
 
-_Generated 2026-11-03 by `aicg org completeness`._
+_Generated 2026-11-08 by `aicg org completeness`._
 
 **Overall: 100%**
 
@@ -17,7 +17,7 @@ _Generated 2026-11-03 by `aicg org completeness`._
 |---|---|---|---|---|---|---|
 | `mod-001-python-fundamentals` | ✅ Complete | 36,775 | 5 | 7 | — | 7/7 |
 | `mod-002-linux-essentials` | ✅ Complete | 71,624 | 9 | 8 | — | 8/8 |
-| `mod-003-git-version-control` | ✅ Complete | 53,029 | 5 | 8 | — | 8/8 |
+| `mod-003-git-version-control` | ✅ Complete | 54,388 | 5 | 8 | — | 8/8 |
 | `mod-004-ml-basics` | ✅ Complete | 33,195 | 4 | 5 | — | 5/5 |
 | `mod-005-docker-containers` | ✅ Complete | 45,014 | 6 | 8 | — | 8/8 |
 | `mod-006-kubernetes-intro` | ✅ Complete | 41,623 | 4 | 7 | — | 7/7 |
