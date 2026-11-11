@@ -1222,6 +1222,184 @@ git log --oneline
 
 ---
 
+### Task 7.2: Branch from a Specific Commit (Model Version Branches)
+
+ML teams often need to keep an exact, rebuildable snapshot of a shipped model
+so that production bug reports can be reproduced and hotfixes can be shipped
+against the deployed version — not whatever happens to be on `main` today. The
+usual pattern is a branch per released model version, created from the commit
+that was actually trained and deployed.
+
+**Instructions:**
+
+```bash
+# Start on a clean main
+git switch main
+git status
+
+# `git branch <new-name> <start-point>` points the new branch at any ref:
+# a commit SHA, a tag, HEAD, HEAD~N, another branch name. The current
+# branch does NOT move — you're just placing a new label.
+
+# Capture the current HEAD so you can refer back to it
+git rev-parse HEAD
+
+# Pretend the HEAD commit on main was trained and shipped as v1.0.0:
+git branch model/v1.0.0 HEAD
+
+# Pretend an earlier model shipped three commits back:
+git branch model/v0.9.0 HEAD~3
+
+# List the branches you just created, with their tip commits
+git branch -v
+
+# Confirm each branch points at the expected commit
+git log --oneline -1 model/v1.0.0
+git log --oneline -1 model/v0.9.0
+
+# Notice: you're still on main. Creating a branch does not switch to it.
+git branch --show-current
+```
+
+**Why this matters:**
+
+When "Model v0.9 is misclassifying red lights" arrives from production, you
+need the exact code, config, and preprocessing that shipped — not what's on
+`main` today. A model version branch pins all three to a single commit, and
+you can switch to it like any other branch to reproduce and patch:
+
+```bash
+git switch model/v0.9.0
+# Reproduce the bug against the exact code that shipped.
+# Create a hotfix branch from here (not from main) so the fix lands on
+# the shipped version, not on current development:
+git switch -c hotfix/v0.9.0-red-light-fix
+```
+
+Tags do a similar job for immutable release markers; branches are what you
+want when you also need to commit onto the version (e.g. for hotfixes).
+
+**Checkpoint:**
+
+- Does `model/v1.0.0` point at the same commit as `main` right now? Why?
+- Predict what `git log main..model/v0.9.0` prints before running it. Then run
+  it and explain the result in terms of what commits are "on" each branch.
+
+---
+
+### Task 7.3: Toggle Between Branches with `git switch -`
+
+As you context-switch between a feature branch and `main` — to review a PR,
+grab a reference, run a hotfix — typing the full branch name every time gets
+old. Git 2.23+ supports `git switch -`, which returns you to the previous
+branch, exactly like `cd -` in the shell.
+
+**Instructions:**
+
+```bash
+# Start somewhere known
+git switch main
+
+# Jump to a feature branch
+git switch feature/batch-inference
+
+# `-` means "the branch you were on before this one"
+git switch -
+# You're back on main
+
+# Toggle again
+git switch -
+# Back on feature/batch-inference
+
+# The shortcut keeps working across longer trips, too:
+git switch main
+git switch feature/model-caching
+git switch -                 # → main
+git switch -                 # → feature/model-caching
+```
+
+**How Git tracks "the previous branch":**
+
+Every branch switch is recorded in `HEAD`'s reflog. The dash resolves to
+`@{-1}` — the branch you were on one checkout ago. You can reach further back
+with explicit syntax when you need to:
+
+```bash
+git switch @{-1}      # Same as git switch -
+git switch @{-2}      # Two checkouts ago
+```
+
+**Checkpoint:**
+
+```bash
+# See the switches recorded as HEAD moves:
+git reflog | head -5
+```
+
+Each line shows a `HEAD@{N}: checkout: moving from <A> to <B>` entry. That is
+exactly the data `git switch @{-N}` indexes into.
+
+---
+
+### Task 7.4: Find Which Branches Contain a Commit
+
+When a bug report lands with a specific commit SHA, or when you're deciding
+whether a fix still needs to be backported, you need to answer: "Which
+branches contain this commit? Which don't?" `git branch --contains` and its
+inverse `--no-contains` answer both.
+
+**Instructions:**
+
+```bash
+# Pick a commit to investigate
+git log --oneline feature/batch-inference
+# Copy a SHA from the output — e.g. the commit that added the batch service
+
+# Which branches contain that commit?
+git branch --contains <commit-sha>
+
+# Which branches do NOT contain it?
+git branch --no-contains <commit-sha>
+
+# The flag also accepts any ref, not just raw SHAs
+git branch --contains HEAD
+git branch --contains main
+
+# Related: which branches are fully merged into main, and which aren't?
+git branch --merged main
+git branch --no-merged main
+```
+
+**Why this matters:**
+
+- **Bug triage.** "Does the fix in `abc123` need backporting to `model/v0.9.0`?"
+  Run `git branch --contains abc123`. If the model branch isn't listed, the
+  fix isn't there yet.
+- **Release readiness.** Before cutting a release, `git branch --merged main`
+  lists every branch whose work has made it in; `--no-merged main` lists the
+  stragglers.
+- **Safe cleanup.** `git branch --no-contains main` surfaces branches whose
+  tip commit isn't reachable from `main` — the branches whose deletion would
+  actually lose work. Delete freely from the `--merged` list, not from this
+  one.
+
+**Checkpoint:**
+
+A short triage drill using a commit from your feature branch:
+
+```bash
+# 1. Pick a commit from feature/batch-inference
+git log --oneline feature/batch-inference
+
+# 2. Confirm main does NOT contain it (the feature hasn't merged)
+git branch --contains <commit-sha>
+
+# 3. Confirm the feature branch does
+git branch --contains <commit-sha> | grep feature/batch-inference
+```
+
+---
+
 ## Validation
 
 ### Validate Your Branch Work
@@ -1496,17 +1674,22 @@ Congratulations! You've completed Exercise 03. You learned:
 ### Key Commands
 
 ```bash
-git branch                    # List branches
-git branch <name>             # Create branch
-git switch <name>             # Switch branch
-git switch -c <name>          # Create and switch
-git branch -d <name>          # Delete merged branch
-git branch -D <name>          # Force delete branch
-git branch -m <new-name>      # Rename branch
-git branch -v                 # List with commits
-git log --graph --all         # Visualize branches
-git diff branch1 branch2      # Compare branches
-git stash                     # Save uncommitted work
+git branch                       # List branches
+git branch <name>                # Create branch at HEAD
+git branch <name> <start-point>  # Create branch at a specific commit/ref
+git switch <name>                # Switch branch
+git switch -c <name>             # Create and switch
+git switch -                     # Switch to previous branch
+git branch -d <name>             # Delete merged branch
+git branch -D <name>             # Force delete branch
+git branch -m <new-name>         # Rename branch
+git branch -v                    # List with commits
+git branch --contains <commit>   # Branches that include a commit
+git branch --no-contains <commit> # Branches that don't
+git branch --merged <base>       # Branches fully merged into base
+git log --graph --all            # Visualize branches
+git diff branch1 branch2         # Compare branches
+git stash                        # Save uncommitted work
 ```
 
 ### Next Steps
