@@ -1469,6 +1469,137 @@ git diff --staged
 git commit -m "Add models endpoint test to testing script"
 ```
 
+**Checkpoint Questions:**
+- What does `git diff` show when nothing is staged?
+- What does `git diff --staged` (also written as `git diff --cached`) show?
+
+---
+
+### Task 6.2: Compare Commits
+
+`git diff` isn't just for pending changes. You can point it at any two commits
+to see what changed between them — useful when preparing to open a pull request
+or reviewing what a teammate pushed.
+
+**Instructions:**
+
+```bash
+# Diff between the two most recent commits
+git diff HEAD~1 HEAD
+
+# Diff between HEAD and three commits back
+git diff HEAD~3 HEAD
+
+# Diff between two commits by hash (get hashes from `git log --oneline`)
+git log --oneline
+git diff <older-hash> <newer-hash>
+
+# Two-dot range form (same meaning as above)
+git diff <older-hash>..<newer-hash>
+```
+
+**How to read the direction of the diff:**
+
+```text
+git diff A B
+```
+
+reads as "what would you have to change in A to get B". Lines marked `-` are in
+A but not B; lines marked `+` are in B but not A. Swapping the arguments flips
+every `+` and `-`.
+
+**Checkpoint:**
+
+```bash
+# What changed since you created the test script?
+git log --oneline
+# Find the commit hash for "Add API testing script" and compare to HEAD:
+git diff <that-hash> HEAD
+```
+
+---
+
+### Task 6.3: Scope a Diff to a File or Directory
+
+On a real project, a diff across all files is too noisy to read. The `--` path
+separator tells Git to limit the diff to specific files or directories.
+
+**Instructions:**
+
+```bash
+# Diff a single file in the working tree
+git diff -- scripts/test_api.sh
+
+# Diff a single file between two commits
+git diff HEAD~1 HEAD -- scripts/test_api.sh
+
+# Diff an entire directory
+git diff HEAD~2 HEAD -- src/
+
+# Diff multiple paths
+git diff HEAD~1 HEAD -- src/api/ src/models/
+```
+
+**Why the `--` matters:**
+
+Without `--`, Git has to guess whether `scripts/test_api.sh` is a path or a
+revision. The `--` is unambiguous: everything after it is a path. Get in the
+habit of writing it even when it's not strictly required — it avoids
+hard-to-debug errors when a filename happens to look like a branch or tag.
+
+**Checkpoint:**
+
+```bash
+# Show only the changes to your testing script, ignoring everything else
+git log --oneline -- scripts/test_api.sh
+git diff HEAD~1 HEAD -- scripts/test_api.sh
+```
+
+---
+
+### Task 6.4: Summarize Instead of Showing Every Line
+
+For large diffs, you usually want a summary first — which files moved, how
+much, and whether anything unexpected got pulled in — before you zoom in on
+line-by-line changes.
+
+**Instructions:**
+
+```bash
+# List only the file names that changed
+git diff HEAD~3 HEAD --name-only
+
+# List file names with change status (A=added, M=modified, D=deleted)
+git diff HEAD~3 HEAD --name-status
+
+# Compact per-file insertion/deletion counts
+git diff HEAD~3 HEAD --stat
+
+# Full numeric stats (machine-parseable: additions, deletions, path)
+git diff HEAD~3 HEAD --numstat
+
+# Overview of the whole history
+git log --stat --oneline
+```
+
+**When to reach for each form:**
+
+- `--name-only` — "which files does this touch?" Fast sanity check.
+- `--name-status` — same, but catches accidental file deletions or renames.
+- `--stat` — a visual bar chart; the right view for a pull request summary.
+- `--numstat` — scripts and tooling; parses cleanly.
+
+**Checkpoint:**
+
+```bash
+# How many lines did each commit add or remove so far?
+git log --stat --oneline
+
+# Which files changed since your first commit?
+git log --oneline
+git diff <first-commit-hash> HEAD --name-status
+```
+
 ---
 
 ## Validation and Testing
@@ -1720,6 +1851,9 @@ git log                     # View history
 git show                    # Show commit details
 git diff                    # View unstaged changes
 git diff --staged           # View staged changes
+git diff HEAD~1 HEAD        # Compare two commits
+git diff <a> <b> -- <path>  # Scope a diff to a file or directory
+git diff --stat             # Summarize a diff by file
 git restore                 # Discard or unstage changes
 ```
 
