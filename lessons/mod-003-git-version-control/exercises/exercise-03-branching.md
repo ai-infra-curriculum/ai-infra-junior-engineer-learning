@@ -1400,6 +1400,97 @@ git branch --contains <commit-sha> | grep feature/batch-inference
 
 ---
 
+### Task 7.5: Move Commits to the Right Branch (Forgot to Branch First)
+
+The single most common branching mistake is the forgotten-branch mistake: you
+sit down to add "a quick thing," commit directly to `main`, and only on the
+second or third commit realise the work belongs on a feature branch. There is
+a clean two-command fix that uses only pieces you already know — `git branch
+<name>` from Task 7.2 to capture the current position, and `git reset --hard`
+from Exercise 02 to rewind the branch pointer you committed to.
+
+**Set up the mistake on purpose:**
+
+Use a sacrificial branch so the real `main` in your exercise repo stays put.
+
+```bash
+git switch main
+git switch -c demo/forgot-to-branch
+
+# Pretend this branch is `main`. Make two commits that should have gone
+# on a feature branch for a new metrics module.
+mkdir -p src/metrics
+cat > src/metrics/drift.py << 'EOF'
+"""Drift detection for inference features (WIP)."""
+EOF
+git add src/metrics/drift.py
+git commit -m "feat(metrics): sketch drift detection module"
+
+cat > src/metrics/calibrate.py << 'EOF'
+"""Calibration helper for classifier outputs (WIP)."""
+EOF
+git add src/metrics/calibrate.py
+git commit -m "feat(metrics): add calibration helper"
+
+# Here is the realisation moment: these two commits were supposed to
+# land on feature/custom-metrics, not on the "main" you're pretending
+# this branch is.
+git log --oneline -3
+```
+
+**Fix in three steps:**
+
+```bash
+# 1. Point a new branch at the current commit. Your two commits are now
+#    reachable from feature/custom-metrics — the work is safe.
+git branch feature/custom-metrics
+
+# 2. Rewind the branch you committed to back to where it started.
+#    demo/forgot-to-branch had no commits of its own, so HEAD~2 is the
+#    commit you started from.
+git reset --hard HEAD~2
+
+# 3. Switch to the branch that now holds the commits.
+git switch feature/custom-metrics
+git log --oneline -3
+```
+
+After step 3, the two commits live on `feature/custom-metrics` and
+`demo/forgot-to-branch` is back to the commit it was created from.
+
+**Why the order matters:**
+
+`git branch feature/custom-metrics` creates a new branch at the *current*
+HEAD and does not move HEAD — exactly the behaviour you confirmed in Task 7.2.
+That pins the two commits to a name before you rewind the branch you are on.
+If you reversed the order — ran `git reset --hard HEAD~2` first — the commits
+would no longer be reachable from any branch, and recovering them would mean
+reading SHAs out of the reflog (see the Troubleshooting section below).
+
+Keeping work reachable from *some* named ref is Git's general safety rule.
+Create the rescue branch first, rewind second.
+
+**Cleanup:**
+
+```bash
+git switch main
+# demo/forgot-to-branch is back to the same commit as main — safe to delete
+# with -d because its tip is reachable from main.
+git branch -d demo/forgot-to-branch
+# Keep feature/custom-metrics if you want the practice work, or drop it:
+# git branch -D feature/custom-metrics
+```
+
+**Checkpoint:**
+
+- After step 1, run `git branch --show-current`. Did creating
+  `feature/custom-metrics` move HEAD? Why not?
+- Predict in writing what would happen if you reversed steps 1 and 2 —
+  `git reset --hard HEAD~2` before `git branch feature/custom-metrics`.
+  Where would the two commits live? How would you get them back?
+
+---
+
 ## Validation
 
 ### Validate Your Branch Work
