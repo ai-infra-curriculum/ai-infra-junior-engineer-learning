@@ -1697,16 +1697,102 @@ Fixes #1"
 
 ### Challenge 3: Write Better Commit Messages
 
-Practice writing detailed commit messages:
+Short `-m "..."` messages are fine for trivial edits, but anything a reviewer
+or future-you might need to understand later deserves a proper subject line
+and body. This challenge walks through writing one end-to-end.
+
+**Step 1: Make a meaningful change**
+
+Add a `setup.cfg` that configures the linters the project already depends on
+(`flake8` and `mypy` from `requirements-dev.txt`). This is a realistic change,
+not a one-liner, so there's something substantive to describe.
 
 ```bash
-# Make a change
-echo "strict = true" >> setup.cfg
+cat > setup.cfg << 'EOF'
+[flake8]
+max-line-length = 100
+extend-ignore = E203, W503
+exclude = .git,__pycache__,venv,build,dist
+
+[mypy]
+python_version = 3.11
+strict = true
+ignore_missing_imports = true
+
+[mypy-torch.*]
+ignore_missing_imports = true
+EOF
 
 git add setup.cfg
-git commit
-# Editor opens - write a detailed message following the format from lecture
 ```
+
+**Step 2: Open the editor instead of using `-m`**
+
+```bash
+git commit
+```
+
+Git opens whichever editor you configured earlier (vim by default, or whatever
+you set via `core.editor`). Write the message inside the editor — no `-m`.
+
+**Step 3: Follow the seven rules from Lecture 01**
+
+1. Separate subject from body with a blank line
+2. Limit the subject line to 50 characters
+3. Capitalize the subject line
+4. Do not end the subject line with a period
+5. Use the imperative mood in the subject ("Add", not "Added" or "Adds")
+6. Wrap the body at 72 characters per line
+7. Use the body to explain **what** and **why**, not **how**
+
+**Example of a good message for this commit:**
+
+```text
+Add linter and type-checker configuration
+
+Project already depends on flake8 and mypy via requirements-dev.txt
+but ships no configuration for either, so every contributor gets a
+different set of warnings depending on their tool defaults.
+
+Why:
+- Lock in a 100-char line length so flake8 and Black agree
+- Enable mypy strict mode so new code must carry type hints
+- Silence the "missing imports" noise from PyTorch internals
+
+How to verify:
+- flake8 src/ runs without unexpected errors
+- mypy src/ reports only genuine type issues
+```
+
+**Step 4: Inspect what you wrote**
+
+```bash
+# Show the commit you just made
+git log -1
+
+# Check the subject-line length (aim for 50 or fewer characters)
+git log -1 --pretty=%s | wc -c
+
+# Flag any body lines over 72 characters
+git log -1 --pretty=%b | awk 'length($0) > 72 { print NR": "length($0)" chars: "$0 }'
+```
+
+The first command prints your commit. The second prints the subject length
+(the count includes a trailing newline, so you'll see one more than the
+character count). The third prints any body lines longer than 72 characters —
+ideally it prints nothing.
+
+**If you don't like what you wrote**, run `git commit --amend` to reopen the
+editor on the last commit and rewrite the message in place. Exercise 02 goes
+deeper on amending and rewriting history.
+
+**Checkpoint:**
+
+- Does your subject line survive the 50-character check?
+- Does your body answer "why was this change necessary?" rather than
+  "what did I type?"
+- Could a teammate reading this commit six months from now understand the
+  motivation without reading the diff?
 
 ---
 
