@@ -766,6 +766,98 @@ git log --oneline main..feature/batch-inference
 
 ---
 
+### Task 3.3: `..` vs `...` — Asymmetric and Symmetric Ranges
+
+Every command you ran in Task 3.1 used the two-dot form (`main..feature/...`).
+Git also accepts a three-dot form, and the two mean genuinely different things.
+Worse, the difference is **not the same** for `git log` and `git diff` — the
+same syntax, different semantics. This is one of the top sources of "wait, why
+does GitHub show fewer changes than my local diff?" confusion.
+
+**The two forms, plainly:**
+
+For `git log` (and anything that walks commits like `git rev-list`):
+
+- `A..B` — commits reachable from `B` but not from `A`. One-sided.
+- `A...B` — commits reachable from `A` or `B` but not both. The **symmetric
+  difference** — useful when two branches have both moved since they diverged.
+
+For `git diff`:
+
+- `git diff A B` (or `git diff A..B`) — the diff from the tip of `A` to the
+  tip of `B`. Includes everything that happened on `A` after the branches
+  diverged, inverted.
+- `git diff A...B` — the diff from the **merge-base** of `A` and `B` to the
+  tip of `B`. Shows only what `B` has added since it branched off, ignoring
+  anything that landed on `A` in the meantime. This is what GitHub's PR
+  "Files changed" tab shows.
+
+**Instructions:**
+
+```bash
+# Start on main for predictable output
+git switch main
+
+# Make sure both sides of the comparison have moved since the branches
+# diverged — put a commit on main first so three-dot has something to hide.
+cat >> README.md << 'EOF'
+
+<!-- note added on main after branches diverged -->
+EOF
+git add README.md
+git commit -m "docs: tiny note on main (for range-syntax demo)"
+
+# --- git log: one-sided vs symmetric ---
+
+# One-sided: commits on feature/batch-inference not yet on main
+git log --oneline main..feature/batch-inference
+
+# One-sided the other way: commits on main not on feature/batch-inference
+# (this is the commit you just made)
+git log --oneline feature/batch-inference..main
+
+# Symmetric: commits on either side but not both, marked with < and >
+# < = left side (main) only, > = right side (feature/batch-inference) only
+git log --oneline --left-right main...feature/batch-inference
+
+# --- git diff: tip-to-tip vs merge-base-to-tip ---
+
+# Tip-to-tip: everything that differs between the two branches, including
+# commits on main that aren't on the feature branch (inverted in the diff)
+git diff --stat main feature/batch-inference
+
+# Merge-base-to-tip: only what the feature branch has added since it
+# branched off. GitHub's PR view uses this form.
+git diff --stat main...feature/batch-inference
+
+# Confirm the merge-base that three-dot diff is anchored at:
+git merge-base main feature/batch-inference
+```
+
+**When to reach for which:**
+
+- Reviewing a PR locally the way GitHub shows it: `git diff main...feature/x`.
+- Asking "what have I added on this branch, independent of what main has done
+  since": `git diff main...feature/x` or `git log main..feature/x`.
+- Asking "what's different between these two branches as snapshots, both
+  directions included": `git diff main feature/x`.
+- Asking "which commits are unique to each side": `git log --left-right
+  --oneline main...feature/x`.
+
+**Checkpoint:**
+
+- After the demo commit on `main` above, how many commits does
+  `git log main..feature/batch-inference` show? How many does
+  `git log feature/batch-inference..main` show? Why aren't they equal?
+- Compare the file counts in `git diff --stat main feature/batch-inference`
+  against `git diff --stat main...feature/batch-inference`. Which number
+  matches what a reviewer would see on GitHub?
+
+> Full syntax reference: `git help gitrevisions` (search for "Dotted Range
+> Notations") and the "COMPARING BRANCHES" section of `git help diff`.
+
+---
+
 ## Part 4: Managing Multiple Features
 
 ### Task 4.1: Switch Between Branches
@@ -1491,6 +1583,83 @@ git branch -d demo/forgot-to-branch
 
 ---
 
+### Task 7.6: Grab One File From Another Branch Without Switching
+
+A full `git switch` swaps your whole working tree. Sometimes you only need
+one file: the production `configs/default.yaml` from `main` while you're
+mid-flight on a feature, a single `.py` module you already finished on
+another branch, or a reference copy of a file you want to compare side by
+side. Three Git commands do this without moving HEAD.
+
+**Instructions:**
+
+```bash
+# Set up a situation where another branch has a file you want.
+# You're going to be on feature/model-caching and pull just one file
+# from feature/batch-inference's tip.
+git switch feature/model-caching
+git status
+
+# --- Option A: view-only, no files touched ---
+# `git show <ref>:<path>` prints the file at that ref to stdout.
+# Great for a sanity check before you overwrite anything.
+git show feature/batch-inference:src/api/batch.py | head -20
+
+# --- Option B: copy the file into your working tree (Git 2.23+) ---
+# `git restore --source=<ref> -- <path>` writes the file from <ref>
+# into your working tree *without* switching branches. HEAD stays put.
+git restore --source=feature/batch-inference --staged --worktree -- src/api/batch.py
+
+# Confirm: you're still on feature/model-caching, but src/api/batch.py now
+# exists here too.
+git branch --show-current
+git status
+ls src/api/batch.py
+
+# --- Option C: the older equivalent (works on any Git version) ---
+# `git checkout <ref> -- <path>` does the same thing. Note the `--`
+# which tells Git "treat what follows as paths, not a branch name."
+# (Skip running this if you already ran Option B — it would be a no-op.)
+# git checkout feature/batch-inference -- src/api/batch.py
+
+# You now have an uncommitted file pulled from the other branch.
+# Commit it here, drop it, or edit it like any other change.
+
+# Clean up so this doesn't bleed into later tasks:
+git restore --staged --worktree -- src/api/batch.py 2>/dev/null || true
+rm -f src/api/batch.py
+```
+
+**Why this matters:**
+
+- **Reference without disruption.** `git show branch:path` is read-only. No
+  files on disk change, nothing to clean up. Perfect for "what did this look
+  like on main?" while you keep working.
+- **Targeted recovery.** If you only need one file that's on another branch —
+  not a whole merge — `git restore --source=...` scopes the operation to that
+  path and nothing else. No merge commit, no conflict resolution, no HEAD
+  movement.
+- **It stages, if you want.** `--staged --worktree` (as above) writes to both
+  the index and the working tree so `git status` sees it as staged. Drop
+  `--staged` to leave it unstaged; drop `--worktree` to only update the
+  index.
+
+The deprecation story: `git restore` and `git switch` were introduced in
+Git 2.23 (Aug 2019) to split the overloaded responsibilities of
+`git checkout`. `git checkout <ref> -- <path>` still works on every Git
+version and is what you'll see in older tutorials and Stack Overflow answers.
+
+**Checkpoint:**
+
+- Why didn't `git restore --source=feature/batch-inference -- src/api/batch.py`
+  change your current branch? (Hint: compare against `git switch
+  feature/batch-inference`, which does.)
+- What's the difference between `git show feature/batch-inference:src/api/batch.py`
+  and `git restore --source=feature/batch-inference -- src/api/batch.py`?
+  When would you reach for the first instead of the second?
+
+---
+
 ## Validation
 
 ### Validate Your Branch Work
@@ -1779,7 +1948,12 @@ git branch --contains <commit>   # Branches that include a commit
 git branch --no-contains <commit> # Branches that don't
 git branch --merged <base>       # Branches fully merged into base
 git log --graph --all            # Visualize branches
-git diff branch1 branch2         # Compare branches
+git diff branch1 branch2         # Compare branches (tip-to-tip)
+git diff branch1...branch2       # Compare from merge-base (matches GitHub PR)
+git log A..B                     # Commits on B not on A
+git log --left-right A...B       # Commits unique to each side, labelled
+git show <ref>:<path>            # View a file at another ref (no files touched)
+git restore --source=<ref> -- <path>  # Copy one file from another ref into worktree
 git stash                        # Save uncommitted work
 ```
 
