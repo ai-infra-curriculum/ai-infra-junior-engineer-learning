@@ -1602,7 +1602,7 @@ git diff <first-commit-hash> HEAD --name-status
 
 ---
 
-## Validation and Testing
+## Part 7: Validation and Testing
 
 ### Task 7.1: Verify Repository State
 
@@ -1637,6 +1637,81 @@ ls -la configs/
 - Multiple commits in history
 - Proper directory structure
 - `.gitignore` preventing unwanted files from being tracked
+
+---
+
+### Task 7.2: Audit What Git Is Actually Tracking
+
+`git status` only reports what changed since the last commit. It is not an
+inventory of the repository. To answer "what's in this repo right now, and is
+anything slipping past my `.gitignore`?" you need two other commands:
+`git ls-files` to enumerate what Git is tracking, and `git check-ignore` to
+debug why a specific file is (or isn't) ignored. For an ML project where an
+accidentally-committed 5 GB model file or a leaked `.env` is a career-level
+incident, this is the audit step that catches mistakes before `git push`.
+
+**Instructions:**
+
+```bash
+# From the previous task, you still have data/test.csv on disk.
+# Confirm Git is ignoring it:
+git status --ignored --short
+
+# List every file Git is currently tracking
+git ls-files
+
+# Count tracked files
+git ls-files | wc -l
+
+# Spot-check: are any model, data, or weight files tracked?
+# (They shouldn't be — your .gitignore covers these extensions.)
+git ls-files | grep -E '\.(pth|h5|pkl|onnx|csv|parquet)$' || echo "clean"
+
+# List files that are NOT tracked and NOT ignored
+# (i.e. new files you forgot to `git add`)
+git ls-files --others --exclude-standard
+```
+
+**Ask Git why a specific path is ignored:**
+
+```bash
+# Create a file that SHOULD be ignored
+mkdir -p models
+touch models/resnet50.pth
+
+# Ask Git which rule matched
+git check-ignore -v models/resnet50.pth
+# Expected: a line showing the source file, line number, and pattern
+# that matched (something like: .gitignore:<n>:*.pth models/resnet50.pth)
+
+# Try a path that is NOT ignored
+git check-ignore -v README.md
+# No output; exit code 1 — no rule matched.
+```
+
+The `-v` (verbose) flag prints the source (`.gitignore` or a parent
+`.gitignore`), the line number of the matching rule, and the pattern itself.
+When a `.gitignore` rule isn't behaving the way you expect, this is how you
+debug it without guessing.
+
+**Clean up the stray file before moving on:**
+
+```bash
+rm -rf models/resnet50.pth data/test.csv
+```
+
+**Checkpoint Questions:**
+
+- Does the `git ls-files | grep` command find any model or data files? If it
+  does, which `.gitignore` rule is missing?
+- Which file and line in `.gitignore` matches `data/test.csv`? Use
+  `git check-ignore -v` to find out.
+- What's the difference between `git status`, `git status --ignored`, and
+  `git ls-files --others --exclude-standard`? When would you reach for each?
+- If `git ls-files` listed a file you don't want tracked — say, a `.env` that
+  slipped in before `.gitignore` was written — how would you un-track it
+  without deleting the working copy? (Hint: see the Troubleshooting section
+  below.)
 
 ---
 
@@ -1941,6 +2016,9 @@ git diff HEAD~1 HEAD        # Compare two commits
 git diff <a> <b> -- <path>  # Scope a diff to a file or directory
 git diff --stat             # Summarize a diff by file
 git restore                 # Discard or unstage changes
+git ls-files                # List every file Git is tracking
+git check-ignore -v <path>  # Show which .gitignore rule matched a path
+git status --ignored        # Include ignored files in status output
 ```
 
 ### Next Steps
